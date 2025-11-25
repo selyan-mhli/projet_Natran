@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Émissions - Projet Natran CSR</title>
+    <link rel="icon" type="image/png"
+        href="https://upload.wikimedia.org/wikipedia/fr/thumb/3/36/Logo_NaTran.svg/langfr-560px-Logo_NaTran.svg.png">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <div class="app">
+
+        <!-- ============= SIDEBAR ============= -->
+        <aside class="sidebar">
+            <div class="logo">
+                <div class="logo-circle">CSR</div>
+                <div class="logo-text">
+                    <h1>CSR Pilot</h1>
+                    <span>Pyro-gazéification</span>
+                </div>
+            </div>
+
+            <nav class="side-nav">
+                <button class="side-nav-item" onclick="window.location.href='index.html'">Dashboard</button>
+                <button class="side-nav-item"
+                    onclick="window.location.href='pre-traitement.html'">Pré-traitement</button>
+                <button class="side-nav-item" onclick="window.location.href='reacteur.html'">Réacteur</button>
+                <button class="side-nav-item active">Émissions</button>
+                <button class="side-nav-item" onclick="window.location.href='rapports.html'">Rapports</button>
+                <button class="side-nav-item" onclick="window.location.href='fiches-csr.html'">Fiches CSR</button>
+            </nav>
+        </aside>
+
+        <!-- ============= MAIN ============= -->
+        <main class="main">
+
+            <!-- ======= TOPBAR ======= -->
+            <header class="topbar">
+                <div class="top-left">
+                    <div class="date-card">
+                        <span class="date-day">19</span>
+                        <div class="date-info">
+                            <span class="date-weekday">Mardi</span>
+                            <span class="date-month">Décembre</span>
+                        </div>
+                    </div>
+
+                    <button class="primary-btn" onclick="window.location.href='taches.html'">
+                        Voir mes tâches <span class="arrow">→</span>
+                    </button>
+                </div>
+
+                <div class="top-right">
+                    <div class="user">
+                        <img src="https://upload.wikimedia.org/wikipedia/fr/thumb/3/36/Logo_NaTran.svg/langfr-560px-Logo_NaTran.svg.png"
+                            alt="Logo Natran" class="user-avatar">
+                        <div>
+                            <div class="user-name">Selyan MOUHALI</div>
+                            <div class="user-role">Opérateur unité pilote</div>
+                        </div>
+                    </div>
+
+                    <div class="search-wrapper">
+                        <input type="text" class="search-input" placeholder="Rechercher...">
+                    </div>
+                </div>
+            </header>
+
+            <!-- ======= HERO ======= -->
+            <section class="hero">
+                <div>
+                    <h2>Émissions et impact environnemental 👋</h2>
+                    <p>Bonjour <strong id="hero-user-name">Selyan MOUHALI</strong>, suivez les émissions et l'impact
+                        environnemental de l'unité.</p>
+                </div>
+
+                <button class="icon-btn">🎙</button>
+            </section>
+
+            <!-- ============= GRID DASHBOARD ============= -->
+            <section class="grid">
+
+                <!-- -------- CARTE : ÉMISSIONS ATMOSPHÉRIQUES -------- -->
+                <article class="card card-large">
+                    <header class="card-header">
+                        <h3>Émissions atmosphériques</h3>
+                        <select class="card-select">
+                            <option>Aujourd'hui</option>
+                            <option>Cette semaine</option>
+                            <option>Ce mois</option>
+                        </select>
+                    </header>
+
+                    <div class="card-body">
+                        <div class="kpi-col">
+                            <div class="kpi-row">
+                                <span>CO₂</span>
+                                <strong>18.5 g/Nm³</strong>
+                            </div>
+                            <div class="kpi-row">
+                                <span>NOₓ</span>
+                                <strong>45 mg/Nm³</strong>
+                            </div>
+                            <div class="kpi-row">
+                                <span>SO₂</span>
+                                <strong>12 mg/Nm³</strong>
+                            </div>
+                            <div class="kpi-row">
+                                <span>Poussières</span>
+                                <strong>8 mg/Nm³</strong>
+                            </div>
+                            <div class="kpi-row">
+                                <span>CO</span>
+                                <strong>32 %</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <footer class="card-footer">
+                        <button class="ghost-btn">Voir historique</button>
+                        <button class="link-btn">Rapport détaillé →</button>
+                    </footer>
+                </article>
+
+                <!-- -------- CARTE : TRAITEMENT FUMÉES -------- -->
+                <article class="card">
+                    <header class="card-header">
+                        <h3>Traitement des fumées</h3>
+                        <span class="pill">Actif</span>
+                    </header>
+
+                    <div class="card-body">
+                        <div class="kpi-row big">
+                            <span>Efficacité traitement</span>
+                            <strong>98.5 %</strong>
+                        </div>
+                        <div class="kpi-row">
+                            <span>Filtre à particules</span>
+                            <strong>Opérationnel</strong>
+                        </div>
+                        <p class="small-text">Conforme aux normes</p>
+                    </div>
+                </article>
+
+                <!-- -------- CARTE : CO₂ ÉVITÉ -------- -->
+                <article class="card">
+                    <header class="card-header">
+                        <h3>CO₂ évité</h3>
+                    </header>
+
+                    <div class="card-body">
+                        <div class="kpi-row big">
+                            <span>Aujourd'hui</span>
+                            <strong>2.3 t</strong>
+                        </div>
+                        <div class="kpi-row">
+                            <span>Ce mois</span>
+                            <strong>68.5 t</strong>
+                        </div>
+                        <p class="small-text">Par rapport à l'incinération</p>
+                    </div>
+                </article>
+
+                <!-- -------- CARTE : CONFORMITÉ RÉGLEMENTAIRE -------- -->
+                <article class="card">
+                    <header class="card-header">
+                        <h3>Conformité réglementaire</h3>
+                    </header>
+
+                    <div class="card-body">
+                        <ul class="alarms">
+                            <li class="alarm ok"><span class="dot"></span> Normes respectées</li>
+                            <li class="alarm ok"><span class="dot"></span> Seuils réglementaires OK</li>
+                            <li class="alarm ok"><span class="dot"></span> Dernière inspection : OK</li>
+                        </ul>
+                    </div>
+                </article>
+
+                <!-- -------- CARTE : IMPACT ENVIRONNEMENTAL -------- -->
+                <article class="card card-wide">
+                    <header class="card-header">
+                        <h3>Impact environnemental global</h3>
+                    </header>
+
+                    <div class="card-body">
+                        <div class="kpi-row">
+                            <span>Énergie produite</span>
+                            <strong>12.5 MWh/j</strong>
+                        </div>
+                        <div class="kpi-row">
+                            <span>CSR traités</span>
+                            <strong>28.8 t/j</strong>
+                        </div>
+                        <div class="kpi-row">
+                            <span>Déchets évités</span>
+                            <strong>28.8 t/j</strong>
+                        </div>
+                        <p class="small-text">Estimations sur la base des relevés actuels</p>
+                    </div>
+                </article>
+
+                <!-- -------- CARTE : QUALITÉ AIR -------- -->
+                <article class="card">
+                    <header class="card-header">
+                        <h3>Qualité de l'air</h3>
+                    </header>
+
+                    <div class="card-body">
+                        <div class="kpi-row">
+                            <span>Indice qualité</span>
+                            <strong>Bon</strong>
+                        </div>
+                        <div class="kpi-row">
+                            <span>Dernière mesure</span>
+                            <strong>Il y a 5 min</strong>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- -------- CARTE : RÉSUMÉ ÉMISSIONS -------- -->
+                <article class="card">
+                    <header class="card-header">
+                        <h3>Résumé émissions</h3>
+                    </header>
+
+                    <div class="card-body">
+                        <div class="tags-col">
+                            <span class="tag good">CO₂ : Conforme</span>
+                            <span class="tag good">NOₓ : Conforme</span>
+                            <span class="tag good">SO₂ : Conforme</span>
+                            <span class="tag good">Poussières : Conforme</span>
+                        </div>
+                    </div>
+                </article>
+
+            </section>
+        </main>
+    </div>
+
+    <!-- Script JS -->
+    <script src="navigation.js"></script>
+
+</body>
+
+</html>

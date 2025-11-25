@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rapports - Projet Natran CSR</title>
+    <link rel="icon" type="image/png"
+        href="https://upload.wikimedia.org/wikipedia/fr/thumb/3/36/Logo_NaTran.svg/langfr-560px-Logo_NaTran.svg.png">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <div class="app">
+
+        <!-- ============= SIDEBAR ============= -->
+        <aside class="sidebar">
+            <div class="logo">
+                <div class="logo-circle">CSR</div>
+                <div class="logo-text">
+                    <h1>CSR Pilot</h1>
+                    <span>Pyro-gazéification</span>
+                </div>
+            </div>
+
+            <nav class="side-nav">
+                <button class="side-nav-item" onclick="window.location.href='index.html'">Dashboard</button>
+                <button class="side-nav-item"
+                    onclick="window.location.href='pre-traitement.html'">Pré-traitement</button>
+                <button class="side-nav-item" onclick="window.location.href='reacteur.html'">Réacteur</button>
+                <button class="side-nav-item" onclick="window.location.href='emissions.html'">Émissions</button>
+                <button class="side-nav-item active">Rapports</button>
+                <button class="side-nav-item" onclick="window.location.href='fiches-csr.html'">Fiches CSR</button>
+            </nav>
+        </aside>
+
+        <!-- ============= MAIN ============= -->
+        <main class="main">
+
+            <!-- ======= TOPBAR ======= -->
+            <header class="topbar">
+                <div class="top-left">
+                    <div class="date-card">
+                        <span class="date-day">19</span>
+                        <div class="date-info">
+                            <span class="date-weekday">Mardi</span>
+                            <span class="date-month">Décembre</span>
+                        </div>
+                    </div>
+
+                    <button class="primary-btn" onclick="window.location.href='taches.html'">
+                        Voir mes tâches <span class="arrow">→</span>
+                    </button>
+                </div>
+
+                <div class="top-right">
+                    <div class="user">
+                        <img src="https://upload.wikimedia.org/wikipedia/fr/thumb/3/36/Logo_NaTran.svg/langfr-560px-Logo_NaTran.svg.png"
+                            alt="Logo Natran" class="user-avatar">
+                        <div>
+                            <div class="user-name">Selyan MOUHALI</div>
+                            <div class="user-role">Opérateur unité pilote</div>
+                        </div>
+                    </div>
+
+                    <div class="search-wrapper">
+                        <input type="text" class="search-input" placeholder="Rechercher...">
+                    </div>
+                </div>
+            </header>
+
+            <!-- ======= HERO ======= -->
+            <section class="hero">
+                <div>
+                    <h2>Rapports et analyses 👋</h2>
+                    <p>Bonjour <strong id="hero-user-name">Selyan MOUHALI</strong>, consultez et générez vos rapports
+                        d'activité.</p>
+                </div>
+
+                <button class="icon-btn">🎙</button>
+            </section>
+
+            <!-- ============= GRID DASHBOARD ============= -->
+            <section class="grid">
+
+                <!-- -------- CARTE : RAPPORTS DISPONIBLES -------- -->
+                <article class="card card-large">
+                    <header class="card-header">
+                        <h3>Rapports disponibles</h3>
+                        <select class="card-select">
+                            <option>Tous les rapports</option>
+                            <option>Rapports quotidiens</option>
+                            <option>Rapports hebdomadaires</option>
+                            <option>Rapports mensuels</option>
+                        </select>
+                    </header>
+
+                    <div class="card-body">
+                        <ul class="notes-list" style="gap: 12px;">
+                            <li style="padding: 12px; background: #f7f7fb; border-radius: 8px;">
+                                <strong>Rapport quotidien - 19/12/2023</strong><br>
+                                <span class="small-text">Production, émissions, qualité CSR</span>
+                                <button class="ghost-btn" style="margin-top: 8px; width: 100%;">Télécharger</button>
+                            </li>
+                            <li style="padding: 12px; background: #f7f7fb; border-radius: 8px;">
+                                <strong>Rapport hebdomadaire - Semaine 50</strong><br>
+                                <span class="small-text">Synthèse des performances</span>
+                                <button class="ghost-btn" style="margin-top: 8px; width: 100%;">Télécharger</button>
+                            </li>
+                            <li style="padding: 12px; background: #f7f7fb; border-radius: 8px;">
+                                <strong>Rapport mensuel - Novembre 2023</strong><br>
+                                <span class="small-text">Analyse complète du mois</span>
+                                <button class="ghost-btn" style="margin-top: 8px; width: 100%;">Télécharger</button>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <footer class="card-footer">
+                        <button class="ghost-btn">Voir tous les rapports</button>
+                        <button class="link-btn">Générer nouveau rapport →</button>
+                    </footer>
+                </article>
+
+                <!-- -------- CARTE : STATISTIQUES GLOBALES -------- -->
+                <article class="card">
+                    <header class="card-header">
+                        <h3>Statistiques globales</h3>
+                        <select class="card-select">
+                            <option>Ce mois</option>
+                            <option>Ce trimestre</option>
+                            <option>Cette année</option>
+                        </select>
+                    </header>
+
+                    <div class="card-body">
+                        <div class="kpi-row">
+                            <span>CSR traités</span>
+                            <strong>865 t</strong>
+                        </div>
+                        <div class="kpi-row">
+                            <span>Énergie produite</span>
+                            <strong>375 MWh</strong>
+                        </div>
+                        <div class="kpi-row">
+                            <span>CO₂ évité</span>
+                            <strong>2056 t</strong>
+                        </div>
+                        <p class="small-text">Sur la période sélectionnée</p>
+                    </div>
+                </article>
+
+                <!-- -------- CARTE : PERFORMANCES -------- -->
+                <article class="card">
+                    <header class="card-header">
+                        <h3>Performances</h3>
+                    </header>
+
+                    <div class="card-body">
+                        <div class="kpi-row">
+                            <span>Disponibilité</span>
+                            <strong>96.2 %</strong>
+                        </div>
+                        <div class="kpi-row">
+                            <span>Rendement moyen</span>
+                            <strong>85.5 %</strong>
+                        </div>
+                        <div class="kpi-row">
+                            <span>Conformité émissions</span>
+                            <strong>100 %</strong>
+                        </div>
+                        <p class="small-text">Sur les 30 derniers jours</p>
+                    </div>
+                </article>
+
+                <!-- -------- CARTE : EXPORT DONNÉES -------- -->
+                <article class="card">
+                    <header class="card-header">
+                        <h3>Export de données</h3>
+                    </header>
+
+                    <div class="card-body">
+                        <div class="tags-col">
+                            <button class="ghost-btn" style="width: 100%; margin-bottom: 8px;">Export CSV</button>
+                            <button class="ghost-btn" style="width: 100%; margin-bottom: 8px;">Export Excel</button>
+                            <button class="ghost-btn" style="width: 100%;">Export PDF</button>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- -------- CARTE : RAPPORTS AUTOMATIQUES -------- -->
+                <article class="card card-wide">
+                    <header class="card-header">
+                        <h3>Rapports automatiques</h3>
+                    </header>
+
+                    <div class="card-body">
+                        <div class="kpi-row">
+                            <span>Rapport quotidien</span>
+                            <strong>Activé</strong>
+                        </div>
+                        <div class="kpi-row">
+                            <span>Rapport hebdomadaire</span>
+                            <strong>Activé</strong>
+                        </div>
+                        <div class="kpi-row">
+                            <span>Rapport mensuel</span>
+                            <strong>Activé</strong>
+                        </div>
+                        <p class="small-text">Génération automatique activée</p>
+                    </div>
+
+                    <footer class="card-footer">
+                        <button class="ghost-btn">Configurer</button>
+                    </footer>
+                </article>
+
+                <!-- -------- CARTE : ALERTES RAPPORTS -------- -->
+                <article class="card">
+                    <header class="card-header">
+                        <h3>Alertes rapports</h3>
+                    </header>
+
+                    <div class="card-body">
+                        <ul class="alarms">
+                            <li class="alarm ok"><span class="dot"></span> Tous les rapports à jour</li>
+                            <li class="alarm ok"><span class="dot"></span> Aucune anomalie détectée</li>
+                        </ul>
+                    </div>
+                </article>
+
+                <!-- -------- CARTE : HISTORIQUE -------- -->
+                <article class="card">
+                    <header class="card-header">
+                        <h3>Historique</h3>
+                    </header>
+
+                    <div class="card-body">
+                        <div class="kpi-row">
+                            <span>Rapports générés</span>
+                            <strong>156</strong>
+                        </div>
+                        <div class="kpi-row">
+                            <span>Dernier rapport</span>
+                            <strong>Aujourd'hui</strong>
+                        </div>
+                        <p class="small-text">Depuis le début</p>
+                    </div>
+                </article>
+
+            </section>
+        </main>
+    </div>
+
+    <!-- Script JS -->
+    <script src="navigation.js"></script>
+
+</body>
+
+</html>

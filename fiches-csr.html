@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fiches CSR - Projet Natran</title>
+    <link rel="icon" type="image/png"
+        href="https://upload.wikimedia.org/wikipedia/fr/thumb/3/36/Logo_NaTran.svg/langfr-560px-Logo_NaTran.svg.png">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <div class="app">
+
+        <!-- ============= SIDEBAR ============= -->
+        <aside class="sidebar">
+            <div class="logo">
+                <div class="logo-circle">CSR</div>
+                <div class="logo-text">
+                    <h1>CSR Pilot</h1>
+                    <span>Pyro-gazéification</span>
+                </div>
+            </div>
+
+            <nav class="side-nav">
+                <button class="side-nav-item" onclick="window.location.href='index.html'">Dashboard</button>
+                <button class="side-nav-item"
+                    onclick="window.location.href='pre-traitement.html'">Pré-traitement</button>
+                <button class="side-nav-item" onclick="window.location.href='reacteur.html'">Réacteur</button>
+                <button class="side-nav-item" onclick="window.location.href='emissions.html'">Émissions</button>
+                <button class="side-nav-item active" onclick="window.location.href='fiches-csr.html'">Fiches
+                    CSR</button>
+            </nav>
+        </aside>
+
+        <!-- ============= MAIN ============= -->
+        <main class="main">
+
+            <!-- ======= TOPBAR ======= -->
+            <header class="topbar">
+                <div class="top-left">
+                    <h2>Fiches d'identité Énergétique CSR</h2>
+                </div>
+
+                <div class="top-right">
+                    <div class="user">
+                        <img src="https://upload.wikimedia.org/wikipedia/fr/thumb/3/36/Logo_NaTran.svg/langfr-560px-Logo_NaTran.svg.png"
+                            alt="Logo Natran" class="user-avatar">
+                        <div>
+                            <div class="user-name">Selyan MOUHALI</div>
+                            <div class="user-role">Opérateur unité pilote</div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- ======= CONTENT ======= -->
+            <section class="grid" id="batches-grid">
+                <!-- Les cartes seront injectées ici par JS -->
+                <div class="card card-wide">
+                    <div class="card-body">
+                        <p>Chargement des fiches...</p>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <script>
+        // Navigation logic (simplified for this page)
+        document.querySelectorAll('.side-nav-item').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                // Handled by onclick in HTML for simplicity or navigation.js if included
+            });
+        });
+
+        // Fetch and display batches
+        async function fetchBatches() {
+            try {
+                const res = await fetch('/api/batches');
+                if (!res.ok) throw new Error('Erreur API');
+                const batches = await res.json();
+                renderBatches(batches);
+            } catch (err) {
+                console.error(err);
+                document.getElementById('batches-grid').innerHTML = '<p>Impossible de charger les fiches CSR.</p>';
+            }
+        }
+
+        function renderBatches(batches) {
+            const container = document.getElementById('batches-grid');
+            container.innerHTML = '';
+
+            if (batches.length === 0) {
+                container.innerHTML = '<p>Aucune fiche CSR disponible.</p>';
+                return;
+            }
+
+            batches.forEach(batch => {
+                const card = document.createElement('article');
+                card.className = 'card';
+
+                // Format pollutants
+                let pollutantsHtml = '';
+                for (const [key, val] of Object.entries(batch.pollutants)) {
+                    pollutantsHtml += `<span class="tag neutral">${key}: ${val}%</span>`;
+                }
+
+                card.innerHTML = `
+                <header class="card-header">
+                    <div>
+                        <h3>${batch.name || 'CSR Standard'}</h3>
+                        <span class="small-text">${batch.batch_ref}</span>
+                    </div>
+                    <span class="pill">${new Date(batch.created_at).toLocaleDateString()}</span>
+                </header>
+                <div class="card-body">
+                    <div class="kpi-row">
+                        <span>PCI</span>
+                        <strong>${batch.pci} MJ/kg</strong>
+                    </div>
+                    <div class="kpi-row">
+                        <span>Humidité</span>
+                        <strong>${batch.humidity}%</strong>
+                    </div>
+                    <div class="kpi-row">
+                        <span>Granulométrie</span>
+                        <strong>${batch.granulometry} mm</strong>
+                    </div>
+                    <hr style="border: 0; border-top: 1px solid #eee; margin: 8px 0;">
+                    <div class="syngas-grid" style="grid-template-columns: 1fr 1fr 1fr;">
+                        <div class="syngas-item">
+                            <span>C</span>
+                            <strong>${batch.carbon}%</strong>
+                        </div>
+                        <div class="syngas-item">
+                            <span>H</span>
+                            <strong>${batch.hydrogen}%</strong>
+                        </div>
+                        <div class="syngas-item">
+                            <span>O</span>
+                            <strong>${batch.oxygen}%</strong>
+                        </div>
+                    </div>
+                    <div class="tags-col" style="margin-top: 8px; flex-direction: row; flex-wrap: wrap;">
+                        ${pollutantsHtml}
+                    </div>
+                </div>
+            `;
+                container.appendChild(card);
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', fetchBatches);
+    </script>
+
+</body>
+
+</html>

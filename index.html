@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Projet Natran - CSR</title>
+    <link rel="icon" type="image/png"
+        href="https://upload.wikimedia.org/wikipedia/fr/thumb/3/36/Logo_NaTran.svg/langfr-560px-Logo_NaTran.svg.png">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+
+<body>
+
+    <div class="app">
+
+        <!-- ============= SIDEBAR ============= -->
+        <aside class="sidebar">
+            <div class="logo">
+                <div class="logo-circle">CSR</div>
+                <div class="logo-text">
+                    <h1>CSR Pilot</h1>
+                    <span>Pyro-gazéification</span>
+                </div>
+            </div>
+
+            <nav class="side-nav">
+                <button class="side-nav-item active">Dashboard</button>
+                <button class="side-nav-item"
+                    onclick="window.location.href='pre-traitement.html'">Pré-traitement</button>
+                <button class="side-nav-item" onclick="window.location.href='reacteur.html'">Réacteur</button>
+                <button class="side-nav-item" onclick="window.location.href='emissions.html'">Émissions</button>
+                <button class="side-nav-item" onclick="window.location.href='fiches-csr.html'">Fiches CSR</button>
+            </nav>
+        </aside>
+
+        <!-- ============= MAIN ============= -->
+        <main class="main">
+
+            <!-- ======= TOPBAR ======= -->
+            <header class="topbar">
+                <div class="top-left">
+                    <div class="date-card">
+                        <span class="date-day">19</span>
+                        <div class="date-info">
+                            <span class="date-weekday">Mardi</span>
+                            <span class="date-month">Décembre</span>
+                        </div>
+                    </div>
+
+                    <button class="primary-btn" onclick="window.location.href='taches.html'">
+                        Voir mes tâches <span class="arrow">→</span>
+                    </button>
+                </div>
+
+                <div class="top-right">
+                    <div class="user">
+                        <img src="https://upload.wikimedia.org/wikipedia/fr/thumb/3/36/Logo_NaTran.svg/langfr-560px-Logo_NaTran.svg.png"
+                            alt="Logo Natran" class="user-avatar">
+                        <div>
+                            <div class="user-name">Selyan MOUHALI</div>
+                            <div class="user-role">Opérateur unité pilote</div>
+                        </div>
+                    </div>
+
+                    <div class="search-wrapper">
+                        <input type="text" class="search-input" placeholder="Rechercher...">
+                    </div>
+                </div>
+            </header>
+
+            <!-- ======= HERO ======= -->
+            <section class="hero">
+                <div>
+                    <h2>Bienvenue sur votre Dashboard 👋</h2>
+                    <p>Bonjour <strong id="hero-user-name">Selyan MOUHALI</strong>, voici un aperçu de votre unité
+                        pilote CSR.</p>
+                </div>
+
+                <button class="icon-btn">🎙</button>
+            </section>
+
+            <!-- ============= GRID DASHBOARD ============= -->
+            <section class="grid">
+
+                <!-- -------- CARTE 1 : QUALITÉ CSR -------- -->
+                <article class="card card-large">
+                    <header class="card-header">
+                        <h3>Qualité des CSR entrants</h3>
+                        <select class="card-select" id="select-lot">
+                            <option>Lot #2023-12-19-A</option>
+                            <option>Lot #2023-12-18-B</option>
+                        </select>
+                    </header>
+
+                    <div class="card-body two-cols">
+                        <div class="kpi-col">
+                            <div class="kpi-row">
+                                <span>PCI moyen</span>
+                                <strong id="kpi-pci">-- MJ/kg</strong>
+                            </div>
+                            <div class="kpi-row">
+                                <span>Humidité</span>
+                                <strong id="kpi-humidity">-- %</strong>
+                            </div>
+                            <div class="kpi-row">
+                                <span>Granulométrie</span>
+                                <strong id="kpi-granulo">-- mm</strong>
+                            </div>
+                        </div>
+
+                        <div class="tags-col">
+                            <span class="tag good" id="tag-chlore">Cl &lt; 0,5 %</span>
+                            <span class="tag warn" id="tag-soufre">S proche limite</span>
+                            <span class="tag neutral">Métaux lourds : OK</span>
+                        </div>
+                    </div>
+
+                    <footer class="card-footer">
+                        <button class="ghost-btn">Analyse détaillée</button>
+                        <button class="link-btn">Voir historique →</button>
+                    </footer>
+
+
+                </article>
+
+                <!-- -------- CARTE : TEMPÉRATURE RÉACTEUR -------- -->
+                <article class="card">
+                    <header class="card-header">
+                        <h3>Température réacteur</h3>
+                        <span class="pill">Temps réel</span>
+                    </header>
+
+                    <div class="card-body">
+                        <div class="circle-kpi">
+                            <span class="circle-value" id="kpi-temp-reactor">--°C</span>
+                            <span class="circle-label">Consigne 850–900°C</span>
+                        </div>
+                        <p class="small-text">Stabilité thermique <strong id="temp-stability">-- %</strong></p>
+                    </div>
+                </article>
+
+                <!-- -------- CARTE : SYNGAZ -------- -->
+                <article class="card">
+                    <header class="card-header">
+                        <h3>Composition du syngaz</h3>
+                        <select class="card-select" id="select-syngas-range">
+                            <option>5 minutes</option>
+                            <option>1 heure</option>
+                        </select>
+                    </header>
+
+                    <div class="card-body syngas-grid">
+                        <div class="syngas-item">
+                            <span>H₂</span>
+                            <strong id="kpi-h2">-- %</strong>
+                        </div>
+                        <div class="syngas-item">
+                            <span>CO</span>
+                            <strong id="kpi-co">-- %</strong>
+                        </div>
+                        <div class="syngas-item">
+                            <span>CH₄</span>
+                            <strong id="kpi-ch4">-- %</strong>
+                        </div>
+                        <div class="syngas-item">
+                            <span>CO₂</span>
+                            <strong id="kpi-co2">-- %</strong>
+                        </div>
+                        <div class="syngas-item">
+                            <span>Tars</span>
+                            <strong id="kpi-tars">-- g/Nm³</strong>
+                        </div>
+                    </div>
+
+                    <footer class="card-footer">
+                        <button class="ghost-btn">Voir graphique</button>
+                    </footer>
+                </article>
+
+                <!-- -------- CARTE : DISPONIBILITÉ UNTIÉ -------- -->
+                <article class="card">
+                    <header class="card-header">
+                        <h3>Disponibilité unité pilote</h3>
+                    </header>
+
+                    <div class="card-body">
+                        <div class="donut">
+                            <div class="donut-inner">
+                                <span class="donut-value" id="kpi-dispo">--%</span>
+                                <span class="donut-label">Temps en fonctionnement</span>
+                            </div>
+                        </div>
+                        <p class="small-text">Sur 30 jours.</p>
+                    </div>
+                </article>
+
+                <!-- -------- CARTE : FLUX CSR -------- -->
+                <article class="card card-wide">
+                    <header class="card-header">
+                        <h3>Flux CSR traités</h3>
+                        <select class="card-select" id="select-flux">
+                            <option>Jour</option>
+                            <option>Semaine</option>
+                            <option>Mois</option>
+                        </select>
+                    </header>
+
+                    <div class="card-body">
+                        <div class="kpi-row big">
+                            <span>Débit instantané</span>
+                            <strong id="kpi-debit">-- t/h</strong>
+                        </div>
+
+                        <div class="chart-placeholder">
+                            Mini-graphe charge (sparklines)
+                        </div>
+                    </div>
+                </article>
+
+                <!-- -------- CARTE : GRAPHIQUE CAMEMBERT SYNGAZ -------- -->
+                <article class="card">
+                    <header class="card-header">
+                        <h3>Composition syngaz</h3>
+                        <span class="pill">Répartition</span>
+                    </header>
+
+                    <div class="card-body">
+                        <canvas id="syngas-pie-chart" style="max-height: 200px;"></canvas>
+                    </div>
+
+                    <footer class="card-footer">
+                        <button class="ghost-btn">Voir détails</button>
+                    </footer>
+                </article>
+
+                <!-- -------- CARTE : ALARMES -------- -->
+                <article class="card">
+                    <header class="card-header">
+                        <h3>Risques & alarmes</h3>
+                    </header>
+
+                    <div class="card-body">
+                        <ul class="alarms" id="alarm-list">
+                            <li class="alarm ok"><span class="dot"></span> Aucune alarme</li>
+                        </ul>
+                    </div>
+
+                    <footer class="card-footer">
+                        <button class="ghost-btn">Journal des événements</button>
+                    </footer>
+                </article>
+
+                <!-- -------- CARTE : IMPACT ENVIRONNEMENTAL -------- -->
+                <article class="card">
+                    <header class="card-header">
+                        <h3>Impact environnemental</h3>
+                    </header>
+
+                    <div class="card-body">
+                        <div class="kpi-row">
+                            <span>CO₂ évité</span>
+                            <strong id="kpi-co2-evite">-- t/j</strong>
+                        </div>
+
+                        <div class="kpi-row">
+                            <span>Traitement fumées</span>
+                            <strong id="kpi-traitement">-- %</strong>
+                        </div>
+
+                        <p class="small-text">Estimations sur la base des relevés syngaz.</p>
+                    </div>
+                </article>
+
+            </section>
+        </main>
+    </div>
+
+    <!-- Script JS -->
+    <script src="navigation.js"></script>
+    <script src="app.js"></script>
+
+</body>
+
+</html>

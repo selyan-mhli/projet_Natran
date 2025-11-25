@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pré-traitement - Projet Natran CSR</title>
+    <link rel="icon" type="image/png"
+        href="https://upload.wikimedia.org/wikipedia/fr/thumb/3/36/Logo_NaTran.svg/langfr-560px-Logo_NaTran.svg.png">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <div class="app">
+
+        <!-- ============= SIDEBAR ============= -->
+        <aside class="sidebar">
+            <div class="logo">
+                <div class="logo-circle">CSR</div>
+                <div class="logo-text">
+                    <h1>CSR Pilot</h1>
+                    <span>Pyro-gazéification</span>
+                </div>
+            </div>
+
+            <nav class="side-nav">
+                <button class="side-nav-item" onclick="window.location.href='index.html'">Dashboard</button>
+                <button class="side-nav-item active">Pré-traitement</button>
+                <button class="side-nav-item" onclick="window.location.href='reacteur.html'">Réacteur</button>
+                <button class="side-nav-item" onclick="window.location.href='emissions.html'">Émissions</button>
+                <button class="side-nav-item" onclick="window.location.href='rapports.html'">Rapports</button>
+                <button class="side-nav-item" onclick="window.location.href='fiches-csr.html'">Fiches CSR</button>
+            </nav>
+        </aside>
+
+        <!-- ============= MAIN ============= -->
+        <main class="main">
+
+            <!-- ======= TOPBAR ======= -->
+            <header class="topbar">
+                <div class="top-left">
+                    <div class="date-card">
+                        <span class="date-day">19</span>
+                        <div class="date-info">
+                            <span class="date-weekday">Mardi</span>
+                            <span class="date-month">Décembre</span>
+                        </div>
+                    </div>
+
+                    <button class="primary-btn" onclick="window.location.href='taches.html'">
+                        Voir mes tâches <span class="arrow">→</span>
+                    </button>
+                </div>
+
+                <div class="top-right">
+                    <div class="user">
+                        <img src="https://upload.wikimedia.org/wikipedia/fr/thumb/3/36/Logo_NaTran.svg/langfr-560px-Logo_NaTran.svg.png"
+                            alt="Logo Natran" class="user-avatar">
+                        <div>
+                            <div class="user-name">Selyan MOUHALI</div>
+                            <div class="user-role">Opérateur unité pilote</div>
+                        </div>
+                    </div>
+
+                    <div class="search-wrapper">
+                        <input type="text" class="search-input" placeholder="Rechercher...">
+                    </div>
+                </div>
+            </header>
+
+            <!-- ======= HERO ======= -->
+            <section class="hero">
+                <div>
+                    <h2>Pré-traitement des CSR 👋</h2>
+                    <p>Bonjour <strong id="hero-user-name">Selyan MOUHALI</strong>, suivez le processus de préparation
+                        des CSR avant gazéification.</p>
+                </div>
+
+                <button class="icon-btn">🎙</button>
+            </section>
+
+            <!-- ============= GRID DASHBOARD ============= -->
+            <section class="grid">
+
+                <!-- -------- CARTE : QUALITÉ CSR ENTRANTS -------- -->
+                <article class="card card-large">
+                    <header class="card-header">
+                        <h3>Qualité des CSR entrants</h3>
+                        <select class="card-select">
+                            <option>Lot #2023-12-19-A</option>
+                            <option>Lot #2023-12-18-B</option>
+                        </select>
+                    </header>
+
+                    <div class="card-body two-cols">
+                        <div class="kpi-col">
+                            <div class="kpi-row">
+                                <span>PCI moyen</span>
+                                <strong>16.2 MJ/kg</strong>
+                            </div>
+                            <div class="kpi-row">
+                                <span>Humidité</span>
+                                <strong>12.5 %</strong>
+                            </div>
+                            <div class="kpi-row">
+                                <span>Granulométrie</span>
+                                <strong>20 mm</strong>
+                            </div>
+                            <div class="kpi-row">
+                                <span>Cendres</span>
+                                <strong>8.2 %</strong>
+                            </div>
+                        </div>
+
+                        <div class="tags-col">
+                            <span class="tag good">Cl &lt; 0,5 %</span>
+                            <span class="tag warn">S proche limite</span>
+                            <span class="tag neutral">Métaux lourds : OK</span>
+                            <span class="tag good">Azote : OK</span>
+                        </div>
+                    </div>
+
+                    <footer class="card-footer">
+                        <button class="ghost-btn">Analyse détaillée</button>
+                        <button class="link-btn">Voir historique →</button>
+                    </footer>
+                </article>
+
+                <!-- -------- CARTE : BROYAGE -------- -->
+                <article class="card">
+                    <header class="card-header">
+                        <h3>Broyage</h3>
+                        <span class="pill">Actif</span>
+                    </header>
+
+                    <div class="card-body">
+                        <div class="kpi-row">
+                            <span>Granulométrie cible</span>
+                            <strong>15-25 mm</strong>
+                        </div>
+                        <div class="kpi-row">
+                            <span>Granulométrie actuelle</span>
+                            <strong>20 mm</strong>
+                        </div>
+                        <p class="small-text">Conforme aux spécifications</p>
+                    </div>
+                </article>
+
+                <!-- -------- CARTE : SÉCHAGE -------- -->
+                <article class="card">
+                    <header class="card-header">
+                        <h3>Séchage</h3>
+                        <span class="pill">En cours</span>
+                    </header>
+
+                    <div class="card-body">
+                        <div class="kpi-row">
+                            <span>Humidité cible</span>
+                            <strong>&lt; 15 %</strong>
+                        </div>
+                        <div class="kpi-row">
+                            <span>Humidité actuelle</span>
+                            <strong>12.5 %</strong>
+                        </div>
+                        <p class="small-text">Objectif atteint</p>
+                    </div>
+                </article>
+
+                <!-- -------- CARTE : TRI ET SÉPARATION -------- -->
+                <article class="card">
+                    <header class="card-header">
+                        <h3>Tri et séparation</h3>
+                    </header>
+
+                    <div class="card-body">
+                        <div class="kpi-row">
+                            <span>Métaux retirés</span>
+                            <strong>2.3 kg</strong>
+                        </div>
+                        <div class="kpi-row">
+                            <span>Plastiques retirés</span>
+                            <strong>1.8 kg</strong>
+                        </div>
+                        <p class="small-text">Sur le lot actuel</p>
+                    </div>
+                </article>
+
+                <!-- -------- CARTE : STOCKAGE -------- -->
+                <article class="card card-wide">
+                    <header class="card-header">
+                        <h3>Stockage CSR préparés</h3>
+                        <select class="card-select">
+                            <option>Aujourd'hui</option>
+                            <option>Cette semaine</option>
+                            <option>Ce mois</option>
+                        </select>
+                    </header>
+
+                    <div class="card-body">
+                        <div class="kpi-row big">
+                            <span>Stock disponible</span>
+                            <strong>45.2 t</strong>
+                        </div>
+                        <div class="kpi-row">
+                            <span>Capacité maximale</span>
+                            <strong>60 t</strong>
+                        </div>
+                        <p class="small-text">75% de la capacité utilisée</p>
+                    </div>
+                </article>
+
+                <!-- -------- CARTE : DÉBIT TRAITEMENT -------- -->
+                <article class="card">
+                    <header class="card-header">
+                        <h3>Débit de traitement</h3>
+                    </header>
+
+                    <div class="card-body">
+                        <div class="kpi-row big">
+                            <span>Débit moyen</span>
+                            <strong>1.2 t/h</strong>
+                        </div>
+                        <p class="small-text">Sur les dernières 24h</p>
+                    </div>
+                </article>
+
+                <!-- -------- CARTE : STATUT ÉQUIPEMENTS -------- -->
+                <article class="card">
+                    <header class="card-header">
+                        <h3>Statut équipements</h3>
+                    </header>
+
+                    <div class="card-body">
+                        <ul class="alarms">
+                            <li class="alarm ok"><span class="dot"></span> Broyeur : Opérationnel</li>
+                            <li class="alarm ok"><span class="dot"></span> Sécheur : Opérationnel</li>
+                            <li class="alarm ok"><span class="dot"></span> Séparateur : Opérationnel</li>
+                        </ul>
+                    </div>
+                </article>
+
+            </section>
+        </main>
+    </div>
+
+    <!-- Script JS -->
+    <script src="navigation.js"></script>
+
+</body>
+
+</html>

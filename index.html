@@ -31,6 +31,7 @@
                     onclick="window.location.href='pre-traitement.html'">Pré-traitement</button>
                 <button class="side-nav-item" onclick="window.location.href='reacteur.html'">Réacteur</button>
                 <button class="side-nav-item" onclick="window.location.href='emissions.html'">Émissions</button>
+                <button class="side-nav-item" onclick="window.location.href='rapports.html'">Rapports</button>
                 <button class="side-nav-item" onclick="window.location.href='fiches-csr.html'">Fiches CSR</button>
             </nav>
         </aside>
@@ -87,42 +88,42 @@
                 <!-- -------- CARTE 1 : QUALITÉ CSR -------- -->
                 <article class="card card-large">
                     <header class="card-header">
-                        <h3>Qualité des CSR entrants</h3>
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <h3>Qualité des CSR entrants</h3>
+                            <span class="tag good" style="font-size:0.7rem; padding:2px 8px;">Excellente</span>
+                        </div>
                         <select class="card-select" id="select-lot">
                             <option>Lot #2023-12-19-A</option>
                             <option>Lot #2023-12-18-B</option>
                         </select>
                     </header>
 
-                    <div class="card-body two-cols">
-                        <div class="kpi-col">
-                            <div class="kpi-row">
-                                <span>PCI moyen</span>
-                                <strong id="kpi-pci">-- MJ/kg</strong>
+                    <div class="card-body">
+                        <div class="dashboard-kpi-grid">
+                            <div class="dashboard-kpi-box">
+                                <span class="label">PCI</span>
+                                <span class="value" id="kpi-pci">-- MJ/kg</span>
                             </div>
-                            <div class="kpi-row">
-                                <span>Humidité</span>
-                                <strong id="kpi-humidity">-- %</strong>
+                            <div class="dashboard-kpi-box">
+                                <span class="label">Humidité</span>
+                                <span class="value" id="kpi-humidity">-- %</span>
                             </div>
-                            <div class="kpi-row">
-                                <span>Granulométrie</span>
-                                <strong id="kpi-granulo">-- mm</strong>
+                            <div class="dashboard-kpi-box">
+                                <span class="label">Granulo.</span>
+                                <span class="value" id="kpi-granulo">-- mm</span>
                             </div>
                         </div>
 
-                        <div class="tags-col">
+                        <div class="tags-col" style="flex-direction: row; flex-wrap: wrap; gap: 8px;">
                             <span class="tag good" id="tag-chlore">Cl &lt; 0,5 %</span>
                             <span class="tag warn" id="tag-soufre">S proche limite</span>
-                            <span class="tag neutral">Métaux lourds : OK</span>
+                            <span class="tag neutral">Métaux : OK</span>
                         </div>
                     </div>
 
                     <footer class="card-footer">
-                        <button class="ghost-btn">Analyse détaillée</button>
-                        <button class="link-btn">Voir historique →</button>
+                        <button class="ghost-btn" onclick="window.location.href='fiches-csr.html'">Voir détails</button>
                     </footer>
-
-
                 </article>
 
                 <!-- -------- CARTE : TEMPÉRATURE RÉACTEUR -------- -->

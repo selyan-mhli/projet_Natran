@@ -30,6 +30,7 @@
                     onclick="window.location.href='pre-traitement.html'">Pré-traitement</button>
                 <button class="side-nav-item" onclick="window.location.href='reacteur.html'">Réacteur</button>
                 <button class="side-nav-item" onclick="window.location.href='emissions.html'">Émissions</button>
+                <button class="side-nav-item" onclick="window.location.href='rapports.html'">Rapports</button>
                 <button class="side-nav-item active" onclick="window.location.href='fiches-csr.html'">Fiches
                     CSR</button>
             </nav>
@@ -103,49 +104,100 @@
                 const card = document.createElement('article');
                 card.className = 'card';
 
+                // Calculate Quality (Mock logic)
+                let qualityClass = 'neutral';
+                let qualityText = 'Standard';
+                if (batch.pci > 20) {
+                    qualityClass = 'good';
+                    qualityText = 'Excellente';
+                } else if (batch.pci < 15) {
+                    qualityClass = 'warn';
+                    qualityText = 'Moyenne';
+                }
+
                 // Format pollutants
                 let pollutantsHtml = '';
                 for (const [key, val] of Object.entries(batch.pollutants)) {
-                    pollutantsHtml += `<span class="tag neutral">${key}: ${val}%</span>`;
+                    let colorClass = 'neutral';
+                    if (val > 1.0) colorClass = 'warn'; // Example threshold
+                    pollutantsHtml += `<span class="tag ${colorClass}">${key}: ${val}%</span>`;
                 }
+
+                // Helper for progress bars
+                const renderProgress = (label, value, max = 100, unit = '%') => {
+                    const pct = (value / max) * 100;
+                    let color = 'var(--accent)';
+                    if (label === 'Humidité') {
+                        color = value < 15 ? '#2ecc71' : (value < 25 ? '#f1c40f' : '#e74c3c');
+                    }
+                    return `
+                        <div class="progress-item">
+                            <div class="progress-label">
+                                <span>${label}</span>
+                                <strong>${value}${unit}</strong>
+                            </div>
+                            <div class="progress-track">
+                                <div class="progress-fill" style="width: ${pct}%; background: ${color};"></div>
+                            </div>
+                        </div>
+                    `;
+                };
 
                 card.innerHTML = `
                 <header class="card-header">
                     <div>
-                        <h3>${batch.name || 'CSR Standard'}</h3>
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <h3>${batch.name || 'CSR Standard'}</h3>
+                            <span class="tag ${qualityClass}" style="font-size:0.7rem; padding:2px 8px;">${qualityText}</span>
+                        </div>
                         <span class="small-text">${batch.batch_ref}</span>
                     </div>
                     <span class="pill">${new Date(batch.created_at).toLocaleDateString()}</span>
                 </header>
+                
                 <div class="card-body">
-                    <div class="kpi-row">
-                        <span>PCI</span>
-                        <strong>${batch.pci} MJ/kg</strong>
+                    
+                    <!-- Section Physico-chimique -->
+                    <div class="section-title">Physico-chimique</div>
+                    <div class="kpi-grid-2">
+                        <div class="kpi-box">
+                            <span class="label">PCI</span>
+                            <span class="value">${batch.pci} <small>MJ/kg</small></span>
+                        </div>
+                        <div class="kpi-box">
+                            <span class="label">Granulo.</span>
+                            <span class="value">${batch.granulometry} <small>mm</small></span>
+                        </div>
                     </div>
-                    <div class="kpi-row">
-                        <span>Humidité</span>
-                        <strong>${batch.humidity}%</strong>
-                    </div>
-                    <div class="kpi-row">
-                        <span>Granulométrie</span>
-                        <strong>${batch.granulometry} mm</strong>
-                    </div>
-                    <hr style="border: 0; border-top: 1px solid #eee; margin: 8px 0;">
-                    <div class="syngas-grid" style="grid-template-columns: 1fr 1fr 1fr;">
+                    ${renderProgress('Humidité', batch.humidity)}
+
+                    <hr class="divider">
+
+                    <!-- Section Élémentaire -->
+                    <div class="section-title">Analyse Élémentaire</div>
+                    <div class="syngas-grid">
                         <div class="syngas-item">
                             <span>C</span>
                             <strong>${batch.carbon}%</strong>
+                            <div class="mini-bar"><div style="width:${batch.carbon}%; background:#555;"></div></div>
                         </div>
                         <div class="syngas-item">
                             <span>H</span>
                             <strong>${batch.hydrogen}%</strong>
+                            <div class="mini-bar"><div style="width:${batch.hydrogen * 5}%; background:#3498db;"></div></div>
                         </div>
                         <div class="syngas-item">
                             <span>O</span>
                             <strong>${batch.oxygen}%</strong>
+                            <div class="mini-bar"><div style="width:${batch.oxygen * 2}%; background:#e74c3c;"></div></div>
                         </div>
                     </div>
-                    <div class="tags-col" style="margin-top: 8px; flex-direction: row; flex-wrap: wrap;">
+
+                    <hr class="divider">
+
+                    <!-- Section Polluants -->
+                    <div class="section-title">Polluants & Résidus</div>
+                    <div class="tags-col" style="flex-direction: row; flex-wrap: wrap;">
                         ${pollutantsHtml}
                     </div>
                 </div>

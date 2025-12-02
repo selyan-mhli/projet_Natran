@@ -4,13 +4,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Fiches d'identité énergétique CSR - Projet Natran">
     <title>Fiches CSR - Projet Natran</title>
+
     <link rel="icon" type="image/png"
         href="https://upload.wikimedia.org/wikipedia/fr/thumb/3/36/Logo_NaTran.svg/langfr-560px-Logo_NaTran.svg.png">
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loading-overlay">
+        <div class="spinner"></div>
+    </div>
 
     <div class="app">
 
@@ -25,14 +32,24 @@
             </div>
 
             <nav class="side-nav">
-                <button class="side-nav-item" onclick="window.location.href='index.html'">Dashboard</button>
-                <button class="side-nav-item"
-                    onclick="window.location.href='pre-traitement.html'">Pré-traitement</button>
-                <button class="side-nav-item" onclick="window.location.href='reacteur.html'">Réacteur</button>
-                <button class="side-nav-item" onclick="window.location.href='emissions.html'">Émissions</button>
-                <button class="side-nav-item" onclick="window.location.href='rapports.html'">Rapports</button>
-                <button class="side-nav-item active" onclick="window.location.href='fiches-csr.html'">Fiches
-                    CSR</button>
+                <button class="side-nav-item" onclick="window.location.href='index.html'">
+                    <span>📊</span> Dashboard
+                </button>
+                <button class="side-nav-item" onclick="window.location.href='pre-traitement.html'">
+                    <span>⚙️</span> Pré-traitement
+                </button>
+                <button class="side-nav-item" onclick="window.location.href='reacteur.html'">
+                    <span>🔥</span> Réacteur
+                </button>
+                <button class="side-nav-item" onclick="window.location.href='emissions.html'">
+                    <span>🌿</span> Émissions
+                </button>
+                <button class="side-nav-item" onclick="window.location.href='rapports.html'">
+                    <span>📋</span> Rapports
+                </button>
+                <button class="side-nav-item active" aria-current="page">
+                    <span>📄</span> Fiches CSR
+                </button>
             </nav>
         </aside>
 
@@ -42,10 +59,14 @@
             <!-- ======= TOPBAR ======= -->
             <header class="topbar">
                 <div class="top-left">
-                    <h2>Fiches d'identité Énergétique CSR</h2>
+                    <h2 style="margin: 0; font-size: 1.3rem;">Fiches d'identité Énergétique CSR</h2>
                 </div>
 
                 <div class="top-right">
+                    <button class="primary-btn small" onclick="alert('Ajouter une nouvelle fiche CSR...')">
+                        + Nouvelle fiche
+                    </button>
+
                     <div class="user">
                         <img src="https://upload.wikimedia.org/wikipedia/fr/thumb/3/36/Logo_NaTran.svg/langfr-560px-Logo_NaTran.svg.png"
                             alt="Logo Natran" class="user-avatar">
@@ -54,15 +75,58 @@
                             <div class="user-role">Opérateur unité pilote</div>
                         </div>
                     </div>
+
+                    <div class="search-wrapper">
+                        <input type="text" class="search-input" placeholder="Rechercher une fiche..."
+                            aria-label="Recherche" id="search-input">
+                    </div>
                 </div>
             </header>
 
+            <!-- ======= FILTRES ======= -->
+            <section
+                style="background: var(--card-bg); border-radius: var(--radius-lg); padding: 16px; box-shadow: var(--shadow-soft); margin-bottom: 20px;">
+                <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+                    <span style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted);">Filtrer par:</span>
+                    <select class="card-select" aria-label="Filtrer par qualité" onchange="filterBatches()">
+                        <option value="all">Toutes les qualités</option>
+                        <option value="excellent">Excellente</option>
+                        <option value="good">Bonne</option>
+                        <option value="moyenne">Moyenne</option>
+                    </select>
+                    <select class="card-select" aria-label="Trier par" onchange="sortBatches()">
+                        <option value="recent">Plus récents</option>
+                        <option value="oldest">Plus anciens</option>
+                        <option value="pci-high">PCI décroissant</option>
+                        <option value="pci-low">PCI croissant</option>
+                    </select>
+                    <div style="flex: 1;"></div>
+                    <span style="font-size: 0.8rem; color: var(--text-muted);" id="batch-count">Chargement...</span>
+                </div>
+            </section>
+
             <!-- ======= CONTENT ======= -->
             <section class="grid" id="batches-grid">
-                <!-- Les cartes seront injectées ici par JS -->
-                <div class="card card-wide">
+                <!-- Skeleton loading -->
+                <div class="card">
                     <div class="card-body">
-                        <p>Chargement des fiches...</p>
+                        <div class="skeleton" style="height: 20px; margin-bottom: 10px;"></div>
+                        <div class="skeleton" style="height: 60px; margin-bottom: 10px;"></div>
+                        <div class="skeleton" style="height: 40px;"></div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-body">
+                        <div class="skeleton" style="height: 20px; margin-bottom: 10px;"></div>
+                        <div class="skeleton" style="height: 60px; margin-bottom: 10px;"></div>
+                        <div class="skeleton" style="height: 40px;"></div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-body">
+                        <div class="skeleton" style="height: 20px; margin-bottom: 10px;"></div>
+                        <div class="skeleton" style="height: 60px; margin-bottom: 10px;"></div>
+                        <div class="skeleton" style="height: 40px;"></div>
                     </div>
                 </div>
             </section>
@@ -70,25 +134,200 @@
         </main>
     </div>
 
+    <script src="navigation.js"></script>
+
+    <style>
+        /* Styles inline */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.95);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+
+        body.loading .loading-overlay {
+            display: flex;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--accent);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: skeleton 1.5s infinite;
+            border-radius: 8px;
+        }
+
+        @keyframes skeleton {
+            0% {
+                background-position: 200% 0;
+            }
+
+            100% {
+                background-position: -200% 0;
+            }
+        }
+
+        .side-nav-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .data-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+
+        .data-item {
+            background: #f8f8fb;
+            padding: 10px;
+            border-radius: 10px;
+            transition: all 0.3s;
+        }
+
+        .data-item:hover {
+            background: #f0f0f5;
+            transform: translateY(-2px);
+        }
+
+        .data-label {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        .data-value {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: #e0e0e0;
+            border-radius: 999px;
+            overflow: hidden;
+            margin-top: 6px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 999px;
+            transition: width 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card {
+            animation: fadeIn 0.4s ease;
+        }
+
+        .card:nth-child(n) {
+            animation-delay: calc(0.05s * var(--i, 1));
+        }
+
+        .syngas-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        .syngas-item {
+            background: #f8f8fb;
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .syngas-item span {
+            display: block;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+
+        .syngas-item strong {
+            display: block;
+            font-size: 1rem;
+            color: var(--text-main);
+        }
+
+        .mini-bar {
+            height: 4px;
+            background: #e0e0e0;
+            border-radius: 999px;
+            margin-top: 6px;
+            overflow: hidden;
+        }
+
+        .mini-bar div {
+            height: 100%;
+            border-radius: 999px;
+            transition: width 0.5s;
+        }
+    </style>
+
     <script>
-        // Navigation logic (simplified for this page)
-        document.querySelectorAll('.side-nav-item').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                // Handled by onclick in HTML for simplicity or navigation.js if included
-            });
-        });
+        let allBatches = [];
 
         // Fetch and display batches
         async function fetchBatches() {
+            document.body.classList.add('loading');
             try {
                 const res = await fetch('/api/batches');
                 if (!res.ok) throw new Error('Erreur API');
-                const batches = await res.json();
-                renderBatches(batches);
+                allBatches = await res.json();
+                renderBatches(allBatches);
+                updateBatchCount(allBatches.length);
             } catch (err) {
                 console.error(err);
-                document.getElementById('batches-grid').innerHTML = '<p>Impossible de charger les fiches CSR.</p>';
+                document.getElementById('batches-grid').innerHTML = '<div class="card card-wide"><div class="card-body"><p style="color: #e74c3c;">❌ Impossible de charger les fiches CSR. Vérifiez que le serveur est démarré.</p></div></div>';
+            } finally {
+                document.body.classList.remove('loading');
             }
+        }
+
+        function updateBatchCount(count) {
+            document.getElementById('batch-count').textContent = `${count} fiche${count > 1 ? 's' : ''} disponible${count > 1 ? 's' : ''}`;
         }
 
         function renderBatches(batches) {
@@ -96,99 +335,98 @@
             container.innerHTML = '';
 
             if (batches.length === 0) {
-                container.innerHTML = '<p>Aucune fiche CSR disponible.</p>';
+                container.innerHTML = '<div class="card card-wide"><div class="card-body"><p>Aucune fiche CSR disponible.</p></div></div>';
                 return;
             }
 
-            batches.forEach(batch => {
+            batches.forEach((batch, index) => {
                 const card = document.createElement('article');
                 card.className = 'card';
+                card.style.setProperty('--i', index + 1);
 
-                // Calculate Quality (Mock logic)
+                // Calculate Quality
                 let qualityClass = 'neutral';
                 let qualityText = 'Standard';
+                let qualityEmoji = '⚪';
+
                 if (batch.pci > 20) {
                     qualityClass = 'good';
                     qualityText = 'Excellente';
-                } else if (batch.pci < 15) {
+                    qualityEmoji = '🟢';
+                } else if (batch.pci > 17) {
+                    qualityClass = 'neutral';
+                    qualityText = 'Bonne';
+                    qualityEmoji = '🟡';
+                } else {
                     qualityClass = 'warn';
                     qualityText = 'Moyenne';
+                    qualityEmoji = '🟠';
                 }
 
                 // Format pollutants
                 let pollutantsHtml = '';
                 for (const [key, val] of Object.entries(batch.pollutants)) {
-                    let colorClass = 'neutral';
-                    if (val > 1.0) colorClass = 'warn'; // Example threshold
-                    pollutantsHtml += `<span class="tag ${colorClass}">${key}: ${val}%</span>`;
+                    let colorClass = 'good';
+                    if (val > 1.0) colorClass = 'warn';
+                    if (val > 2.0) colorClass = 'danger';
+                    pollutantsHtml += `<span class="tag ${colorClass}" style="font-size: 0.75rem;">${key}: ${val}%</span>`;
                 }
-
-                // Helper for progress bars
-                const renderProgress = (label, value, max = 100, unit = '%') => {
-                    const pct = (value / max) * 100;
-                    let color = 'var(--accent)';
-                    if (label === 'Humidité') {
-                        color = value < 15 ? '#2ecc71' : (value < 25 ? '#f1c40f' : '#e74c3c');
-                    }
-                    return `
-                        <div class="progress-item">
-                            <div class="progress-label">
-                                <span>${label}</span>
-                                <strong>${value}${unit}</strong>
-                            </div>
-                            <div class="progress-track">
-                                <div class="progress-fill" style="width: ${pct}%; background: ${color};"></div>
-                            </div>
-                        </div>
-                    `;
-                };
 
                 card.innerHTML = `
                 <header class="card-header">
                     <div>
-                        <div style="display:flex; align-items:center; gap:8px;">
-                            <h3>${batch.name || 'CSR Standard'}</h3>
-                            <span class="tag ${qualityClass}" style="font-size:0.7rem; padding:2px 8px;">${qualityText}</span>
+                        <div style="display:flex; align-items:center; gap:8px; margin-bottom: 4px;">
+                            <h3 style="margin: 0; font-size: 1rem;">${batch.name || 'CSR Standard'}</h3>
+                            <span class="tag ${qualityClass}" style="font-size:0.7rem; padding:2px 8px;">${qualityEmoji} ${qualityText}</span>
                         </div>
                         <span class="small-text">${batch.batch_ref}</span>
                     </div>
-                    <span class="pill">${new Date(batch.created_at).toLocaleDateString()}</span>
+                    <span class="pill">${new Date(batch.created_at).toLocaleDateString('fr-FR')}</span>
                 </header>
                 
                 <div class="card-body">
                     
                     <!-- Section Physico-chimique -->
-                    <div class="section-title">Physico-chimique</div>
-                    <div class="kpi-grid-2">
-                        <div class="kpi-box">
-                            <span class="label">PCI</span>
-                            <span class="value">${batch.pci} <small>MJ/kg</small></span>
+                    <div class="section-title">⚗️ Physico-chimique</div>
+                    <div class="data-grid">
+                        <div class="data-item">
+                            <div class="data-label">PCI</div>
+                            <div class="data-value" style="color: ${batch.pci > 18 ? '#2ecc71' : '#f1c40f'};">${batch.pci} MJ/kg</div>
                         </div>
-                        <div class="kpi-box">
-                            <span class="label">Granulo.</span>
-                            <span class="value">${batch.granulometry} <small>mm</small></span>
+                        <div class="data-item">
+                            <div class="data-label">Granulométrie</div>
+                            <div class="data-value">${batch.granulometry} mm</div>
                         </div>
                     </div>
-                    ${renderProgress('Humidité', batch.humidity)}
+
+                    <div style="margin: 10px 0;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                            <span style="font-size: 0.75rem; color: var(--text-muted);">Humidité</span>
+                            <strong style="font-size: 0.85rem;">${batch.humidity}%</strong>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${batch.humidity * 5}%; background: ${batch.humidity < 15 ? 'linear-gradient(90deg, #2ecc71, #27ae60)' : 'linear-gradient(90deg, #f1c40f, #e67e22)'};"></div>
+                        </div>
+                    </div>
 
                     <hr class="divider">
 
                     <!-- Section Élémentaire -->
-                    <div class="section-title">Analyse Élémentaire</div>
+                    <div class="section-title">🧪 Analyse Élémentaire</div>
                     <div class="syngas-grid">
                         <div class="syngas-item">
                             <span>C</span>
-                            <strong>${batch.carbon}%</strong>
+                            <strong style="color: #555;">${batch.carbon}%</strong>
                             <div class="mini-bar"><div style="width:${batch.carbon}%; background:#555;"></div></div>
                         </div>
                         <div class="syngas-item">
                             <span>H</span>
-                            <strong>${batch.hydrogen}%</strong>
-                            <div class="mini-bar"><div style="width:${batch.hydrogen * 5}%; background:#3498db;"></div></div>
+                            <strong style="color: #3498db;">${batch.hydrogen}%</strong>
+                            <div class="mini-bar"><div style="width:${batch.hydrogen * 10}%; background:#3498db;"></div></div>
                         </div>
                         <div class="syngas-item">
                             <span>O</span>
-                            <strong>${batch.oxygen}%</strong>
+                            <strong style="color: #e74c3c;">${batch.oxygen}%</strong>
                             <div class="mini-bar"><div style="width:${batch.oxygen * 2}%; background:#e74c3c;"></div></div>
                         </div>
                     </div>
@@ -196,15 +434,49 @@
                     <hr class="divider">
 
                     <!-- Section Polluants -->
-                    <div class="section-title">Polluants & Résidus</div>
-                    <div class="tags-col" style="flex-direction: row; flex-wrap: wrap;">
+                    <div class="section-title">⚠️ Polluants & Résidus</div>
+                    <div style="display: flex; flex-wrap: wrap; gap: 6px;">
                         ${pollutantsHtml}
                     </div>
                 </div>
+
+                <footer class="card-footer">
+                    <button class="ghost-btn" onclick="viewBatchDetails('${batch.batch_ref}')">📋 Détails complets</button>
+                    <button class="link-btn" onclick="exportBatch('${batch.batch_ref}')">💾 Exporter</button>
+                </footer>
             `;
                 container.appendChild(card);
             });
         }
+
+        function viewBatchDetails(batchRef) {
+            alert(`Affichage des détails complets pour: ${batchRef}`);
+        }
+
+        function exportBatch(batchRef) {
+            alert(`Export de la fiche: ${batchRef}`);
+        }
+
+        function filterBatches() {
+            // À implémenter: filtrage par qualité
+            console.log('Filtrage...');
+        }
+
+        function sortBatches() {
+            // À implémenter: tri
+            console.log('Tri...');
+        }
+
+        // Recherche en temps réel
+        document.getElementById('search-input')?.addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase();
+            const filtered = allBatches.filter(batch =>
+                batch.name.toLowerCase().includes(query) ||
+                batch.batch_ref.toLowerCase().includes(query)
+            );
+            renderBatches(filtered);
+            updateBatchCount(filtered.length);
+        });
 
         document.addEventListener('DOMContentLoaded', fetchBatches);
     </script>

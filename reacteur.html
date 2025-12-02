@@ -4,13 +4,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Monitoring du réacteur de gazéification en temps réel">
     <title>Réacteur - Projet Natran CSR</title>
+
     <link rel="icon" type="image/png"
         href="https://upload.wikimedia.org/wikipedia/fr/thumb/3/36/Logo_NaTran.svg/langfr-560px-Logo_NaTran.svg.png">
     <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
 
 <body>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loading-overlay">
+        <div class="spinner"></div>
+    </div>
 
     <div class="app">
 
@@ -25,13 +33,24 @@
             </div>
 
             <nav class="side-nav">
-                <button class="side-nav-item" onclick="window.location.href='index.html'">Dashboard</button>
-                <button class="side-nav-item"
-                    onclick="window.location.href='pre-traitement.html'">Pré-traitement</button>
-                <button class="side-nav-item active">Réacteur</button>
-                <button class="side-nav-item" onclick="window.location.href='emissions.html'">Émissions</button>
-                <button class="side-nav-item" onclick="window.location.href='rapports.html'">Rapports</button>
-                <button class="side-nav-item" onclick="window.location.href='fiches-csr.html'">Fiches CSR</button>
+                <button class="side-nav-item" onclick="window.location.href='index.html'">
+                    <span>📊</span> Dashboard
+                </button>
+                <button class="side-nav-item" onclick="window.location.href='pre-traitement.html'">
+                    <span>⚙️</span> Pré-traitement
+                </button>
+                <button class="side-nav-item active" aria-current="page">
+                    <span>🔥</span> Réacteur
+                </button>
+                <button class="side-nav-item" onclick="window.location.href='emissions.html'">
+                    <span>🌿</span> Émissions
+                </button>
+                <button class="side-nav-item" onclick="window.location.href='rapports.html'">
+                    <span>📋</span> Rapports
+                </button>
+                <button class="side-nav-item" onclick="window.location.href='fiches-csr.html'">
+                    <span>📄</span> Fiches CSR
+                </button>
             </nav>
         </aside>
 
@@ -42,10 +61,10 @@
             <header class="topbar">
                 <div class="top-left">
                     <div class="date-card">
-                        <span class="date-day">19</span>
+                        <span class="date-day" id="current-day">19</span>
                         <div class="date-info">
-                            <span class="date-weekday">Mardi</span>
-                            <span class="date-month">Décembre</span>
+                            <span class="date-weekday" id="current-weekday">Mardi</span>
+                            <span class="date-month" id="current-month">Décembre</span>
                         </div>
                     </div>
 
@@ -55,6 +74,15 @@
                 </div>
 
                 <div class="top-right">
+                    <div class="connection-status">
+                        <span>Connecté</span>
+                    </div>
+
+                    <div class="live-indicator">
+                        <span class="live-dot"></span>
+                        <span>Temps réel</span>
+                    </div>
+
                     <div class="user">
                         <img src="https://upload.wikimedia.org/wikipedia/fr/thumb/3/36/Logo_NaTran.svg/langfr-560px-Logo_NaTran.svg.png"
                             alt="Logo Natran" class="user-avatar">
@@ -65,7 +93,7 @@
                     </div>
 
                     <div class="search-wrapper">
-                        <input type="text" class="search-input" placeholder="Rechercher...">
+                        <input type="text" class="search-input" placeholder="Rechercher..." aria-label="Recherche">
                     </div>
                 </div>
             </header>
@@ -73,12 +101,12 @@
             <!-- ======= HERO ======= -->
             <section class="hero">
                 <div>
-                    <h2>Réacteur de gazéification 👋</h2>
+                    <h2>Réacteur de gazéification 🔥</h2>
                     <p>Bonjour <strong id="hero-user-name">Selyan MOUHALI</strong>, surveillez les paramètres du
                         réacteur en temps réel.</p>
                 </div>
 
-                <button class="icon-btn">🎙</button>
+                <button class="icon-btn" aria-label="Commande vocale">🎙</button>
             </section>
 
             <!-- ============= GRID DASHBOARD ============= -->
@@ -88,42 +116,95 @@
                 <article class="card card-large">
                     <header class="card-header">
                         <h3>Température réacteur</h3>
-                        <span class="pill">Temps réel</span>
+                        <div style="display: flex; gap: 8px;">
+                            <span class="connection-status">
+                                <span>Stable</span>
+                            </span>
+                            <span class="pill">Temps réel</span>
+                        </div>
                     </header>
 
                     <div class="card-body">
-                        <div class="circle-kpi" style="margin: 20px auto; max-width: 200px;">
-                            <span class="circle-value" style="font-size: 2.5rem;">870°C</span>
-                            <span class="circle-label">Consigne 850–900°C</span>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: center;">
+                            <div class="temp-gauge" style="width: 180px; height: 180px;">
+                                <div class="temp-gauge-bg" style="background: conic-gradient(
+                                    from 180deg,
+                                    #e74c3c 0deg 60deg,
+                                    #f1c40f 60deg 120deg,
+                                    #2ecc71 120deg 240deg,
+                                    #f1c40f 240deg 300deg,
+                                    #e74c3c 300deg 360deg
+                                );">
+                                    <div class="temp-gauge-inner">
+                                        <span class="temp-value" style="font-size: 2.5rem;">870°C</span>
+                                        <span class="temp-label">Réacteur</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <div class="data-item" style="margin-bottom: 10px;">
+                                    <div class="data-label">Consigne</div>
+                                    <div class="data-value" style="font-size: 1.2rem;">850–900°C</div>
+                                </div>
+                                <div class="data-item" style="margin-bottom: 10px;">
+                                    <div class="data-label">Température minimale</div>
+                                    <div class="data-value" style="color: #3498db;">865°C</div>
+                                </div>
+                                <div class="data-item" style="margin-bottom: 10px;">
+                                    <div class="data-label">Température maximale</div>
+                                    <div class="data-value" style="color: #e74c3c;">875°C</div>
+                                </div>
+                                <div class="data-item">
+                                    <div class="data-label">Stabilité thermique</div>
+                                    <div class="data-value" style="color: #2ecc71;">98.5%</div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="kpi-row">
-                            <span>Température minimale</span>
-                            <strong>865°C</strong>
+
+                        <div class="section-title" style="margin-top: 20px;">Historique 24h</div>
+                        <div class="chart-placeholder"
+                            style="height: 120px; display: flex; align-items: center; justify-content: center;">
+                            <canvas id="temp-history-chart" style="max-height: 100%;"></canvas>
                         </div>
-                        <div class="kpi-row">
-                            <span>Température maximale</span>
-                            <strong>875°C</strong>
-                        </div>
-                        <p class="small-text">Stabilité thermique <strong>98.5 %</strong></p>
                     </div>
+
+                    <footer class="card-footer">
+                        <button class="ghost-btn">Ajuster consigne</button>
+                        <button class="link-btn">Voir courbes →</button>
+                    </footer>
                 </article>
 
                 <!-- -------- CARTE : PRESSION -------- -->
                 <article class="card">
                     <header class="card-header">
                         <h3>Pression réacteur</h3>
+                        <span class="tag good">Normal</span>
                     </header>
 
                     <div class="card-body">
-                        <div class="kpi-row big">
-                            <span>Pression actuelle</span>
-                            <strong>1.2 bar</strong>
+                        <div class="temp-gauge" style="width: 120px; height: 120px;">
+                            <div class="temp-gauge-bg"
+                                style="background: conic-gradient(from 0deg, #3498db 0deg 216deg, #e0e0e0 216deg 360deg);">
+                                <div class="temp-gauge-inner">
+                                    <span class="temp-value">1.2</span>
+                                    <span class="temp-label">bar</span>
+                                </div>
+                            </div>
                         </div>
-                        <div class="kpi-row">
-                            <span>Consigne</span>
-                            <strong>1.0-1.5 bar</strong>
+
+                        <div style="margin-top: 16px;">
+                            <div class="kpi-row">
+                                <span>Consigne</span>
+                                <strong>1.0-1.5 bar</strong>
+                            </div>
+                            <div class="progress-bar" style="margin-top: 8px;">
+                                <div class="progress-fill"
+                                    style="width: 60%; background: linear-gradient(90deg, #3498db, #2980b9);"></div>
+                            </div>
+                            <p class="small-text" style="margin-top: 6px; color: #2ecc71;">✓ Dans les limites normales
+                            </p>
                         </div>
-                        <p class="small-text">Dans les limites normales</p>
                     </div>
                 </article>
 
@@ -131,18 +212,27 @@
                 <article class="card">
                     <header class="card-header">
                         <h3>Débit CSR</h3>
+                        <span class="live-indicator">
+                            <span class="live-dot"></span>
+                            <span>Actif</span>
+                        </span>
                     </header>
 
                     <div class="card-body">
-                        <div class="kpi-row big">
-                            <span>Débit instantané</span>
-                            <strong>1.2 t/h</strong>
+                        <div class="data-item" style="margin-bottom: 12px;">
+                            <div class="data-label">Débit instantané</div>
+                            <div class="data-value" style="font-size: 2rem; color: var(--accent);">1.2 t/h</div>
+                            <div class="data-trend trend-up">↑ +0.1 t/h</div>
                         </div>
-                        <div class="kpi-row">
-                            <span>Débit moyen</span>
-                            <strong>1.15 t/h</strong>
+
+                        <div class="data-item">
+                            <div class="data-label">Débit moyen (24h)</div>
+                            <div class="data-value">1.15 t/h</div>
                         </div>
-                        <p class="small-text">Sur les dernières 24h</p>
+
+                        <div class="progress-bar" style="margin-top: 12px;">
+                            <div class="progress-fill" style="width: 80%;"></div>
+                        </div>
                     </div>
                 </article>
 
@@ -150,75 +240,109 @@
                 <article class="card">
                     <header class="card-header">
                         <h3>Débit gaz</h3>
+                        <span class="pill">Production</span>
                     </header>
 
                     <div class="card-body">
-                        <div class="kpi-row big">
-                            <span>Débit syngaz</span>
-                            <strong>850 Nm³/h</strong>
+                        <div class="data-item" style="margin-bottom: 12px;">
+                            <div class="data-label">Débit syngaz</div>
+                            <div class="data-value" style="font-size: 1.8rem; color: #2ecc71;">850 Nm³/h</div>
                         </div>
-                        <div class="kpi-row">
-                            <span>Pouvoir calorifique</span>
-                            <strong>12.5 MJ/Nm³</strong>
+
+                        <div class="data-item">
+                            <div class="data-label">Pouvoir calorifique</div>
+                            <div class="data-value">12.5 MJ/Nm³</div>
+                            <div class="data-trend trend-up">↑ Excellent</div>
                         </div>
                     </div>
+
+                    <footer class="card-footer">
+                        <button class="link-btn">Détails →</button>
+                    </footer>
                 </article>
 
                 <!-- -------- CARTE : COMPOSITION SYNGAZ -------- -->
                 <article class="card card-wide">
                     <header class="card-header">
                         <h3>Composition du syngaz</h3>
-                        <select class="card-select">
+                        <select class="card-select" aria-label="Intervalle">
                             <option>5 minutes</option>
                             <option>1 heure</option>
                             <option>24 heures</option>
                         </select>
                     </header>
 
-                    <div class="card-body syngas-grid">
-                        <div class="syngas-item">
-                            <span>H₂</span>
-                            <strong>41 %</strong>
-                        </div>
-                        <div class="syngas-item">
-                            <span>CO</span>
-                            <strong>32 %</strong>
-                        </div>
-                        <div class="syngas-item">
-                            <span>CH₄</span>
-                            <strong>6 %</strong>
-                        </div>
-                        <div class="syngas-item">
-                            <span>CO₂</span>
-                            <strong>18 %</strong>
-                        </div>
-                        <div class="syngas-item">
-                            <span>Tars</span>
-                            <strong>2.1 g/Nm³</strong>
-                        </div>
-                        <div class="syngas-item">
-                            <span>N₂</span>
-                            <strong>3 %</strong>
+                    <div class="card-body">
+                        <div class="syngas-grid">
+                            <div class="syngas-item">
+                                <span>H₂</span>
+                                <strong style="font-size: 1.3rem; color: #4CAF50;">41 %</strong>
+                                <div class="mini-bar">
+                                    <div style="width:82%; background:#4CAF50;"></div>
+                                </div>
+                            </div>
+                            <div class="syngas-item">
+                                <span>CO</span>
+                                <strong style="font-size: 1.3rem; color: #2196F3;">32 %</strong>
+                                <div class="mini-bar">
+                                    <div style="width:64%; background:#2196F3;"></div>
+                                </div>
+                            </div>
+                            <div class="syngas-item">
+                                <span>CH₄</span>
+                                <strong style="font-size: 1.3rem; color: #FF9800;">6 %</strong>
+                                <div class="mini-bar">
+                                    <div style="width:12%; background:#FF9800;"></div>
+                                </div>
+                            </div>
+                            <div class="syngas-item">
+                                <span>CO₂</span>
+                                <strong style="font-size: 1.3rem; color: #F44336;">18 %</strong>
+                                <div class="mini-bar">
+                                    <div style="width:36%; background:#F44336;"></div>
+                                </div>
+                            </div>
+                            <div class="syngas-item">
+                                <span>Tars</span>
+                                <strong style="font-size: 1.1rem; color: #9E9E9E;">2.1 g/Nm³</strong>
+                                <div class="mini-bar">
+                                    <div style="width:42%; background:#9E9E9E;"></div>
+                                </div>
+                            </div>
+                            <div class="syngas-item">
+                                <span>N₂</span>
+                                <strong style="font-size: 1.3rem; color: #607D8B;">3 %</strong>
+                                <div class="mini-bar">
+                                    <div style="width:6%; background:#607D8B;"></div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
                     <footer class="card-footer">
-                        <button class="ghost-btn">Voir graphique</button>
+                        <button class="ghost-btn">Voir graphique détaillé</button>
+                        <button class="link-btn">Analyse →</button>
                     </footer>
                 </article>
 
                 <!-- -------- CARTE : RENDEMENT -------- -->
                 <article class="card">
                     <header class="card-header">
-                        <h3>Rendement</h3>
+                        <h3>Rendement gazéification</h3>
+                        <span class="tag good">Optimal</span>
                     </header>
 
                     <div class="card-body">
-                        <div class="kpi-row big">
-                            <span>Rendement gazéification</span>
-                            <strong>85.2 %</strong>
+                        <div class="donut" style="margin: 0 auto;">
+                            <div class="donut-inner">
+                                <span class="donut-value">85.2%</span>
+                                <span class="donut-label">Rendement</span>
+                            </div>
                         </div>
-                        <p class="small-text">Rapport syngaz/CSR entrant</p>
+                        <p class="small-text" style="text-align: center; margin-top: 12px;">Rapport syngaz/CSR entrant
+                        </p>
+                        <div class="data-trend trend-up" style="text-align: center; margin-top: 8px;">↑ +1.2% vs hier
+                        </div>
                     </div>
                 </article>
 
@@ -226,13 +350,34 @@
                 <article class="card">
                     <header class="card-header">
                         <h3>Alarmes réacteur</h3>
+                        <span class="connection-status">
+                            <span>OK</span>
+                        </span>
                     </header>
 
                     <div class="card-body">
                         <ul class="alarms">
-                            <li class="alarm ok"><span class="dot"></span> Aucune alarme</li>
-                            <li class="alarm ok"><span class="dot"></span> Température stable</li>
-                            <li class="alarm ok"><span class="dot"></span> Pression normale</li>
+                            <li class="alarm ok">
+                                <span class="dot"></span>
+                                <div style="flex: 1;">
+                                    <strong>Aucune alarme</strong>
+                                    <div class="small-text">Tous les systèmes fonctionnent normalement</div>
+                                </div>
+                            </li>
+                            <li class="alarm ok">
+                                <span class="dot"></span>
+                                <div style="flex: 1;">
+                                    <strong>Température stable</strong>
+                                    <div class="small-text">870°C - Dans la plage cible</div>
+                                </div>
+                            </li>
+                            <li class="alarm ok">
+                                <span class="dot"></span>
+                                <div style="flex: 1;">
+                                    <strong>Pression normale</strong>
+                                    <div class="small-text">1.2 bar - Optimal</div>
+                                </div>
+                            </li>
                         </ul>
                     </div>
 
@@ -241,12 +386,367 @@
                     </footer>
                 </article>
 
+                <!-- -------- CARTE : PARAMÈTRES AVANCÉS -------- -->
+                <article class="card">
+                    <header class="card-header">
+                        <h3>Paramètres avancés</h3>
+                    </header>
+
+                    <div class="card-body">
+                        <div class="data-grid" style="grid-template-columns: 1fr;">
+                            <div class="data-item">
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span style="font-size: 0.8rem;">O₂ injection</span>
+                                    <strong>21%</strong>
+                                </div>
+                            </div>
+                            <div class="data-item">
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span style="font-size: 0.8rem;">Ratio air/CSR</span>
+                                    <strong>1.5</strong>
+                                </div>
+                            </div>
+                            <div class="data-item">
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span style="font-size: 0.8rem;">Temps séjour</span>
+                                    <strong>45 min</strong>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <footer class="card-footer">
+                        <button class="ghost-btn">Modifier</button>
+                    </footer>
+                </article>
+
+                <!-- -------- CARTE : PRODUCTION ÉNERGÉTIQUE -------- -->
+                <article class="card">
+                    <header class="card-header">
+                        <h3>Production énergétique</h3>
+                        <span class="live-indicator">
+                            <span class="live-dot"></span>
+                            <span>Temps réel</span>
+                        </span>
+                    </header>
+
+                    <div class="card-body">
+                        <div class="data-item" style="margin-bottom: 12px;">
+                            <div class="data-label">Puissance actuelle</div>
+                            <div class="data-value" style="font-size: 1.8rem; color: var(--accent);">520 kW</div>
+                        </div>
+
+                        <div class="data-item">
+                            <div class="data-label">Production journalière</div>
+                            <div class="data-value">12.5 MWh</div>
+                            <div class="data-trend trend-up">↑ +0.8 MWh vs hier</div>
+                        </div>
+                    </div>
+                </article>
+
             </section>
         </main>
     </div>
 
-    <!-- Script JS -->
     <script src="navigation.js"></script>
+
+    <style>
+        /* Styles inline */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.95);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+
+        body.loading .loading-overlay {
+            display: flex;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--accent);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .connection-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            border-radius: 999px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            background: rgba(46, 204, 113, 0.1);
+            color: #2ecc71;
+        }
+
+        .connection-status::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: currentColor;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        .live-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            padding: 4px 10px;
+            background: #f8f8fb;
+            border-radius: 999px;
+        }
+
+        .live-dot {
+            width: 6px;
+            height: 6px;
+            background: #2ecc71;
+            border-radius: 50%;
+            animation: livePulse 2s infinite;
+        }
+
+        @keyframes livePulse {
+
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 0.5;
+                transform: scale(1.2);
+            }
+        }
+
+        .temp-gauge {
+            position: relative;
+            margin: 0 auto;
+        }
+
+        .temp-gauge-bg {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            position: relative;
+        }
+
+        .temp-gauge-inner {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80%;
+            height: 80%;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .temp-value {
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .temp-label {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .data-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+
+        .data-item {
+            background: #f8f8fb;
+            padding: 10px;
+            border-radius: 10px;
+            transition: all 0.3s;
+        }
+
+        .data-item:hover {
+            background: #f0f0f5;
+            transform: translateY(-2px);
+        }
+
+        .data-label {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        .data-value {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .data-trend {
+            font-size: 0.7rem;
+            margin-top: 4px;
+        }
+
+        .trend-up {
+            color: #2ecc71;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 999px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent), #ff8f6b);
+            border-radius: 999px;
+            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% {
+                transform: translateX(-100%);
+            }
+
+            100% {
+                transform: translateX(100%);
+            }
+        }
+
+        .side-nav-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card {
+            animation: fadeIn 0.4s ease;
+        }
+
+        .card:nth-child(n) {
+            animation-delay: calc(0.05s * var(--i, 1));
+        }
+    </style>
+
+    <script>
+        function updateDate() {
+            const now = new Date();
+            const days = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
+            const months = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin',
+                'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
+
+            document.getElementById('current-day').textContent = now.getDate();
+            document.getElementById('current-weekday').textContent = days[now.getDay()];
+            document.getElementById('current-month').textContent = months[now.getMonth()];
+        }
+
+        updateDate();
+
+        // Graphique simple d'historique de température
+        const ctx = document.getElementById('temp-history-chart');
+        if (ctx) {
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00', '24:00'],
+                    datasets: [{
+                        label: 'Température',
+                        data: [868, 872, 870, 875, 869, 871, 870],
+                        borderColor: '#FF6A3D',
+                        backgroundColor: 'rgba(255, 106, 61, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            min: 850,
+                            max: 900
+                        }
+                    }
+                }
+            });
+        }
+    </script>
 
 </body>
 

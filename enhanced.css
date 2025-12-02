@@ -1,0 +1,438 @@
+/* ========================================
+   STYLES ADDITIONNELS POUR CSR DASHBOARD
+   ======================================== */
+
+/* --- LOADING STATES --- */
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+}
+
+body.loading .loading-overlay {
+    opacity: 1;
+    pointer-events: all;
+}
+
+.spinner {
+    width: 50px;
+    height: 50px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid var(--accent);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* --- TOAST NOTIFICATIONS --- */
+.error-toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: #e74c3c;
+    color: white;
+    padding: 16px 24px;
+    border-radius: 12px;
+    box-shadow: 0 8px 25px rgba(231, 76, 60, 0.3);
+    z-index: 10000;
+    animation: slideInUp 0.3s ease;
+    max-width: 400px;
+}
+
+.error-toast.fade-out {
+    animation: fadeOut 0.3s ease;
+}
+
+@keyframes slideInUp {
+    from {
+        transform: translateY(100px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeOut {
+    to {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+}
+
+/* --- STATUS BADGES --- */
+.connection-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    background: rgba(46, 204, 113, 0.1);
+    color: #2ecc71;
+}
+
+.connection-status::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+    animation: pulse 2s infinite;
+}
+
+.connection-status.disconnected {
+    background: rgba(231, 76, 60, 0.1);
+    color: #e74c3c;
+}
+
+.connection-status.disconnected::before {
+    animation: none;
+}
+
+/* --- ENHANCED CARDS --- */
+.card {
+    position: relative;
+    overflow: hidden;
+}
+
+.card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent), #ff8f6b);
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.card:hover::before {
+    opacity: 1;
+}
+
+.card.updating {
+    animation: cardPulse 1s ease;
+}
+
+@keyframes cardPulse {
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.02);
+    }
+}
+
+/* --- IMPROVED KPI BOXES --- */
+.kpi-box {
+    position: relative;
+    overflow: hidden;
+}
+
+.kpi-box::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, transparent 0%, rgba(255, 106, 61, 0.05) 100%);
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.kpi-box:hover::after {
+    opacity: 1;
+}
+
+/* --- LIVE UPDATE INDICATOR --- */
+.live-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    padding: 4px 10px;
+    background: #f8f8fb;
+    border-radius: 999px;
+}
+
+.live-dot {
+    width: 6px;
+    height: 6px;
+    background: #2ecc71;
+    border-radius: 50%;
+    animation: livePulse 2s infinite;
+}
+
+@keyframes livePulse {
+
+    0%,
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    50% {
+        opacity: 0.5;
+        transform: scale(1.2);
+    }
+}
+
+/* --- PROGRESS BARS WITH GRADIENT --- */
+.progress-bar {
+    width: 100%;
+    height: 8px;
+    background: #e0e0e0;
+    border-radius: 999px;
+    overflow: hidden;
+    position: relative;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), #ff8f6b);
+    border-radius: 999px;
+    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.progress-fill::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background: linear-gradient(90deg,
+            transparent,
+            rgba(255, 255, 255, 0.3),
+            transparent);
+    animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+    0% {
+        transform: translateX(-100%);
+    }
+
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+/* --- TEMPERATURE GAUGE --- */
+.temp-gauge {
+    position: relative;
+    width: 150px;
+    height: 150px;
+    margin: 0 auto;
+}
+
+.temp-gauge-bg {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: conic-gradient(from 180deg,
+            #e74c3c 0deg 60deg,
+            #f1c40f 60deg 120deg,
+            #2ecc71 120deg 240deg,
+            #f1c40f 240deg 300deg,
+            #e74c3c 300deg 360deg);
+    position: relative;
+}
+
+.temp-gauge-inner {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 80%;
+    height: 80%;
+    background: white;
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.temp-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+.temp-label {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* --- DATA GRID --- */
+.data-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 12px;
+}
+
+.data-item {
+    background: #f8f8fb;
+    padding: 12px;
+    border-radius: 12px;
+    transition: all 0.3s;
+}
+
+.data-item:hover {
+    background: #f0f0f5;
+    transform: translateY(-2px);
+}
+
+.data-label {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+}
+
+.data-value {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+.data-trend {
+    font-size: 0.75rem;
+    margin-top: 4px;
+}
+
+.trend-up {
+    color: #2ecc71;
+}
+
+.trend-down {
+    color: #e74c3c;
+}
+
+/* --- CHART CONTAINERS --- */
+.chart-container {
+    position: relative;
+    height: 250px;
+    padding: 16px;
+    background: #fafafa;
+    border-radius: 12px;
+}
+
+.chart-title {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* --- RESPONSIVE IMPROVEMENTS --- */
+@media (max-width: 768px) {
+    .data-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .chart-container {
+        height: 200px;
+    }
+
+    .temp-gauge {
+        width: 120px;
+        height: 120px;
+    }
+
+    .temp-value {
+        font-size: 1.5rem;
+    }
+}
+
+/* --- DARK MODE SUPPORT (Optional) --- */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --bg-main: #1a1a1a;
+        --card-bg: #2a2a2a;
+        --text-main: #ffffff;
+        --text-muted: #a0a0a0;
+        --border-soft: #3a3a3a;
+    }
+
+    .card {
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+    }
+}
+
+/* --- ACCESSIBILITY --- */
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* Focus visible pour la navigation au clavier */
+*:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}
+
+/* --- PRINT STYLES --- */
+@media print {
+
+    .sidebar,
+    .topbar,
+    .icon-btn,
+    .primary-btn {
+        display: none;
+    }
+
+    .main {
+        padding: 0;
+    }
+
+    .card {
+        break-inside: avoid;
+        box-shadow: none;
+        border: 1px solid #ccc;
+    }
+}

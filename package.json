@@ -2,15 +2,25 @@
   "name": "natran-dashboard",
   "version": "1.0.0",
   "description": "Dashboard CSR - Unité Pilote",
-  "main": "serveur.js",
   "scripts": {
-    "start": "node serveur.js",
-    "test-data": "node insert-test-data.js"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
   },
   "dependencies": {
-    "express": "^4.18.2",
-    "cors": "^2.8.5",
+    "chart.js": "^4.4.2",
+    "next": "14.2.3",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
     "sqlite3": "^5.1.6"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.25",
+    "@types/react": "^18.2.67",
+    "@types/react-dom": "^18.2.21",
+    "@types/sqlite3": "^3.1.11",
+    "eslint": "^8.57.0",
+    "typescript": "^5.4.2"
   }
 }
-

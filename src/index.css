@@ -1,0 +1,19 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-slate-950 text-slate-100;
+  }
+}
+
+@layer utilities {
+  .glass-effect {
+    @apply bg-slate-900/50 backdrop-blur-md border border-slate-800;
+  }
+  
+  .glow-effect {
+    box-shadow: 0 0 20px rgba(14, 165, 233, 0.3);
+  }
+}

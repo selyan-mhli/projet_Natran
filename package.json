@@ -9,6 +9,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@babylonjs/core": "^8.40.1",
+    "@babylonjs/loaders": "^8.40.1",
+    "@babylonjs/materials": "^8.40.1",
     "clsx": "^2.0.0",
     "lucide-react": "^0.294.0",
     "react": "^18.2.0",

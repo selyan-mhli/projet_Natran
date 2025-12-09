@@ -97,19 +97,19 @@ export default function Dashboard() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="glass-effect rounded-xl p-6">
-          <h3 className="text-xl font-bold mb-4 text-white">Détections en Temps Réel</h3>
+          <h3 className="text-xl font-bold mb-4 text-slate-900">Flux de détection en temps réel</h3>
           <div className="space-y-2 max-h-96 overflow-y-auto">
             {detections.map((detection) => (
-              <div key={detection.id} className="flex items-center justify-between p-3 bg-slate-800/50 rounded-lg">
+              <div key={detection.id} className="flex items-center justify-between p-3 bg-slate-100/80 rounded-lg">
                 <div className="flex items-center gap-3">
                   <div className={`w-3 h-3 rounded-full ${getMaterialColor(detection.type)}`}></div>
                   <div>
-                    <p className="font-medium text-white">{detection.type}</p>
+                    <p className="font-medium text-slate-900">{detection.type}</p>
                     <p className="text-xs text-slate-400">{detection.time}</p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="text-sm font-medium text-green-400">{detection.confidence.toFixed(1)}%</p>
+                  <p className="text-sm font-medium text-slate-400">{detection.confidence.toFixed(1)}%</p>
                   <p className="text-xs text-slate-400">Confiance</p>
                 </div>
               </div>
@@ -118,7 +118,7 @@ export default function Dashboard() {
         </div>
 
         <div className="glass-effect rounded-xl p-6">
-          <h3 className="text-xl font-bold mb-4 text-white">Composition CSR Détectée</h3>
+          <h3 className="text-xl font-bold mb-4 text-slate-900">Analyse compositionnelle instantanée</h3>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={compositionData}>
               <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
@@ -135,7 +135,7 @@ export default function Dashboard() {
       </div>
 
       <div className="glass-effect rounded-xl p-6">
-        <h3 className="text-xl font-bold mb-4 text-white">Qualité du Gaz Produit (24h)</h3>
+        <h3 className="text-xl font-bold mb-4 text-slate-900">Qualité du syngas produit (24h)</h3>
         <ResponsiveContainer width="100%" height={300}>
           <LineChart data={qualityData}>
             <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
@@ -146,8 +146,8 @@ export default function Dashboard() {
               labelStyle={{ color: '#f1f5f9' }}
             />
             <Legend />
-            <Line type="monotone" dataKey="avant" stroke="#ef4444" strokeWidth={2} name="Sans Tri IA" />
-            <Line type="monotone" dataKey="apres" stroke="#22c55e" strokeWidth={2} name="Avec Tri IA" />
+            <Line type="monotone" dataKey="avant" stroke="#ef4444" strokeWidth={2} name="Sans tri prédictif" />
+            <Line type="monotone" dataKey="apres" stroke="#22c55e" strokeWidth={2} name="Avec tri prédictif" />
           </LineChart>
         </ResponsiveContainer>
       </div>
@@ -159,21 +159,21 @@ function MetricCard({ title, value, icon: Icon, status, trend }: any) {
   return (
     <div className="glass-effect rounded-xl p-6">
       <div className="flex items-center justify-between mb-2">
-        <Icon className={`w-8 h-8 ${status === 'good' ? 'text-green-400' : 'text-yellow-400'}`} />
-        <span className={`text-sm font-medium ${trend.startsWith('+') ? 'text-green-400' : 'text-red-400'}`}>
+        <Icon className={`w-8 h-8 ${status === 'good' ? 'text-slate-400' : 'text-slate-400'}`} />
+        <span className={`text-sm font-medium ${trend.startsWith('+') ? 'text-slate-400' : 'text-slate-400'}`}>
           {trend}
         </span>
       </div>
       <h3 className="text-sm text-slate-400 mb-1">{title}</h3>
-      <p className="text-2xl font-bold text-white">{value}</p>
+      <p className="text-2xl font-bold text-slate-900">{value}</p>
     </div>
   )
 }
 
 function getMaterialColor(type: string) {
   const colors: Record<string, string> = {
-    'PVC (Chloré)': 'bg-red-500',
-    'PE/PP': 'bg-blue-500',
+    'PVC (Chloré)': 'bg-slate-500',
+    'PE/PP': 'bg-slate-500',
     'Papier/Carton': 'bg-yellow-500',
     'Métaux ferreux': 'bg-gray-400',
     'Bois': 'bg-amber-700',

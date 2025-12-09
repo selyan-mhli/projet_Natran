@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { Camera, Cpu, Play, RotateCcw, Zap, AlertTriangle, CheckCircle, Activity } from 'lucide-react'
+import { Camera, Cpu, Play, RotateCcw, Zap } from 'lucide-react'
 
 interface Detection {
   x: number
@@ -41,12 +41,12 @@ export default function Simulation() {
   const animationRef = useRef<number>()
 
   const materials = [
-    { name: 'PVC (Chloré)', color: 'border-red-500', bgColor: 'bg-red-500/20', reject: true, avgConf: 0.94, shape: 'bottle', emoji: '🧴' },
-    { name: 'PE/PP', color: 'border-blue-500', bgColor: 'bg-blue-500/20', reject: false, avgConf: 0.96, shape: 'bag', emoji: '🛍️' },
-    { name: 'Papier/Carton', color: 'border-yellow-500', bgColor: 'bg-yellow-500/20', reject: false, avgConf: 0.92, shape: 'box', emoji: '📦' },
-    { name: 'Métaux', color: 'border-gray-400', bgColor: 'bg-gray-400/20', reject: true, avgConf: 0.98, shape: 'can', emoji: '🥫' },
-    { name: 'Bois', color: 'border-amber-700', bgColor: 'bg-amber-700/20', reject: false, avgConf: 0.91, shape: 'plank', emoji: '🪵' },
-    { name: 'Textile', color: 'border-purple-500', bgColor: 'bg-purple-500/20', reject: false, avgConf: 0.89, shape: 'cloth', emoji: '👕' },
+    { name: 'PVC (Chloré)', color: 'border-slate-500', bgColor: 'bg-slate-500/20', reject: true, avgConf: 0.94, shape: 'bottle' },
+    { name: 'PE/PP', color: 'border-slate-500', bgColor: 'bg-slate-500/20', reject: false, avgConf: 0.96, shape: 'bag' },
+    { name: 'Papier/Carton', color: 'border-yellow-500', bgColor: 'bg-yellow-500/20', reject: false, avgConf: 0.92, shape: 'box' },
+    { name: 'Métaux', color: 'border-gray-400', bgColor: 'bg-gray-400/20', reject: true, avgConf: 0.98, shape: 'can' },
+    { name: 'Bois', color: 'border-amber-700', bgColor: 'bg-amber-700/20', reject: false, avgConf: 0.91, shape: 'plank' },
+    { name: 'Textile', color: 'border-purple-500', bgColor: 'bg-purple-500/20', reject: false, avgConf: 0.89, shape: 'cloth' },
   ]
 
   useEffect(() => {
@@ -174,7 +174,7 @@ export default function Simulation() {
       <div className="glass-effect rounded-xl p-6">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h2 className="text-2xl font-bold text-white mb-2">Simulation de Détection IA</h2>
+            <h2 className="text-2xl font-bold text-slate-900 mb-2">Simulation de Détection IA</h2>
             <p className="text-slate-400">Visualisation en temps réel du tri intelligent des CSR</p>
           </div>
           <div className="flex gap-3">
@@ -184,7 +184,7 @@ export default function Simulation() {
               className={`flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-all ${
                 isRunning
                   ? 'bg-slate-700 text-slate-400 cursor-not-allowed'
-                  : 'bg-primary-600 text-white hover:bg-primary-700 glow-effect'
+                  : 'bg-slate-600 text-slate-900 hover:bg-slate-700 glow-effect'
               }`}
             >
               <Play className="w-5 h-5" />
@@ -192,7 +192,7 @@ export default function Simulation() {
             </button>
             <button
               onClick={reset}
-              className="flex items-center gap-2 px-6 py-3 bg-slate-700 text-white rounded-lg font-medium hover:bg-slate-600 transition-all"
+              className="flex items-center gap-2 px-6 py-3 bg-slate-700 text-slate-900 rounded-lg font-medium hover:bg-slate-600 transition-all"
             >
               <RotateCcw className="w-5 h-5" />
               Réinitialiser
@@ -201,43 +201,43 @@ export default function Simulation() {
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3 mb-6">
-          <div className="glass-effect rounded-lg p-4 border-l-4 border-primary-500">
+          <div className="glass-effect rounded-lg p-4 border-l-4 border-slate-500">
             <p className="text-xs text-slate-400 mb-1">Total Détecté</p>
-            <p className="text-2xl font-bold text-white">{stats.total}</p>
+            <p className="text-2xl font-bold text-slate-900">{stats.total}</p>
           </div>
-          <div className="glass-effect rounded-lg p-4 border-l-4 border-green-500">
-            <p className="text-xs text-slate-400 mb-1">✓ Accepté</p>
-            <p className="text-2xl font-bold text-green-400">{stats.accepted}</p>
+          <div className="glass-effect rounded-lg p-4 border-l-4 border-slate-500">
+            <p className="text-xs text-slate-400 mb-1">Accepté</p>
+            <p className="text-2xl font-bold text-slate-400">{stats.accepted}</p>
           </div>
-          <div className="glass-effect rounded-lg p-4 border-l-4 border-red-500">
-            <p className="text-xs text-slate-400 mb-1">✕ Rejeté</p>
-            <p className="text-2xl font-bold text-red-400">{stats.rejected}</p>
+          <div className="glass-effect rounded-lg p-4 border-l-4 border-slate-500">
+            <p className="text-xs text-slate-400 mb-1">Rejeté</p>
+            <p className="text-2xl font-bold text-slate-400">{stats.rejected}</p>
           </div>
-          <div className="glass-effect rounded-lg p-4 border-l-4 border-blue-500">
-            <p className="text-xs text-slate-400 mb-1">Débit</p>
-            <p className="text-2xl font-bold text-blue-400">{stats.currentThroughput}<span className="text-sm">/min</span></p>
+          <div className="glass-effect rounded-lg p-4 border-l-4 border-slate-500">
+            <p className="text-xs text-slate-400 mb-1">Débit traitement</p>
+            <p className="text-2xl font-bold text-slate-400">{stats.currentThroughput}<span className="text-sm">/min</span></p>
           </div>
           <div className="glass-effect rounded-lg p-4 border-l-4 border-yellow-500">
-            <p className="text-xs text-slate-400 mb-1">Confiance Moy.</p>
-            <p className="text-2xl font-bold text-yellow-400">{(stats.avgConfidence * 100).toFixed(1)}%</p>
+            <p className="text-xs text-slate-400 mb-1">Confiance moyenne</p>
+            <p className="text-2xl font-bold text-slate-400">{(stats.avgConfidence * 100).toFixed(1)}%</p>
           </div>
           <div className="glass-effect rounded-lg p-4 border-l-4 border-purple-500">
-            <p className="text-xs text-slate-400 mb-1">Efficacité</p>
-            <p className="text-2xl font-bold text-purple-400">{stats.total > 0 ? ((stats.rejected / stats.total) * 100).toFixed(0) : 0}%</p>
+            <p className="text-xs text-slate-400 mb-1">Taux de rejet</p>
+            <p className="text-2xl font-bold text-slate-400">{stats.total > 0 ? ((stats.rejected / stats.total) * 100).toFixed(0) : 0}%</p>
           </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
           <div className="glass-effect rounded-lg p-4">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sm text-slate-400">Niveau de Chlore</span>
-              <span className={`text-lg font-bold ${stats.chloreLevel < 0.8 ? 'text-green-400' : 'text-orange-400'}`}>
+              <span className="text-sm text-slate-400">Taux de chlore</span>
+              <span className={`text-lg font-bold ${stats.chloreLevel < 0.8 ? 'text-slate-400' : 'text-slate-400'}`}>
                 {stats.chloreLevel.toFixed(2)}%
               </span>
             </div>
             <div className="w-full bg-slate-700 rounded-full h-2">
               <div 
-                className={`h-2 rounded-full transition-all duration-500 ${stats.chloreLevel < 0.8 ? 'bg-green-500' : 'bg-orange-500'}`}
+                className={`h-2 rounded-full transition-all duration-500 ${stats.chloreLevel < 0.8 ? 'bg-slate-500' : 'bg-orange-500'}`}
                 style={{ width: `${(stats.chloreLevel / 1.5) * 100}%` }}
               ></div>
             </div>
@@ -246,14 +246,14 @@ export default function Simulation() {
 
           <div className="glass-effect rounded-lg p-4">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sm text-slate-400">PCI (Pouvoir Calorifique)</span>
-              <span className={`text-lg font-bold ${stats.pciValue > 19 ? 'text-green-400' : 'text-blue-400'}`}>
+              <span className="text-sm text-slate-400">Pouvoir Calorifique Inférieur</span>
+              <span className={`text-lg font-bold ${stats.pciValue > 19 ? 'text-slate-400' : 'text-slate-400'}`}>
                 {stats.pciValue.toFixed(1)} MJ/kg
               </span>
             </div>
             <div className="w-full bg-slate-700 rounded-full h-2">
               <div 
-                className={`h-2 rounded-full transition-all duration-500 ${stats.pciValue > 19 ? 'bg-green-500' : 'bg-blue-500'}`}
+                className={`h-2 rounded-full transition-all duration-500 ${stats.pciValue > 19 ? 'bg-slate-500' : 'bg-slate-500'}`}
                 style={{ width: `${((stats.pciValue - 16) / 6) * 100}%` }}
               ></div>
             </div>
@@ -261,16 +261,16 @@ export default function Simulation() {
           </div>
         </div>
 
-        <div className="relative bg-slate-950 rounded-xl border-2 border-slate-700 overflow-hidden" style={{ 
+        <div className="relative bg-white rounded-xl border-2 border-slate-700 overflow-hidden" style={{ 
           height: '600px'
         }}>
           {/* En-tête avec infos caméra */}
           <div className="absolute top-4 left-4 flex items-center gap-3 glass-effect px-4 py-2 rounded-lg z-20">
-            <Camera className="w-5 h-5 text-primary-400" />
+            <Camera className="w-5 h-5 text-slate-400" />
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-sm font-medium text-white">CAM-01 • Convoyeur Principal</span>
-                {isRunning && <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>}
+                <span className="text-sm font-medium text-slate-900">CAM-01 • Convoyeur Principal</span>
+                {isRunning && <div className="w-2 h-2 bg-slate-500 rounded-full animate-pulse"></div>}
               </div>
               <span className="text-xs text-slate-400">4K • 60Hz • NIR+RGB</span>
             </div>
@@ -280,16 +280,16 @@ export default function Simulation() {
           <div className="absolute top-4 right-4 space-y-2 z-20">
             <div className="glass-effect px-4 py-2 rounded-lg">
               <div className="flex items-center gap-2">
-                <Cpu className="w-5 h-5 text-primary-400" />
-                <span className="text-sm font-medium text-white">YOLOv8-CSR-Custom</span>
+                <Cpu className="w-5 h-5 text-slate-400" />
+                <span className="text-sm font-medium text-slate-900">YOLOv8-CSR-Custom</span>
               </div>
               <span className="text-xs text-slate-400">NVIDIA Jetson AGX Orin</span>
             </div>
             {isRunning && (
               <div className="glass-effect px-4 py-2 rounded-lg">
                 <div className="flex items-center gap-2">
-                  <Zap className="w-4 h-4 text-green-400" />
-                  <span className="text-sm font-bold text-green-400">{fps} FPS</span>
+                  <Zap className="w-4 h-4 text-slate-400" />
+                  <span className="text-sm font-bold text-slate-400">{fps} FPS</span>
                 </div>
               </div>
             )}
@@ -329,15 +329,15 @@ export default function Simulation() {
                 {/* Support 3D */}
                 <div className="w-2 h-32 bg-gradient-to-b from-slate-500 to-slate-700 mx-auto rounded-full shadow-lg"></div>
                 {/* Caméra RGB */}
-                <div className="w-16 h-12 bg-gradient-to-br from-slate-700 to-slate-900 border-2 border-blue-500 rounded-lg flex items-center justify-center shadow-2xl" style={{
+                <div className="w-16 h-12 bg-gradient-to-br from-slate-700 to-slate-900 border-2 border-slate-500 rounded-lg flex items-center justify-center shadow-2xl" style={{
                   boxShadow: '0 10px 30px rgba(59, 130, 246, 0.5), inset 0 2px 4px rgba(255,255,255,0.1)'
                 }}>
-                  <Camera className="w-6 h-6 text-blue-400" />
+                  <Camera className="w-6 h-6 text-slate-400" />
                   {isRunning && (
-                    <div className="absolute inset-0 border-2 border-blue-400 rounded-lg animate-pulse"></div>
+                    <div className="absolute inset-0 border-2 border-slate-400 rounded-lg animate-pulse"></div>
                   )}
                 </div>
-                <div className="text-xs text-blue-400 text-center mt-2 font-bold bg-slate-900/80 px-2 py-1 rounded">RGB 4K</div>
+                <div className="text-xs text-slate-400 text-center mt-2 font-bold bg-slate-900/80 px-2 py-1 rounded">RGB 4K</div>
                 {/* Faisceau 3D */}
                 {isRunning && (
                   <div className="absolute top-12 left-1/2 -translate-x-1/2 w-32 h-64 bg-gradient-to-b from-blue-500/30 via-blue-500/10 to-transparent pointer-events-none" style={{
@@ -357,12 +357,12 @@ export default function Simulation() {
                 <div className="w-20 h-14 bg-gradient-to-br from-slate-700 to-slate-900 border-2 border-purple-500 rounded-lg flex items-center justify-center shadow-2xl" style={{
                   boxShadow: '0 10px 30px rgba(168, 85, 247, 0.5), inset 0 2px 4px rgba(255,255,255,0.1)'
                 }}>
-                  <Camera className="w-7 h-7 text-purple-400" />
+                  <Camera className="w-7 h-7 text-slate-400" />
                   {isRunning && (
                     <div className="absolute inset-0 border-2 border-purple-400 rounded-lg animate-pulse"></div>
                   )}
                 </div>
-                <div className="text-xs text-purple-400 text-center mt-2 font-bold bg-slate-900/80 px-2 py-1 rounded">NIR</div>
+                <div className="text-xs text-slate-400 text-center mt-2 font-bold bg-slate-900/80 px-2 py-1 rounded">NIR</div>
                 {/* Faisceau 3D */}
                 {isRunning && (
                   <div className="absolute top-14 left-1/2 -translate-x-1/2 w-40 h-72 bg-gradient-to-b from-purple-500/35 via-purple-500/12 to-transparent pointer-events-none" style={{
@@ -379,15 +379,15 @@ export default function Simulation() {
                 {/* Support 3D */}
                 <div className="w-2 h-32 bg-gradient-to-b from-slate-500 to-slate-700 mx-auto rounded-full shadow-lg"></div>
                 {/* Capteur */}
-                <div className="w-16 h-12 bg-gradient-to-br from-slate-700 to-slate-900 border-2 border-green-500 rounded-lg flex items-center justify-center shadow-2xl" style={{
+                <div className="w-16 h-12 bg-gradient-to-br from-slate-700 to-slate-900 border-2 border-slate-500 rounded-lg flex items-center justify-center shadow-2xl" style={{
                   boxShadow: '0 10px 30px rgba(34, 197, 94, 0.5), inset 0 2px 4px rgba(255,255,255,0.1)'
                 }}>
-                  <Zap className="w-6 h-6 text-green-400" />
+                  <Zap className="w-6 h-6 text-slate-400" />
                   {isRunning && (
-                    <div className="absolute inset-0 border-2 border-green-400 rounded-lg animate-pulse"></div>
+                    <div className="absolute inset-0 border-2 border-slate-400 rounded-lg animate-pulse"></div>
                   )}
                 </div>
-                <div className="text-xs text-green-400 text-center mt-2 font-bold bg-slate-900/80 px-2 py-1 rounded">SPECTRAL</div>
+                <div className="text-xs text-slate-400 text-center mt-2 font-bold bg-slate-900/80 px-2 py-1 rounded">SPECTRAL</div>
                 {/* Faisceau 3D */}
                 {isRunning && (
                   <div className="absolute top-12 left-1/2 -translate-x-1/2 w-32 h-64 bg-gradient-to-b from-green-500/30 via-green-500/10 to-transparent pointer-events-none" style={{
@@ -403,8 +403,8 @@ export default function Simulation() {
               <div className="relative h-full bg-gradient-to-r from-transparent via-red-500 to-transparent opacity-80 shadow-lg shadow-red-500/50">
                 {isRunning && (
                   <>
-                    <div className="absolute inset-0 bg-red-500 animate-pulse"></div>
-                    <div className="absolute -top-8 left-1/2 -translate-x-1/2 text-xs text-red-400 font-bold whitespace-nowrap bg-slate-900/80 px-3 py-1 rounded">
+                    <div className="absolute inset-0 bg-slate-500 animate-pulse"></div>
+                    <div className="absolute -top-8 left-1/2 -translate-x-1/2 text-xs text-slate-400 font-bold whitespace-nowrap bg-slate-900/80 px-3 py-1 rounded">
                       ⚡ ZONE DE DÉTECTION ⚡
                     </div>
                   </>
@@ -416,14 +416,14 @@ export default function Simulation() {
             <div className="absolute right-16 bottom-24 z-20">
               <div className="flex flex-col items-center gap-2">
                 {/* Buse de rejet 3D */}
-                <div className="w-14 h-20 bg-gradient-to-br from-slate-700 to-slate-900 border-2 border-red-500 rounded-t-xl flex items-center justify-center shadow-2xl" style={{
+                <div className="w-14 h-20 bg-gradient-to-br from-slate-700 to-slate-900 border-2 border-slate-500 rounded-t-xl flex items-center justify-center shadow-2xl" style={{
                   boxShadow: '0 10px 30px rgba(239, 68, 68, 0.5), inset 0 2px 4px rgba(255,255,255,0.1)'
                 }}>
                   <div className="text-3xl">💨</div>
                 </div>
-                <div className="text-sm text-red-400 font-bold bg-slate-900/80 px-3 py-1 rounded">REJET</div>
+                <div className="text-sm text-slate-400 font-bold bg-slate-900/80 px-3 py-1 rounded">REJET</div>
                 {isRunning && (
-                  <div className="absolute -top-6 left-1/2 -translate-x-1/2 w-12 h-12 bg-red-500/40 rounded-full animate-ping"></div>
+                  <div className="absolute -top-6 left-1/2 -translate-x-1/2 w-12 h-12 bg-slate-500/40 rounded-full animate-ping"></div>
                 )}
               </div>
             </div>
@@ -431,12 +431,12 @@ export default function Simulation() {
             {/* Sortie accepté 3D (gauche) */}
             <div className="absolute left-16 bottom-24 z-20">
               <div className="flex flex-col items-center gap-2">
-                <div className="w-14 h-20 bg-gradient-to-br from-slate-700 to-slate-900 border-2 border-green-500 rounded-t-xl flex items-center justify-center shadow-2xl" style={{
+                <div className="w-14 h-20 bg-gradient-to-br from-slate-700 to-slate-900 border-2 border-slate-500 rounded-t-xl flex items-center justify-center shadow-2xl" style={{
                   boxShadow: '0 10px 30px rgba(34, 197, 94, 0.5), inset 0 2px 4px rgba(255,255,255,0.1)'
                 }}>
                   <div className="text-3xl">✓</div>
                 </div>
-                <div className="text-sm text-green-400 font-bold bg-slate-900/80 px-3 py-1 rounded">ACCEPTÉ</div>
+                <div className="text-sm text-slate-400 font-bold bg-slate-900/80 px-3 py-1 rounded">ACCEPTÉ</div>
               </div>
             </div>
 
@@ -475,14 +475,9 @@ export default function Simulation() {
                   >
                     {/* Emoji de l'objet - PLUS GROS */}
                     <div className="absolute inset-0 flex items-center justify-center">
-                      <span style={{ 
-                        fontSize: '3.5rem',
-                        filter: 'drop-shadow(0 6px 12px rgba(0,0,0,0.9))',
-                        transform: `rotate(${Math.sin(item.id) * 8}deg)`,
-                        display: 'block'
-                      }}>
-                        {material.emoji}
-                      </span>
+                      <div className="w-full h-full flex items-center justify-center text-slate-900 font-bold text-xs">
+                        {material.shape.toUpperCase()}
+                      </div>
                     </div>
 
                     {/* Bounding box YOLO quand dans la zone de scan */}
@@ -490,8 +485,8 @@ export default function Simulation() {
                       <>
                         {/* Label de détection - PLUS VISIBLE */}
                         <div className={`absolute -top-10 left-1/2 -translate-x-1/2 px-4 py-2 rounded-lg text-sm font-bold ${
-                          isReject ? 'bg-red-500' : 'bg-green-500'
-                        } text-white whitespace-nowrap shadow-2xl z-50 animate-pulse`}
+                          isReject ? 'bg-slate-500' : 'bg-slate-500'
+                        } text-slate-900 whitespace-nowrap shadow-2xl z-50 animate-pulse`}
                         style={{
                           transform: 'translateZ(20px)',
                           boxShadow: `0 8px 20px ${isReject ? 'rgba(239, 68, 68, 0.6)' : 'rgba(34, 197, 94, 0.6)'}`
@@ -523,13 +518,13 @@ export default function Simulation() {
                       zIndex: 50
                     }}>
                       <div className={`w-10 h-10 rounded-full flex items-center justify-center shadow-2xl ${
-                        isReject ? 'bg-red-500' : 'bg-green-500'
+                        isReject ? 'bg-slate-500' : 'bg-slate-500'
                       }`}
                       style={{
                         animation: 'bounce 1s infinite',
                         boxShadow: `0 8px 25px ${isReject ? 'rgba(239, 68, 68, 0.7)' : 'rgba(34, 197, 94, 0.7)'}`
                       }}>
-                        <span className="text-white font-bold text-xl">{isReject ? '✕' : '✓'}</span>
+                        <span className="text-slate-900 font-bold text-xl">{isReject ? '✕' : '✓'}</span>
                       </div>
                     </div>
                   )}
@@ -543,21 +538,21 @@ export default function Simulation() {
             <div className="flex items-center justify-around px-8">
               <div className="text-center">
                 <div className="flex items-center gap-2 justify-center mb-1">
-                  <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                  <div className="w-3 h-3 bg-slate-500 rounded-full"></div>
                   <span className="text-xs text-slate-400">CSR Accepté</span>
                 </div>
                 <p className="text-sm text-slate-300">→ Vers Pyro-gazéification</p>
               </div>
               <div className="text-center">
                 <div className="flex items-center gap-2 justify-center mb-1">
-                  <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                  <div className="w-3 h-3 bg-slate-500 rounded-full"></div>
                   <span className="text-xs text-slate-400">Polluants Détectés</span>
                 </div>
                 <p className="text-sm text-slate-300">→ Rejet automatique</p>
               </div>
               <div className="text-center">
                 <div className="flex items-center gap-2 justify-center mb-1">
-                  <Zap className="w-3 h-3 text-yellow-400" />
+                  <Zap className="w-3 h-3 text-slate-400" />
                   <span className="text-xs text-slate-400">Temps de réponse</span>
                 </div>
                 <p className="text-sm text-slate-300">{'<'} 20ms</p>
@@ -576,12 +571,12 @@ export default function Simulation() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="glass-effect rounded-xl p-6">
-          <h3 className="text-xl font-bold text-white mb-4">Matériaux Détectables</h3>
+          <h3 className="text-xl font-bold text-slate-900 mb-4">Matériaux Détectables</h3>
           <div className="space-y-3">
             {materials.map((material) => (
               <div key={material.name} className={`flex items-center justify-between p-3 border-2 rounded-lg ${material.color}`}>
-                <span className="font-medium text-white">{material.name}</span>
-                <span className={`text-sm font-bold ${material.reject ? 'text-red-400' : 'text-green-400'}`}>
+                <span className="font-medium text-slate-900">{material.name}</span>
+                <span className={`text-sm font-bold ${material.reject ? 'text-slate-400' : 'text-slate-400'}`}>
                   {material.reject ? 'REJETÉ' : 'ACCEPTÉ'}
                 </span>
               </div>
@@ -590,33 +585,33 @@ export default function Simulation() {
         </div>
 
         <div className="glass-effect rounded-xl p-6">
-          <h3 className="text-xl font-bold text-white mb-4">Performances du Modèle</h3>
+          <h3 className="text-xl font-bold text-slate-900 mb-4">Performances du Modèle</h3>
           <div className="space-y-4">
             <div>
               <div className="flex justify-between text-sm mb-2">
                 <span className="text-slate-400">Précision</span>
-                <span className="text-white font-bold">96.8%</span>
+                <span className="text-slate-900 font-bold">96.8%</span>
               </div>
               <div className="w-full bg-slate-700 rounded-full h-2">
-                <div className="bg-green-500 h-2 rounded-full" style={{ width: '96.8%' }}></div>
+                <div className="bg-slate-500 h-2 rounded-full" style={{ width: '96.8%' }}></div>
               </div>
             </div>
             <div>
               <div className="flex justify-between text-sm mb-2">
                 <span className="text-slate-400">Rappel</span>
-                <span className="text-white font-bold">94.2%</span>
+                <span className="text-slate-900 font-bold">94.2%</span>
               </div>
               <div className="w-full bg-slate-700 rounded-full h-2">
-                <div className="bg-blue-500 h-2 rounded-full" style={{ width: '94.2%' }}></div>
+                <div className="bg-slate-500 h-2 rounded-full" style={{ width: '94.2%' }}></div>
               </div>
             </div>
             <div>
               <div className="flex justify-between text-sm mb-2">
                 <span className="text-slate-400">Vitesse de Traitement</span>
-                <span className="text-white font-bold">45 FPS</span>
+                <span className="text-slate-900 font-bold">45 FPS</span>
               </div>
               <div className="w-full bg-slate-700 rounded-full h-2">
-                <div className="bg-primary-500 h-2 rounded-full" style={{ width: '90%' }}></div>
+                <div className="bg-slate-500 h-2 rounded-full" style={{ width: '90%' }}></div>
               </div>
             </div>
           </div>

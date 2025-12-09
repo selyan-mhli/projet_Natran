@@ -262,15 +262,15 @@ export default function Simulation3D() {
       <div className="grid grid-cols-3 gap-4">
         <div className="glass-effect p-4 rounded-lg">
           <p className="text-sm text-slate-400">Total Détecté</p>
-          <p className="text-3xl font-bold text-white">{stats.total}</p>
+          <p className="text-3xl font-bold text-slate-900">{stats.total}</p>
         </div>
         <div className="glass-effect p-4 rounded-lg">
           <p className="text-sm text-slate-400">Accepté</p>
-          <p className="text-3xl font-bold text-green-400">{stats.accepted}</p>
+          <p className="text-3xl font-bold text-slate-400">{stats.accepted}</p>
         </div>
         <div className="glass-effect p-4 rounded-lg">
           <p className="text-sm text-slate-400">Rejeté</p>
-          <p className="text-3xl font-bold text-red-400">{stats.rejected}</p>
+          <p className="text-3xl font-bold text-slate-400">{stats.rejected}</p>
         </div>
       </div>
 
@@ -279,7 +279,7 @@ export default function Simulation3D() {
         {!isRunning ? (
           <button
             onClick={handleStart}
-            className="flex items-center gap-2 px-6 py-3 bg-primary-500 hover:bg-primary-600 text-white rounded-lg font-medium transition-colors"
+            className="flex items-center gap-2 px-6 py-3 bg-slate-500 hover:bg-slate-600 text-slate-900 rounded-lg font-medium transition-colors"
           >
             <Play className="w-5 h-5" />
             Démarrer la Simulation 3D
@@ -287,7 +287,7 @@ export default function Simulation3D() {
         ) : (
           <button
             onClick={handleStop}
-            className="flex items-center gap-2 px-6 py-3 bg-red-500 hover:bg-red-600 text-white rounded-lg font-medium transition-colors"
+            className="flex items-center gap-2 px-6 py-3 bg-slate-500 hover:bg-slate-600 text-slate-900 rounded-lg font-medium transition-colors"
           >
             <Pause className="w-5 h-5" />
             Arrêter
@@ -295,7 +295,7 @@ export default function Simulation3D() {
         )}
         <button
           onClick={handleReset}
-          className="flex items-center gap-2 px-6 py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-lg font-medium transition-colors"
+          className="flex items-center gap-2 px-6 py-3 bg-slate-700 hover:bg-slate-600 text-slate-900 rounded-lg font-medium transition-colors"
         >
           <RotateCcw className="w-5 h-5" />
           Réinitialiser
@@ -303,7 +303,7 @@ export default function Simulation3D() {
       </div>
 
       {/* Canvas 3D */}
-      <div className="relative bg-slate-950 rounded-xl border-2 border-slate-700 overflow-hidden" style={{ height: '600px' }}>
+      <div className="relative bg-white rounded-xl border-2 border-slate-700 overflow-hidden" style={{ height: '600px' }}>
         <Canvas
           camera={{ position: [0, 8, 12], fov: 50 }}
           shadows

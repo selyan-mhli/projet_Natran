@@ -4,13 +4,13 @@
 
 @layer base {
   body {
-    @apply bg-slate-950 text-slate-100;
+    @apply bg-white text-slate-900;
   }
 }
 
 @layer utilities {
   .glass-effect {
-    @apply bg-slate-900/50 backdrop-blur-md border border-slate-800;
+    @apply bg-white/80 backdrop-blur-md border border-slate-200 shadow-lg;
   }
   
   .glow-effect {

@@ -1,326 +1,224 @@
-import { TrendingUp, TrendingDown, Leaf, Zap, DollarSign, Activity } from 'lucide-react'
-import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from 'recharts'
-import { useSimulation } from '../context/SimulationContext'
+﻿import { useSimulation } from '../context/SimulationContext'
 
 export default function Impact() {
   const { stats } = useSimulation()
   
-  // Calculs basés sur la simulation
-  const tauxConformite = stats.total > 0 ? (stats.accepted / stats.total * 100).toFixed(1) : '0'
-  const tauxRejet = stats.total > 0 ? (stats.rejected / stats.total * 100).toFixed(1) : '0'
-  const comparisonData = [
-    { metric: 'Chlore', sansTri: 2.5, avecTri: 0.8 },
-    { metric: 'Soufre', sansTri: 1.8, avecTri: 0.6 },
-    { metric: 'Métaux', sansTri: 1.2, avecTri: 0.3 },
-    { metric: 'Cendres', sansTri: 15, avecTri: 9 },
-    { metric: 'Humidité', sansTri: 18, avecTri: 12 }
-  ]
-
-  const gasQualityData = [
-    { mois: 'Jan', sansTri: 65, avecTri: 92 },
-    { mois: 'Fév', sansTri: 62, avecTri: 94 },
-    { mois: 'Mar', sansTri: 68, avecTri: 91 },
-    { mois: 'Avr', sansTri: 64, avecTri: 93 },
-    { mois: 'Mai', sansTri: 66, avecTri: 95 },
-    { mois: 'Juin', sansTri: 63, avecTri: 94 }
-  ]
-
-  const performanceData = [
-    { subject: 'Efficacité', A: 95, B: 65 },
-    { subject: 'Stabilité', A: 92, B: 60 },
-    { subject: 'Qualité Gaz', A: 94, B: 68 },
-    { subject: 'Rendement', A: 88, B: 70 },
-    { subject: 'Maintenance', A: 85, B: 55 }
-  ]
-
   return (
-    <div className="space-y-6">
-      {/* Résumé des stats de la simulation */}
+    <div className="space-y-8">
+      <div className="text-center">
+        <h1 className="text-3xl font-bold text-slate-900 mb-2">Récapitulatif de la Solution</h1>
+        <p className="text-slate-600">Tri prédictif des CSR par IA pour la pyro-gazéification</p>
+      </div>
+
       {stats.total > 0 && (
         <div className="bg-slate-900 rounded-xl p-6 text-white">
-          <h2 className="text-xl font-bold mb-4">📊 Résumé de la Simulation</h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-            <div className="bg-white/10 rounded-lg p-4">
-              <p className="text-sm text-slate-300">Total CSR triés</p>
-              <p className="text-2xl font-bold">{stats.total}</p>
+          <h2 className="text-xl font-bold mb-4">Résultats Simulation</h2>
+          <div className="grid grid-cols-3 md:grid-cols-6 gap-4">
+            <div className="bg-white/10 rounded-lg p-3">
+              <p className="text-xs text-slate-400">Total</p>
+              <p className="text-xl font-bold">{stats.total}</p>
             </div>
-            <div className="bg-white/10 rounded-lg p-4">
-              <p className="text-sm text-slate-300">Conformes</p>
-              <p className="text-2xl font-bold text-green-400">{stats.accepted}</p>
+            <div className="bg-white/10 rounded-lg p-3">
+              <p className="text-xs text-slate-400">Conformes</p>
+              <p className="text-xl font-bold text-green-400">{stats.accepted}</p>
             </div>
-            <div className="bg-white/10 rounded-lg p-4">
-              <p className="text-sm text-slate-300">Non-conformes</p>
-              <p className="text-2xl font-bold text-red-400">{stats.rejected}</p>
+            <div className="bg-white/10 rounded-lg p-3">
+              <p className="text-xs text-slate-400">Rejetés</p>
+              <p className="text-xl font-bold text-red-400">{stats.rejected}</p>
             </div>
-            <div className="bg-white/10 rounded-lg p-4">
-              <p className="text-sm text-slate-300">Taux conformité</p>
-              <p className="text-2xl font-bold text-green-400">{tauxConformite}%</p>
+            <div className="bg-white/10 rounded-lg p-3">
+              <p className="text-xs text-slate-400">Chlore</p>
+              <p className="text-xl font-bold text-amber-400">{stats.chlore.toFixed(2)}%</p>
             </div>
-            <div className="bg-white/10 rounded-lg p-4">
-              <p className="text-sm text-slate-300">Qualité syngas</p>
-              <p className="text-2xl font-bold text-blue-400">{stats.syngasQuality.toFixed(0)}/100</p>
+            <div className="bg-white/10 rounded-lg p-3">
+              <p className="text-xs text-slate-400">PCI</p>
+              <p className="text-xl font-bold text-blue-400">{stats.pci.toFixed(1)}</p>
             </div>
-            <div className="bg-white/10 rounded-lg p-4">
-              <p className="text-sm text-slate-300">Taux chlore</p>
-              <p className="text-2xl font-bold text-amber-400">{stats.chlore.toFixed(2)}%</p>
+            <div className="bg-white/10 rounded-lg p-3">
+              <p className="text-xs text-slate-400">Syngas</p>
+              <p className="text-xl font-bold text-green-400">{stats.syngasQuality.toFixed(0)}%</p>
             </div>
           </div>
         </div>
       )}
 
-      {/* Comparaison avec/sans solution */}
-      <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm">
-        <h2 className="text-2xl font-bold text-slate-900 mb-2">Comparaison : Avec vs Sans NATRAN</h2>
-        <p className="text-slate-600 mb-6">
-          Impact de notre solution de tri prédictif par IA sur la qualité du processus
-        </p>
-        
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+      <Section title="1. Caractéristiques CSR" subtitle="Sources: ADEME, Norme EN 15359">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="border rounded-xl p-4">
+            <h4 className="font-semibold mb-3">PCI (Pouvoir Calorifique)</h4>
+            <p className="text-sm">Plage: <strong>8 - 27 MJ/kg</strong> (ADEME)</p>
+            <p className="text-sm">Moyenne France: <strong>~14 MJ/kg</strong></p>
+            <p className="text-sm">Objectif: <strong>20-25 MJ/kg</strong></p>
+          </div>
+          <div className="border rounded-xl p-4">
+            <h4 className="font-semibold mb-3">Chlore</h4>
+            <p className="text-sm text-red-600">Max observé: <strong>3.3%</strong> (avec PVC)</p>
+            <p className="text-sm">Limite cimenteries: <strong>&lt; 0.5%</strong></p>
+            <p className="text-sm text-green-600">Classe 1: <strong>&lt; 0.2%</strong></p>
+          </div>
+        </div>
+        <div className="mt-4">
+          <h4 className="font-semibold mb-3">Classes EN 15359 (Chlore)</h4>
+          <div className="grid grid-cols-5 gap-2 text-center text-sm">
+            <div className="bg-green-100 text-green-800 rounded p-2"><strong>Classe 1</strong><br/>&lt; 0.2%</div>
+            <div className="bg-lime-100 text-lime-800 rounded p-2"><strong>Classe 2</strong><br/>&lt; 0.6%</div>
+            <div className="bg-amber-100 text-amber-800 rounded p-2"><strong>Classe 3</strong><br/>&lt; 1.0%</div>
+            <div className="bg-orange-100 text-orange-800 rounded p-2"><strong>Classe 4</strong><br/>&lt; 1.5%</div>
+            <div className="bg-red-100 text-red-800 rounded p-2"><strong>Classe 5</strong><br/>&lt; 3.0%</div>
+          </div>
+        </div>
+      </Section>
+
+      <Section title="2. Problématique" subtitle="Contaminants critiques">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
           <div className="bg-red-50 border border-red-200 rounded-xl p-4">
-            <h3 className="font-bold text-red-800 mb-2">❌ Sans NATRAN</h3>
-            <ul className="text-sm text-red-700 space-y-1">
-              <li>• Chlore : 2.5% (corrosion)</li>
-              <li>• Qualité syngas : 65/100</li>
-              <li>• Tri manuel inefficace</li>
-              <li>• Maintenance élevée</li>
+            <h4 className="font-semibold text-red-900">PVC (Chlore)</h4>
+            <p className="text-sm text-red-800">57% de chlore - HCl corrosif</p>
+          </div>
+          <div className="bg-red-50 border border-red-200 rounded-xl p-4">
+            <h4 className="font-semibold text-red-900">Caoutchouc</h4>
+            <p className="text-sm text-red-800">Soufre - H2S dans syngas</p>
+          </div>
+          <div className="bg-red-50 border border-red-200 rounded-xl p-4">
+            <h4 className="font-semibold text-red-900">Métaux lourds</h4>
+            <p className="text-sm text-red-800">Résidus REFIOM toxiques</p>
+          </div>
+        </div>
+        <div className="bg-red-100 border border-red-300 rounded-xl p-4">
+          <p className="text-red-800 font-medium">Le PVC est visuellement INDISTINGUABLE du PE/PP - Impossible à détecter manuellement</p>
+        </div>
+      </Section>
+
+      <Section title="3. Solution : Tri IA Multi-spectral" subtitle="RGB + NIR">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
+            <h4 className="font-semibold text-blue-900 mb-2">Caméra RGB</h4>
+            <ul className="text-sm text-blue-800">
+              <li>Bois, carton, textile</li>
+              <li>Métaux (reflets)</li>
+              <li className="text-red-600">Ne distingue PAS PVC/PE</li>
             </ul>
+          </div>
+          <div className="bg-purple-50 border border-purple-200 rounded-xl p-4">
+            <h4 className="font-semibold text-purple-900 mb-2">Caméra NIR</h4>
+            <ul className="text-sm text-purple-800">
+              <li className="text-green-700 font-medium">Distingue PVC du PE/PP</li>
+              <li>Signature spectrale C-Cl</li>
+              <li>Essentiel contre HCl</li>
+            </ul>
+          </div>
+        </div>
+        <div className="bg-slate-900 text-white rounded-xl p-4">
+          <h4 className="font-semibold mb-3">Performances IA (Source: PMC 2024)</h4>
+          <div className="grid grid-cols-4 gap-4 text-center">
+            <div><p className="text-2xl font-bold">71%</p><p className="text-xs text-slate-400">YOLOv8</p></div>
+            <div><p className="text-2xl font-bold text-green-400">74.5%</p><p className="text-xs text-slate-400">MRS-YOLO</p></div>
+            <div><p className="text-2xl font-bold text-blue-400">75-85%</p><p className="text-xs text-slate-400">RGB+NIR (est.)</p></div>
+            <div><p className="text-2xl font-bold">2.7ms</p><p className="text-xs text-slate-400">/frame</p></div>
+          </div>
+        </div>
+      </Section>
+
+      <Section title="4. Comparaison Tri Manuel vs IA" subtitle="Estimations">
+        <table className="w-full text-sm border mb-4">
+          <thead className="bg-slate-100">
+            <tr><th className="p-2 text-left">Critère</th><th className="p-2 text-red-600">Manuel</th><th className="p-2 text-green-600">IA</th></tr>
+          </thead>
+          <tbody>
+            <tr className="border-t"><td className="p-2">Détection PVC</td><td className="p-2 text-center text-red-600">&lt; 30%</td><td className="p-2 text-center text-green-600 font-bold">80-90%</td></tr>
+            <tr className="border-t"><td className="p-2">Précision globale</td><td className="p-2 text-center">70-80%</td><td className="p-2 text-center text-green-600 font-bold">75-85%</td></tr>
+            <tr className="border-t"><td className="p-2">Débit</td><td className="p-2 text-center text-red-600">2-5 t/h</td><td className="p-2 text-center text-green-600 font-bold">10-20 t/h</td></tr>
+            <tr className="border-t"><td className="p-2">Fatigue</td><td className="p-2 text-center text-red-600">Oui</td><td className="p-2 text-center text-green-600">Non</td></tr>
+          </tbody>
+        </table>
+      </Section>
+
+      <Section title="5. Impact sur Qualité CSR" subtitle="Simulation">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+          <div className="bg-red-50 border border-red-200 rounded-xl p-4">
+            <h4 className="font-semibold text-red-900 mb-2">Sans tri</h4>
+            <p className="text-sm">Chlore: ~1.5%</p>
+            <p className="text-sm">PCI: 14 MJ/kg</p>
+            <p className="text-sm font-semibold">Classe 4-5</p>
+          </div>
+          <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
+            <h4 className="font-semibold text-amber-900 mb-2">Tri manuel</h4>
+            <p className="text-sm">Chlore: ~1.05%</p>
+            <p className="text-sm">PCI: 16 MJ/kg</p>
+            <p className="text-sm font-semibold">Classe 4</p>
           </div>
           <div className="bg-green-50 border border-green-200 rounded-xl p-4">
-            <h3 className="font-bold text-green-800 mb-2">✅ Avec NATRAN</h3>
-            <ul className="text-sm text-green-700 space-y-1">
-              <li>• Chlore : {stats.total > 0 ? stats.chlore.toFixed(2) : '0.8'}% (-68%)</li>
-              <li>• Qualité syngas : {stats.total > 0 ? stats.syngasQuality.toFixed(0) : '92'}/100</li>
-              <li>• Tri automatisé 96.8% précision</li>
-              <li>• Maintenance réduite de 47%</li>
+            <h4 className="font-semibold text-green-900 mb-2">Tri IA</h4>
+            <p className="text-sm">Chlore: ~0.22%</p>
+            <p className="text-sm">PCI: 18-22 MJ/kg</p>
+            <p className="text-sm font-semibold">Classe 1-2</p>
+          </div>
+        </div>
+        <div className="bg-green-100 border border-green-300 rounded-xl p-4">
+          <h4 className="font-semibold text-green-900 mb-2">Gains estimés</h4>
+          <div className="grid grid-cols-4 gap-4 text-center">
+            <div><p className="text-2xl font-bold text-green-700">-85%</p><p className="text-sm">Chlore</p></div>
+            <div><p className="text-2xl font-bold text-green-700">+43%</p><p className="text-sm">PCI</p></div>
+            <div><p className="text-2xl font-bold text-green-700">x4-5</p><p className="text-sm">Débit</p></div>
+            <div><p className="text-2xl font-bold text-green-700">+50%</p><p className="text-sm">Détection PVC</p></div>
+          </div>
+        </div>
+      </Section>
+
+      <Section title="6. Sources" subtitle="Références">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
+          <div className="bg-green-50 border border-green-200 rounded-xl p-4">
+            <h4 className="font-semibold text-green-900 mb-2">Données vérifiées</h4>
+            <ul className="text-sm text-green-800 space-y-1">
+              <li>Caractéristiques CSR (ADEME, EN 15359)</li>
+              <li>Problème chlore/PVC</li>
+              <li>Performances YOLO (~74% mAP50)</li>
             </ul>
           </div>
-          <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
-            <h3 className="font-bold text-blue-800 mb-2">💰 Économies</h3>
-            <ul className="text-sm text-blue-700 space-y-1">
-              <li>• ROI : &lt; 2 ans</li>
-              <li>• Économies : €450k/an</li>
-              <li>• -1200t CO₂/an</li>
-              <li>• +42% qualité gaz</li>
+          <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
+            <h4 className="font-semibold text-amber-900 mb-2">Estimations</h4>
+            <ul className="text-sm text-amber-800 space-y-1">
+              <li>Précision YOLO sur CSR</li>
+              <li>Performances tri manuel</li>
+              <li>Impact sur syngas</li>
             </ul>
           </div>
         </div>
-      </div>
+        <div className="bg-slate-100 rounded-xl p-4">
+          <ul className="text-sm text-slate-600 space-y-1">
+            <li><strong>EN 15359</strong> - Classification CSR</li>
+            <li><strong>ADEME</strong> - PCI 8-27 MJ/kg</li>
+            <li><strong>PMC 2024</strong> - MRS-YOLO 74.5% mAP50</li>
+            <li><strong>Actu-Environnement</strong> - Limite chlore 0.5%</li>
+          </ul>
+        </div>
+      </Section>
 
-      <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm">
-        <h2 className="text-2xl font-bold text-slate-900 mb-2">Analyse d'impact environnemental et économique</h2>
-        <p className="text-slate-600 mb-6">
-          Étude comparative : pyro-gazéification avec et sans système de tri prédictif
+      <div className="bg-slate-900 rounded-xl p-6 text-white">
+        <h2 className="text-2xl font-bold mb-4">Conclusion</h2>
+        <p className="text-slate-300 mb-4">
+          Notre solution de tri IA multi-spectrale (RGB + NIR) répond à la problématique de variabilité des CSR. 
+          Avantage clé: détection du PVC impossible visuellement.
         </p>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <ImpactCard
-            icon={TrendingDown}
-            title="Polluants"
-            value="-65%"
-            description="Réduction des contaminants (Cl, S, métaux lourds)"
-            trend="down"
-          />
-          <ImpactCard
-            icon={TrendingUp}
-            title="Qualité syngas"
-            value="+42%"
-            description="Amélioration de la pureté du gaz de synthèse"
-            trend="up"
-          />
-          <ImpactCard
-            icon={Leaf}
-            title="Bilan carbone"
-            value="-1200t"
-            description="Émissions évitées (tCO₂eq/an)"
-            trend="down"
-          />
-          <ImpactCard
-            icon={DollarSign}
-            title="Gains financiers"
-            value="€450k"
-            description="Annuels (maintenance et optimisation)"
-            trend="up"
-          />
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm">
-          <h3 className="text-xl font-bold text-slate-900 mb-4">Réduction des contaminants (% massique)</h3>
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={comparisonData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-              <XAxis dataKey="metric" stroke="#64748b" />
-              <YAxis stroke="#64748b" />
-              <Tooltip 
-                contentStyle={{ backgroundColor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '8px' }}
-                labelStyle={{ color: '#0f172a' }}
-              />
-              <Legend />
-              <Bar dataKey="sansTri" fill="#ef4444" name="Sans tri prédictif" radius={[8, 8, 0, 0]} />
-              <Bar dataKey="avecTri" fill="#22c55e" name="Avec tri prédictif" radius={[8, 8, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-
-        <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm">
-          <h3 className="text-xl font-bold text-slate-900 mb-4">Évolution de la qualité du syngas (indice/100)</h3>
-          <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={gasQualityData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-              <XAxis dataKey="mois" stroke="#64748b" />
-              <YAxis stroke="#64748b" domain={[50, 100]} />
-              <Tooltip 
-                contentStyle={{ backgroundColor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '8px' }}
-                labelStyle={{ color: '#0f172a' }}
-              />
-              <Legend />
-              <Line type="monotone" dataKey="sansTri" stroke="#ef4444" strokeWidth={2} name="Sans tri prédictif" />
-              <Line type="monotone" dataKey="avecTri" stroke="#22c55e" strokeWidth={2} name="Avec tri prédictif" />
-            </LineChart>
-          </ResponsiveContainer>
-        </div>
-      </div>
-
-      <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm">
-        <h3 className="text-xl font-bold text-slate-900 mb-4">Analyse comparative des performances</h3>
-        <div className="flex justify-center">
-          <ResponsiveContainer width="100%" height={400}>
-            <RadarChart data={performanceData}>
-              <PolarGrid stroke="#e2e8f0" />
-              <PolarAngleAxis dataKey="subject" stroke="#64748b" />
-              <PolarRadiusAxis angle={90} domain={[0, 100]} stroke="#64748b" />
-              <Radar name="Avec tri prédictif" dataKey="A" stroke="#22c55e" fill="#22c55e" fillOpacity={0.3} />
-              <Radar name="Sans tri prédictif" dataKey="B" stroke="#ef4444" fill="#ef4444" fillOpacity={0.3} />
-              <Legend />
-            </RadarChart>
-          </ResponsiveContainer>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm">
-          <div className="flex items-center gap-3 mb-4">
-            <Zap className="w-6 h-6 text-slate-700" />
-            <h3 className="text-lg font-bold text-slate-900">Rendement énergétique</h3>
-          </div>
-          <div className="space-y-4">
-            <MetricRow label="Rendement gazéification" before="68%" after="88%" />
-            <MetricRow label="Consommation énergie" before="100%" after="82%" />
-            <MetricRow label="Production H₂" before="12%" after="18%" />
-          </div>
-        </div>
-
-        <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm">
-          <div className="flex items-center gap-3 mb-4">
-            <Leaf className="w-6 h-6 text-slate-700" />
-            <h3 className="text-lg font-bold text-slate-900">Impact Environnemental</h3>
-          </div>
-          <div className="space-y-4">
-            <MetricRow label="Émissions HCl" before="2.5 kg/t" after="0.8 kg/t" />
-            <MetricRow label="Émissions H₂S" before="1.8 kg/t" after="0.6 kg/t" />
-            <MetricRow label="Déchets ultimes" before="15%" after="9%" />
-          </div>
-        </div>
-
-        <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm">
-          <div className="flex items-center gap-3 mb-4">
-            <DollarSign className="w-6 h-6 text-slate-700" />
-            <h3 className="text-lg font-bold text-slate-900">Économies Annuelles</h3>
-          </div>
-          <div className="space-y-4">
-            <MetricRow label="Maintenance réacteur" before="€180k" after="€95k" />
-            <MetricRow label="Traitement gaz" before="€220k" after="€110k" />
-            <MetricRow label="Gestion déchets" before="€150k" after="€85k" />
-          </div>
-        </div>
-      </div>
-
-      <div className="bg-slate-900 rounded-xl p-6">
-        <h3 className="text-2xl font-bold text-white mb-4">Conclusion</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <h4 className="text-lg font-semibold text-white mb-3">Bénéfices Techniques</h4>
-            <ul className="space-y-2">
-              <li className="flex items-start gap-2 text-slate-300">
-                <span className="text-green-400 mt-1">✓</span>
-                <span>Stabilisation de la composition des CSR en entrée</span>
-              </li>
-              <li className="flex items-start gap-2 text-slate-300">
-                <span className="text-green-400 mt-1">✓</span>
-                <span>Réduction drastique des polluants (Cl, S, métaux)</span>
-              </li>
-              <li className="flex items-start gap-2 text-slate-300">
-                <span className="text-green-400 mt-1">✓</span>
-                <span>Amélioration de la qualité du gaz de synthèse</span>
-              </li>
-              <li className="flex items-start gap-2 text-slate-300">
-                <span className="text-green-400 mt-1">✓</span>
-                <span>Moins d'encrassement et de maintenance</span>
-              </li>
-            </ul>
-          </div>
-          <div>
-            <h4 className="text-lg font-semibold text-white mb-3">Bénéfices Économiques</h4>
-            <ul className="space-y-2">
-              <li className="flex items-start gap-2 text-slate-300">
-                <span className="text-green-400 mt-1">✓</span>
-                <span>ROI inférieur à 2 ans</span>
-              </li>
-              <li className="flex items-start gap-2 text-slate-300">
-                <span className="text-green-400 mt-1">✓</span>
-                <span>Économies de €450k/an en moyenne</span>
-              </li>
-              <li className="flex items-start gap-2 text-slate-300">
-                <span className="text-green-400 mt-1">✓</span>
-                <span>Valorisation accrue du gaz produit</span>
-              </li>
-              <li className="flex items-start gap-2 text-slate-300">
-                <span className="text-green-400 mt-1">✓</span>
-                <span>Réduction des coûts de traitement des effluents</span>
-              </li>
-            </ul>
-          </div>
+        <div className="grid grid-cols-4 gap-4 text-center">
+          <div className="bg-white/10 rounded-lg p-3"><p className="text-green-400 font-bold">Classe 1-2</p><p className="text-xs">Qualité</p></div>
+          <div className="bg-white/10 rounded-lg p-3"><p className="text-green-400 font-bold">&lt; 0.5%</p><p className="text-xs">Chlore</p></div>
+          <div className="bg-white/10 rounded-lg p-3"><p className="text-green-400 font-bold">75-85%</p><p className="text-xs">Précision</p></div>
+          <div className="bg-white/10 rounded-lg p-3"><p className="text-green-400 font-bold">2.7ms</p><p className="text-xs">Temps réel</p></div>
         </div>
       </div>
     </div>
   )
 }
 
-function ImpactCard({ icon: Icon, title, value, description, trend }: any) {
+function Section({ title, subtitle, children }: { title: string, subtitle: string, children: React.ReactNode }) {
   return (
-    <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm">
-      <div className="flex items-center justify-between mb-3">
-        <Icon className={`w-8 h-8 ${trend === 'up' ? 'text-green-600' : 'text-red-600'}`} />
-        <span className={`text-xs font-medium px-2 py-1 rounded ${
-          trend === 'up' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
-        }`}>
-          {trend === 'up' ? 'Amélioration' : 'Réduction'}
-        </span>
+    <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+      <div className="bg-slate-50 border-b px-6 py-4">
+        <h2 className="text-xl font-bold text-slate-900">{title}</h2>
+        <p className="text-sm text-slate-500">{subtitle}</p>
       </div>
-      <h3 className="text-sm text-slate-600 mb-1">{title}</h3>
-      <p className="text-2xl font-bold text-slate-900 mb-1">{value}</p>
-      <p className="text-xs text-slate-500">{description}</p>
-    </div>
-  )
-}
-
-function MetricRow({ label, before, after }: any) {
-  return (
-    <div>
-      <div className="flex justify-between text-sm mb-2">
-        <span className="text-slate-700 font-medium">{label}</span>
-      </div>
-      <div className="grid grid-cols-2 gap-2">
-        <div className="bg-red-50 border border-red-200 rounded px-2 py-1">
-          <p className="text-xs text-red-600">Avant</p>
-          <p className="text-sm font-bold text-red-700">{before}</p>
-        </div>
-        <div className="bg-green-50 border border-green-200 rounded px-2 py-1">
-          <p className="text-xs text-green-600">Après</p>
-          <p className="text-sm font-bold text-green-700">{after}</p>
-        </div>
-      </div>
+      <div className="p-6">{children}</div>
     </div>
   )
 }

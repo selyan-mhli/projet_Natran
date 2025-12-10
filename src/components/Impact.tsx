@@ -1,7 +1,13 @@
-import { TrendingUp, TrendingDown, Leaf, Zap, DollarSign } from 'lucide-react'
+import { TrendingUp, TrendingDown, Leaf, Zap, DollarSign, Activity } from 'lucide-react'
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from 'recharts'
+import { useSimulation } from '../context/SimulationContext'
 
 export default function Impact() {
+  const { stats } = useSimulation()
+  
+  // Calculs basés sur la simulation
+  const tauxConformite = stats.total > 0 ? (stats.accepted / stats.total * 100).toFixed(1) : '0'
+  const tauxRejet = stats.total > 0 ? (stats.rejected / stats.total * 100).toFixed(1) : '0'
   const comparisonData = [
     { metric: 'Chlore', sansTri: 2.5, avecTri: 0.8 },
     { metric: 'Soufre', sansTri: 1.8, avecTri: 0.6 },
@@ -29,9 +35,80 @@ export default function Impact() {
 
   return (
     <div className="space-y-6">
-      <div className="glass-effect rounded-xl p-6">
+      {/* Résumé des stats de la simulation */}
+      {stats.total > 0 && (
+        <div className="bg-slate-900 rounded-xl p-6 text-white">
+          <h2 className="text-xl font-bold mb-4">📊 Résumé de la Simulation</h2>
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+            <div className="bg-white/10 rounded-lg p-4">
+              <p className="text-sm text-slate-300">Total CSR triés</p>
+              <p className="text-2xl font-bold">{stats.total}</p>
+            </div>
+            <div className="bg-white/10 rounded-lg p-4">
+              <p className="text-sm text-slate-300">Conformes</p>
+              <p className="text-2xl font-bold text-green-400">{stats.accepted}</p>
+            </div>
+            <div className="bg-white/10 rounded-lg p-4">
+              <p className="text-sm text-slate-300">Non-conformes</p>
+              <p className="text-2xl font-bold text-red-400">{stats.rejected}</p>
+            </div>
+            <div className="bg-white/10 rounded-lg p-4">
+              <p className="text-sm text-slate-300">Taux conformité</p>
+              <p className="text-2xl font-bold text-green-400">{tauxConformite}%</p>
+            </div>
+            <div className="bg-white/10 rounded-lg p-4">
+              <p className="text-sm text-slate-300">Qualité syngas</p>
+              <p className="text-2xl font-bold text-blue-400">{stats.syngasQuality.toFixed(0)}/100</p>
+            </div>
+            <div className="bg-white/10 rounded-lg p-4">
+              <p className="text-sm text-slate-300">Taux chlore</p>
+              <p className="text-2xl font-bold text-amber-400">{stats.chlore.toFixed(2)}%</p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Comparaison avec/sans solution */}
+      <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm">
+        <h2 className="text-2xl font-bold text-slate-900 mb-2">Comparaison : Avec vs Sans NATRAN</h2>
+        <p className="text-slate-600 mb-6">
+          Impact de notre solution de tri prédictif par IA sur la qualité du processus
+        </p>
+        
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          <div className="bg-red-50 border border-red-200 rounded-xl p-4">
+            <h3 className="font-bold text-red-800 mb-2">❌ Sans NATRAN</h3>
+            <ul className="text-sm text-red-700 space-y-1">
+              <li>• Chlore : 2.5% (corrosion)</li>
+              <li>• Qualité syngas : 65/100</li>
+              <li>• Tri manuel inefficace</li>
+              <li>• Maintenance élevée</li>
+            </ul>
+          </div>
+          <div className="bg-green-50 border border-green-200 rounded-xl p-4">
+            <h3 className="font-bold text-green-800 mb-2">✅ Avec NATRAN</h3>
+            <ul className="text-sm text-green-700 space-y-1">
+              <li>• Chlore : {stats.total > 0 ? stats.chlore.toFixed(2) : '0.8'}% (-68%)</li>
+              <li>• Qualité syngas : {stats.total > 0 ? stats.syngasQuality.toFixed(0) : '92'}/100</li>
+              <li>• Tri automatisé 96.8% précision</li>
+              <li>• Maintenance réduite de 47%</li>
+            </ul>
+          </div>
+          <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
+            <h3 className="font-bold text-blue-800 mb-2">💰 Économies</h3>
+            <ul className="text-sm text-blue-700 space-y-1">
+              <li>• ROI : &lt; 2 ans</li>
+              <li>• Économies : €450k/an</li>
+              <li>• -1200t CO₂/an</li>
+              <li>• +42% qualité gaz</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm">
         <h2 className="text-2xl font-bold text-slate-900 mb-2">Analyse d'impact environnemental et économique</h2>
-        <p className="text-slate-400 mb-6">
+        <p className="text-slate-600 mb-6">
           Étude comparative : pyro-gazéification avec et sans système de tri prédictif
         </p>
 
@@ -68,16 +145,16 @@ export default function Impact() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="glass-effect rounded-xl p-6">
+        <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm">
           <h3 className="text-xl font-bold text-slate-900 mb-4">Réduction des contaminants (% massique)</h3>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={comparisonData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
-              <XAxis dataKey="metric" stroke="#94a3b8" />
-              <YAxis stroke="#94a3b8" />
+              <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+              <XAxis dataKey="metric" stroke="#64748b" />
+              <YAxis stroke="#64748b" />
               <Tooltip 
-                contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #334155', borderRadius: '8px' }}
-                labelStyle={{ color: '#f1f5f9' }}
+                contentStyle={{ backgroundColor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '8px' }}
+                labelStyle={{ color: '#0f172a' }}
               />
               <Legend />
               <Bar dataKey="sansTri" fill="#ef4444" name="Sans tri prédictif" radius={[8, 8, 0, 0]} />
@@ -86,16 +163,16 @@ export default function Impact() {
           </ResponsiveContainer>
         </div>
 
-        <div className="glass-effect rounded-xl p-6">
+        <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm">
           <h3 className="text-xl font-bold text-slate-900 mb-4">Évolution de la qualité du syngas (indice/100)</h3>
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={gasQualityData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
-              <XAxis dataKey="mois" stroke="#94a3b8" />
-              <YAxis stroke="#94a3b8" domain={[50, 100]} />
+              <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+              <XAxis dataKey="mois" stroke="#64748b" />
+              <YAxis stroke="#64748b" domain={[50, 100]} />
               <Tooltip 
-                contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #334155', borderRadius: '8px' }}
-                labelStyle={{ color: '#f1f5f9' }}
+                contentStyle={{ backgroundColor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '8px' }}
+                labelStyle={{ color: '#0f172a' }}
               />
               <Legend />
               <Line type="monotone" dataKey="sansTri" stroke="#ef4444" strokeWidth={2} name="Sans tri prédictif" />
@@ -105,14 +182,14 @@ export default function Impact() {
         </div>
       </div>
 
-      <div className="glass-effect rounded-xl p-6">
+      <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm">
         <h3 className="text-xl font-bold text-slate-900 mb-4">Analyse comparative des performances</h3>
         <div className="flex justify-center">
           <ResponsiveContainer width="100%" height={400}>
             <RadarChart data={performanceData}>
-              <PolarGrid stroke="#334155" />
-              <PolarAngleAxis dataKey="subject" stroke="#94a3b8" />
-              <PolarRadiusAxis angle={90} domain={[0, 100]} stroke="#94a3b8" />
+              <PolarGrid stroke="#e2e8f0" />
+              <PolarAngleAxis dataKey="subject" stroke="#64748b" />
+              <PolarRadiusAxis angle={90} domain={[0, 100]} stroke="#64748b" />
               <Radar name="Avec tri prédictif" dataKey="A" stroke="#22c55e" fill="#22c55e" fillOpacity={0.3} />
               <Radar name="Sans tri prédictif" dataKey="B" stroke="#ef4444" fill="#ef4444" fillOpacity={0.3} />
               <Legend />
@@ -122,9 +199,9 @@ export default function Impact() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="glass-effect rounded-xl p-6">
+        <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm">
           <div className="flex items-center gap-3 mb-4">
-            <Zap className="w-6 h-6 text-slate-400" />
+            <Zap className="w-6 h-6 text-slate-700" />
             <h3 className="text-lg font-bold text-slate-900">Rendement énergétique</h3>
           </div>
           <div className="space-y-4">
@@ -134,9 +211,9 @@ export default function Impact() {
           </div>
         </div>
 
-        <div className="glass-effect rounded-xl p-6">
+        <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm">
           <div className="flex items-center gap-3 mb-4">
-            <Leaf className="w-6 h-6 text-slate-400" />
+            <Leaf className="w-6 h-6 text-slate-700" />
             <h3 className="text-lg font-bold text-slate-900">Impact Environnemental</h3>
           </div>
           <div className="space-y-4">
@@ -146,9 +223,9 @@ export default function Impact() {
           </div>
         </div>
 
-        <div className="glass-effect rounded-xl p-6">
+        <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm">
           <div className="flex items-center gap-3 mb-4">
-            <DollarSign className="w-6 h-6 text-slate-400" />
+            <DollarSign className="w-6 h-6 text-slate-700" />
             <h3 className="text-lg font-bold text-slate-900">Économies Annuelles</h3>
           </div>
           <div className="space-y-4">
@@ -159,47 +236,47 @@ export default function Impact() {
         </div>
       </div>
 
-      <div className="glass-effect rounded-xl p-6 bg-gradient-to-br from-primary-900/20 to-primary-800/10 border border-slate-500/30">
-        <h3 className="text-2xl font-bold text-slate-900 mb-4">Conclusion</h3>
+      <div className="bg-slate-900 rounded-xl p-6">
+        <h3 className="text-2xl font-bold text-white mb-4">Conclusion</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <h4 className="text-lg font-semibold text-slate-300 mb-3">Bénéfices Techniques</h4>
+            <h4 className="text-lg font-semibold text-white mb-3">Bénéfices Techniques</h4>
             <ul className="space-y-2">
               <li className="flex items-start gap-2 text-slate-300">
-                <span className="text-slate-400 mt-1">✓</span>
+                <span className="text-green-400 mt-1">✓</span>
                 <span>Stabilisation de la composition des CSR en entrée</span>
               </li>
               <li className="flex items-start gap-2 text-slate-300">
-                <span className="text-slate-400 mt-1">✓</span>
+                <span className="text-green-400 mt-1">✓</span>
                 <span>Réduction drastique des polluants (Cl, S, métaux)</span>
               </li>
               <li className="flex items-start gap-2 text-slate-300">
-                <span className="text-slate-400 mt-1">✓</span>
+                <span className="text-green-400 mt-1">✓</span>
                 <span>Amélioration de la qualité du gaz de synthèse</span>
               </li>
               <li className="flex items-start gap-2 text-slate-300">
-                <span className="text-slate-400 mt-1">✓</span>
+                <span className="text-green-400 mt-1">✓</span>
                 <span>Moins d'encrassement et de maintenance</span>
               </li>
             </ul>
           </div>
           <div>
-            <h4 className="text-lg font-semibold text-slate-300 mb-3">Bénéfices Économiques</h4>
+            <h4 className="text-lg font-semibold text-white mb-3">Bénéfices Économiques</h4>
             <ul className="space-y-2">
               <li className="flex items-start gap-2 text-slate-300">
-                <span className="text-slate-400 mt-1">✓</span>
+                <span className="text-green-400 mt-1">✓</span>
                 <span>ROI inférieur à 2 ans</span>
               </li>
               <li className="flex items-start gap-2 text-slate-300">
-                <span className="text-slate-400 mt-1">✓</span>
+                <span className="text-green-400 mt-1">✓</span>
                 <span>Économies de €450k/an en moyenne</span>
               </li>
               <li className="flex items-start gap-2 text-slate-300">
-                <span className="text-slate-400 mt-1">✓</span>
+                <span className="text-green-400 mt-1">✓</span>
                 <span>Valorisation accrue du gaz produit</span>
               </li>
               <li className="flex items-start gap-2 text-slate-300">
-                <span className="text-slate-400 mt-1">✓</span>
+                <span className="text-green-400 mt-1">✓</span>
                 <span>Réduction des coûts de traitement des effluents</span>
               </li>
             </ul>
@@ -212,16 +289,16 @@ export default function Impact() {
 
 function ImpactCard({ icon: Icon, title, value, description, trend }: any) {
   return (
-    <div className="glass-effect rounded-xl p-6">
+    <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm">
       <div className="flex items-center justify-between mb-3">
-        <Icon className={`w-8 h-8 ${trend === 'up' ? 'text-slate-400' : 'text-slate-400'}`} />
+        <Icon className={`w-8 h-8 ${trend === 'up' ? 'text-green-600' : 'text-red-600'}`} />
         <span className={`text-xs font-medium px-2 py-1 rounded ${
-          trend === 'up' ? 'bg-slate-500/20 text-slate-400' : 'bg-slate-500/20 text-slate-400'
+          trend === 'up' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
         }`}>
           {trend === 'up' ? 'Amélioration' : 'Réduction'}
         </span>
       </div>
-      <h3 className="text-sm text-slate-400 mb-1">{title}</h3>
+      <h3 className="text-sm text-slate-600 mb-1">{title}</h3>
       <p className="text-2xl font-bold text-slate-900 mb-1">{value}</p>
       <p className="text-xs text-slate-500">{description}</p>
     </div>
@@ -232,16 +309,16 @@ function MetricRow({ label, before, after }: any) {
   return (
     <div>
       <div className="flex justify-between text-sm mb-2">
-        <span className="text-slate-400">{label}</span>
+        <span className="text-slate-700 font-medium">{label}</span>
       </div>
       <div className="grid grid-cols-2 gap-2">
-        <div className="bg-slate-500/10 border border-slate-500/30 rounded px-2 py-1">
-          <p className="text-xs text-slate-400">Avant</p>
-          <p className="text-sm font-bold text-slate-400">{before}</p>
+        <div className="bg-red-50 border border-red-200 rounded px-2 py-1">
+          <p className="text-xs text-red-600">Avant</p>
+          <p className="text-sm font-bold text-red-700">{before}</p>
         </div>
-        <div className="bg-slate-500/10 border border-slate-500/30 rounded px-2 py-1">
-          <p className="text-xs text-slate-400">Après</p>
-          <p className="text-sm font-bold text-slate-400">{after}</p>
+        <div className="bg-green-50 border border-green-200 rounded px-2 py-1">
+          <p className="text-xs text-green-600">Après</p>
+          <p className="text-sm font-bold text-green-700">{after}</p>
         </div>
       </div>
     </div>

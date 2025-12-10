@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
-import { Play, Pause, RotateCcw } from 'lucide-react'
+import { Play, Pause, RotateCcw, Eye } from 'lucide-react'
 import * as BABYLON from '@babylonjs/core'
+import Dashboard from './Dashboard'
+import { useSimulation } from '../context/SimulationContext'
 
 interface CSRObject {
   mesh: BABYLON.Mesh
@@ -10,27 +12,18 @@ interface CSRObject {
   isBeingGrabbed: boolean
 }
 
-interface Stats {
-  total: number
-  accepted: number
-  rejected: number
-  uncertain: number
-}
-
 export default function FinalSimulation() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const engineRef = useRef<BABYLON.Engine | null>(null)
   const sceneRef = useRef<BABYLON.Scene | null>(null)
+  const cameraRef = useRef<BABYLON.ArcRotateCamera | null>(null)
   const objectsRef = useRef<CSRObject[]>([])
   const armsRef = useRef<{ pivot: BABYLON.TransformNode, arm: BABYLON.Mesh, gripper: BABYLON.Mesh, side: string, isBusy: boolean, heldObject: BABYLON.Mesh | null }[]>([])
   const [isRunning, setIsRunning] = useState(false)
-  const [stats, setStats] = useState<Stats>({
-    total: 0,
-    accepted: 0,
-    rejected: 0,
-    uncertain: 0
-  })
   const [fps, setFps] = useState(60)
+  
+  // Utiliser le contexte global pour les stats
+  const { stats, updateStats, resetStats } = useSimulation()
 
   const materials = [
     { name: 'PVC', color: new BABYLON.Color3(0.93, 0.26, 0.26), decision: 'reject' as const },
@@ -93,6 +86,7 @@ export default function FinalSimulation() {
     camera.attachControl(canvasRef.current, true)
     camera.lowerRadiusLimit = 10
     camera.upperRadiusLimit = 40
+    cameraRef.current = camera
 
     // LUMIÈRES
     const hemiLight = new BABYLON.HemisphericLight('hemi', new BABYLON.Vector3(0, 1, 0), scene)
@@ -227,10 +221,12 @@ export default function FinalSimulation() {
     armsRef.current = [armLeft1, armLeft2, armRight1, armRight2]
     
     // Orienter les bras vers le convoyeur
-    armLeft1.pivot.rotation.y = Math.PI / 2
-    armLeft2.pivot.rotation.y = Math.PI / 2
-    armRight1.pivot.rotation.y = -Math.PI / 2
-    armRight2.pivot.rotation.y = -Math.PI / 2
+    // Gauche (vert) : rotation 0 = pointe vers +Z, donc vers le convoyeur
+    // Droite (rouge) : rotation π = pointe vers -Z, donc vers le convoyeur
+    armLeft1.pivot.rotation.y = 0
+    armLeft2.pivot.rotation.y = 0
+    armRight1.pivot.rotation.y = Math.PI
+    armRight2.pivot.rotation.y = Math.PI
 
     // BACS OUVERTS (sans couvercle)
     const createBin = (x: number, z: number, color: BABYLON.Color3, label: string) => {
@@ -383,12 +379,12 @@ export default function FinalSimulation() {
           isBeingGrabbed: false
         })
 
-        setStats(prev => ({
-          ...prev,
-          total: prev.total + 1,
-          [material.decision === 'accept' ? 'accepted' : material.decision === 'reject' ? 'rejected' : 'uncertain']: 
-            prev[material.decision === 'accept' ? 'accepted' : material.decision === 'reject' ? 'rejected' : 'uncertain'] + 1
-        }))
+        updateStats({
+          total: stats.total + 1,
+          accepted: stats.accepted + (material.decision === 'accept' ? 1 : 0),
+          rejected: stats.rejected + (material.decision === 'reject' ? 1 : 0),
+          uncertain: stats.uncertain + (material.decision === 'uncertain' ? 1 : 0)
+        })
       }
     }, 1000) // Toutes les secondes au lieu de 3
 
@@ -399,23 +395,32 @@ export default function FinalSimulation() {
   useEffect(() => {
     if (!isRunning || !sceneRef.current) return
 
+    // Constantes de configuration
+    const CONVEYOR_SPEED = 0.05        // Vitesse du tapis (unités/frame)
+    const ARM_LENGTH = 2.5             // Longueur du bras
+    const GRAB_DISTANCE = 0.5          // Distance max pour attraper
+    const REACTION_TIME = 0.3          // Temps de réaction en secondes (pour prédiction)
+
     const interval = setInterval(() => {
       objectsRef.current.forEach((obj, index) => {
-        // Les objets continuent TOUJOURS d'avancer (même pendant capture)
-        // C'est le bras qui doit les suivre !
-        obj.mesh.position.z += 0.05
-        // PAS DE ROTATION - les cubes restent stables
-        // obj.mesh.rotation.x += 0.02
-        // obj.mesh.rotation.y += 0.03
+        // Les objets avancent sur le tapis
+        if (!obj.isBeingGrabbed) {
+          obj.mesh.position.z += CONVEYOR_SPEED
+        }
 
         // DÉTECTION DANS LA ZONE DE TRI
-        if (obj.mesh.position.z > 0.5 && obj.mesh.position.z < 3.5 && !obj.isBeingGrabbed) {
-          // Trouver un bras libre du bon côté
+        if (obj.mesh.position.z > 0 && obj.mesh.position.z < 4 && !obj.isBeingGrabbed) {
           const targetSide = obj.decision === 'accept' ? 'left' : obj.decision === 'reject' ? 'right' : null
           
           if (targetSide) {
+            // Prédiction de la position future du cube
+            const predictedZ = obj.mesh.position.z + CONVEYOR_SPEED * (REACTION_TIME * 30)
+            
+            // Trouver un bras libre du bon côté, proche de la position prédite
             const availableArm = armsRef.current.find(arm => 
-              arm.side === targetSide && !arm.isBusy && Math.abs(arm.pivot.position.z - obj.mesh.position.z) < 2
+              arm.side === targetSide && 
+              !arm.isBusy && 
+              Math.abs(arm.pivot.position.z - predictedZ) < 2.5
             )
             
             if (availableArm) {
@@ -427,47 +432,72 @@ export default function FinalSimulation() {
                 ? new BABYLON.Vector3(-5, 0.5, 5) 
                 : new BABYLON.Vector3(5, 0.5, 5)
               
-              // Animation du bras et du cube
+              // Animation dynamique du bras
               const animateArmAndCube = async () => {
-                // 1. Bras pivote vers le convoyeur (attraper)
-                await animatePivot(availableArm.pivot, 'x', -0.3, 0.3)
+                const armPos = availableArm.pivot.position
+                const restAngle = targetSide === 'left' ? 0 : Math.PI
                 
-                // 2. Attacher le cube à la pince
-                obj.mesh.parent = availableArm.gripper
-                obj.mesh.position = new BABYLON.Vector3(0, -0.3, 0)
-                
-                // 3. Bras remonte
-                await animatePivot(availableArm.pivot, 'x', 0, 0.3)
-                
-                // 4. Bras pivote vers le bac
-                const targetAngle = targetSide === 'left' ? Math.PI : 0
-                await animatePivot(availableArm.pivot, 'y', targetAngle, 0.5)
-                
-                // 5. Bras descend pour lâcher
-                await animatePivot(availableArm.pivot, 'x', -0.3, 0.3)
-                
-                // 6. Détacher et placer dans le bac
-                obj.mesh.parent = null
-                obj.mesh.position = binPos.clone()
-                obj.mesh.position.y = 0.5 + Math.random() * 0.5
-                
-                // 7. Bras retourne en position initiale
-                await animatePivot(availableArm.pivot, 'x', 0, 0.2)
-                const initialAngle = targetSide === 'left' ? Math.PI / 2 : -Math.PI / 2
-                await animatePivot(availableArm.pivot, 'y', initialAngle, 0.3)
-                
-                // 8. Libérer le bras
-                availableArm.isBusy = false
-                availableArm.heldObject = null
-                
-                // 9. Supprimer le cube après un délai
-                setTimeout(() => {
-                  obj.mesh.dispose()
-                  const idx = objectsRef.current.indexOf(obj)
-                  if (idx > -1) {
-                    objectsRef.current.splice(idx, 1)
-                  }
-                }, 2000)
+                try {
+                  // 1. VISER LE CUBE - Calculer l'angle vers la position actuelle du cube
+                  const dx = obj.mesh.position.x - armPos.x
+                  const dz = obj.mesh.position.z - armPos.z
+                  const targetAngle = Math.atan2(dx, dz)
+                  
+                  // 2. TOURNER VERS LE CUBE
+                  await animatePivot(availableArm.pivot, 'y', targetAngle, 0.25)
+                  
+                  // 3. DESCENDRE - Incliner le bras vers le bas pour attraper
+                  await animatePivot(availableArm.pivot, 'x', -0.25, 0.15)
+                  
+                  // 4. ATTRAPER - Attacher le cube au gripper
+                  obj.mesh.parent = availableArm.gripper
+                  obj.mesh.position = new BABYLON.Vector3(0, -0.35, 0)
+                  
+                  // 5. REMONTER
+                  await animatePivot(availableArm.pivot, 'x', 0, 0.15)
+                  
+                  // 6. CALCULER L'ANGLE VERS LE BAC
+                  const binDx = binPos.x - armPos.x
+                  const binDz = binPos.z - armPos.z
+                  const binAngle = Math.atan2(binDx, binDz)
+                  
+                  // 7. TOURNER VERS LE BAC
+                  await animatePivot(availableArm.pivot, 'y', binAngle, 0.4)
+                  
+                  // 8. DESCENDRE POUR LÂCHER
+                  await animatePivot(availableArm.pivot, 'x', -0.2, 0.15)
+                  
+                  // 9. LÂCHER DANS LE BAC
+                  obj.mesh.parent = null
+                  obj.mesh.position = binPos.clone()
+                  obj.mesh.position.y = 0.5 + Math.random() * 0.3
+                  obj.mesh.position.x += (Math.random() - 0.5) * 0.5
+                  obj.mesh.position.z += (Math.random() - 0.5) * 0.5
+                  
+                  // 10. REMONTER
+                  await animatePivot(availableArm.pivot, 'x', 0, 0.1)
+                  
+                  // 11. RETOUR POSITION INITIALE
+                  await animatePivot(availableArm.pivot, 'y', restAngle, 0.3)
+                  
+                  // 12. SUPPRIMER LE CUBE APRÈS UN DÉLAI
+                  setTimeout(() => {
+                    if (obj.mesh) {
+                      obj.mesh.dispose()
+                      const idx = objectsRef.current.indexOf(obj)
+                      if (idx > -1) objectsRef.current.splice(idx, 1)
+                    }
+                  }, 2000)
+                  
+                } catch (error) {
+                  // En cas d'erreur, remettre le bras en position
+                  availableArm.pivot.rotation.x = 0
+                  availableArm.pivot.rotation.y = restAngle
+                } finally {
+                  // TOUJOURS libérer le bras
+                  availableArm.isBusy = false
+                  availableArm.heldObject = null
+                }
               }
               
               animateArmAndCube()
@@ -492,30 +522,12 @@ export default function FinalSimulation() {
     setIsRunning(false)
     objectsRef.current.forEach(obj => obj.mesh.dispose())
     objectsRef.current = []
-    setStats({ total: 0, accepted: 0, rejected: 0, uncertain: 0 })
+    resetStats()
   }
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-4 gap-4">
-        <div className="glass-effect p-4 rounded-lg">
-          <p className="text-sm text-slate-600">Total</p>
-          <p className="text-3xl font-bold text-slate-900">{stats.total}</p>
-        </div>
-        <div className="glass-effect p-4 rounded-lg">
-          <p className="text-sm text-slate-600">Conformes</p>
-          <p className="text-3xl font-bold text-green-600">{stats.accepted}</p>
-        </div>
-        <div className="glass-effect p-4 rounded-lg">
-          <p className="text-sm text-slate-600">Non-conformes</p>
-          <p className="text-3xl font-bold text-red-600">{stats.rejected}</p>
-        </div>
-        <div className="glass-effect p-4 rounded-lg">
-          <p className="text-sm text-slate-600">Incertains</p>
-          <p className="text-3xl font-bold text-slate-600">{stats.uncertain}</p>
-        </div>
-      </div>
-
+      {/* Contrôles en haut */}
       <div className="flex gap-4">
         {!isRunning ? (
           <button
@@ -541,6 +553,20 @@ export default function FinalSimulation() {
           <RotateCcw className="w-5 h-5" />
           Réinitialiser
         </button>
+        <button
+          onClick={() => {
+            if (cameraRef.current) {
+              cameraRef.current.alpha = -Math.PI / 2
+              cameraRef.current.beta = Math.PI / 2.5
+              cameraRef.current.radius = 25
+              cameraRef.current.target = new BABYLON.Vector3(0, 2, 0)
+            }
+          }}
+          className="flex items-center gap-2 px-6 py-3 bg-slate-600 text-white rounded-lg font-medium hover:bg-slate-500 transition-colors"
+        >
+          <Eye className="w-5 h-5" />
+          Reset Vue
+        </button>
       </div>
 
       <div className="relative bg-slate-950 rounded-xl border-2 border-slate-700 overflow-hidden" style={{ height: '600px' }}>
@@ -559,6 +585,35 @@ export default function FinalSimulation() {
             🖱️ Clic gauche: Rotation • Molette: Zoom • Clic droit: Déplacement
           </p>
         </div>
+      </div>
+
+      {/* MONITORING - Composant Dashboard intégré */}
+      <div className="mt-8">
+        <div className="inline-block bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold mb-6">
+          Monitoring
+        </div>
+        
+        {/* Stats de la simulation */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+          <div className="bg-white p-4 rounded-lg border border-slate-200 shadow-sm">
+            <p className="text-xs text-slate-500 uppercase tracking-wide">Total CSR triés</p>
+            <p className="text-2xl font-bold text-slate-900">{stats.total}</p>
+          </div>
+          <div className="bg-white p-4 rounded-lg border border-slate-200 shadow-sm">
+            <p className="text-xs text-slate-500 uppercase tracking-wide">Conformes</p>
+            <p className="text-2xl font-bold text-green-600">{stats.accepted}</p>
+          </div>
+          <div className="bg-white p-4 rounded-lg border border-slate-200 shadow-sm">
+            <p className="text-xs text-slate-500 uppercase tracking-wide">Non-conformes</p>
+            <p className="text-2xl font-bold text-red-600">{stats.rejected}</p>
+          </div>
+          <div className="bg-white p-4 rounded-lg border border-slate-200 shadow-sm">
+            <p className="text-xs text-slate-500 uppercase tracking-wide">Incertains</p>
+            <p className="text-2xl font-bold text-slate-500">{stats.uncertain}</p>
+          </div>
+        </div>
+        
+        <Dashboard />
       </div>
     </div>
   )

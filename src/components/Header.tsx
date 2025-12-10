@@ -1,4 +1,4 @@
-import { Flame, BarChart3, Cpu, TrendingUp, BookOpen } from 'lucide-react'
+import { Flame, Cpu, TrendingUp, BookOpen } from 'lucide-react'
 
 interface HeaderProps {
   activeTab: 'dashboard' | 'simulation' | 'architecture' | 'impact' | 'about'
@@ -8,7 +8,6 @@ interface HeaderProps {
 export default function Header({ activeTab, setActiveTab }: HeaderProps) {
   const tabs = [
     { id: 'about' as const, label: 'Introduction', icon: BookOpen },
-    { id: 'dashboard' as const, label: 'Monitoring', icon: BarChart3 },
     { id: 'simulation' as const, label: 'Simulation 3D', icon: Cpu },
     { id: 'architecture' as const, label: 'Architecture', icon: Flame },
     { id: 'impact' as const, label: 'Impact', icon: TrendingUp },

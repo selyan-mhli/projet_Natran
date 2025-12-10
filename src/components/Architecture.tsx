@@ -3,9 +3,9 @@ import { Camera, Cpu, Database, Zap, ArrowRight, Layers } from 'lucide-react'
 export default function Architecture() {
   return (
     <div className="space-y-6">
-      <div className="glass-effect rounded-xl p-6">
+      <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm">
         <h2 className="text-2xl font-bold text-slate-900 mb-2">Architecture du système de tri prédictif</h2>
-        <p className="text-slate-400 mb-6">
+        <p className="text-slate-600 mb-6">
           Infrastructure intégrée de caractérisation et séparation des CSR par vision artificielle
         </p>
 
@@ -79,9 +79,9 @@ export default function Architecture() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="glass-effect rounded-xl p-6">
+        <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm">
           <div className="flex items-center gap-3 mb-4">
-            <Database className="w-6 h-6 text-slate-400" />
+            <Database className="w-6 h-6 text-slate-700" />
             <h3 className="text-xl font-bold text-slate-900">Dataset d'Entraînement</h3>
           </div>
           <div className="space-y-3">
@@ -92,9 +92,9 @@ export default function Architecture() {
           </div>
         </div>
 
-        <div className="glass-effect rounded-xl p-6">
+        <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm">
           <div className="flex items-center gap-3 mb-4">
-            <Layers className="w-6 h-6 text-slate-400" />
+            <Layers className="w-6 h-6 text-slate-700" />
             <h3 className="text-xl font-bold text-slate-900">Infrastructure</h3>
           </div>
           <div className="space-y-3">
@@ -106,7 +106,7 @@ export default function Architecture() {
         </div>
       </div>
 
-      <div className="glass-effect rounded-xl p-6">
+      <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm">
         <h3 className="text-xl font-bold text-slate-900 mb-4">Avantages de la Solution</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <BenefitCard
@@ -153,18 +153,18 @@ export default function Architecture() {
 
 function SystemCard({ icon: Icon, title, description, features }: any) {
   return (
-    <div className="glass-effect rounded-xl p-6 border-t-4 border-slate-500">
+    <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm border-t-4 border-t-slate-900">
       <div className="flex items-center gap-3 mb-3">
-        <div className="w-12 h-12 bg-slate-500/20 rounded-lg flex items-center justify-center">
-          <Icon className="w-6 h-6 text-slate-400" />
+        <div className="w-12 h-12 bg-slate-100 rounded-lg flex items-center justify-center">
+          <Icon className="w-6 h-6 text-slate-700" />
         </div>
         <h3 className="text-lg font-bold text-slate-900">{title}</h3>
       </div>
-      <p className="text-sm text-slate-400 mb-4">{description}</p>
+      <p className="text-sm text-slate-600 mb-4">{description}</p>
       <ul className="space-y-2">
         {features.map((feature: string, index: number) => (
-          <li key={index} className="flex items-center gap-2 text-sm text-slate-300">
-            <div className="w-1.5 h-1.5 bg-slate-400 rounded-full"></div>
+          <li key={index} className="flex items-center gap-2 text-sm text-slate-700">
+            <div className="w-1.5 h-1.5 bg-slate-900 rounded-full"></div>
             {feature}
           </li>
         ))}
@@ -175,46 +175,54 @@ function SystemCard({ icon: Icon, title, description, features }: any) {
 
 function FlowStep({ number, title, description, color }: any) {
   const colors: Record<string, string> = {
-    blue: 'from-blue-500 to-blue-700',
-    purple: 'from-purple-500 to-purple-700',
-    green: 'from-green-500 to-green-700',
-    orange: 'from-orange-500 to-orange-700'
+    blue: 'bg-blue-600',
+    purple: 'bg-purple-600',
+    green: 'bg-green-600',
+    orange: 'bg-orange-600'
   }
 
   return (
     <div className="flex flex-col items-center text-center">
-      <div className={`w-16 h-16 bg-gradient-to-br ${colors[color]} rounded-full flex items-center justify-center text-2xl font-bold text-slate-900 mb-3 glow-effect`}>
+      <div className={`w-16 h-16 ${colors[color]} rounded-full flex items-center justify-center text-2xl font-bold text-white mb-3 shadow-lg`}>
         {number}
       </div>
       <h4 className="text-lg font-bold text-slate-900 mb-1">{title}</h4>
-      <p className="text-sm text-slate-400">{description}</p>
+      <p className="text-sm text-slate-600">{description}</p>
     </div>
   )
 }
 
 function DatasetItem({ label, value }: any) {
   return (
-    <div className="flex items-center justify-between p-3 bg-slate-100/80 rounded-lg">
-      <span className="text-sm text-slate-400">{label}</span>
+    <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg border border-slate-100">
+      <span className="text-sm text-slate-600">{label}</span>
       <span className="text-sm font-bold text-slate-900">{value}</span>
     </div>
   )
 }
 
 function BenefitCard({ title, value, description, color }: any) {
-  const colors: Record<string, string> = {
-    green: 'text-slate-400 border-slate-500',
-    blue: 'text-slate-400 border-slate-500',
-    purple: 'text-slate-400 border-purple-500',
-    orange: 'text-slate-400 border-orange-500',
-    cyan: 'text-slate-400 border-cyan-500',
-    yellow: 'text-slate-400 border-yellow-500'
+  const borderColors: Record<string, string> = {
+    green: 'border-l-green-600',
+    blue: 'border-l-blue-600',
+    purple: 'border-l-purple-600',
+    orange: 'border-l-orange-600',
+    cyan: 'border-l-cyan-600',
+    yellow: 'border-l-yellow-600'
+  }
+  const textColors: Record<string, string> = {
+    green: 'text-green-600',
+    blue: 'text-blue-600',
+    purple: 'text-purple-600',
+    orange: 'text-orange-600',
+    cyan: 'text-cyan-600',
+    yellow: 'text-yellow-600'
   }
 
   return (
-    <div className={`glass-effect rounded-xl p-4 border-l-4 ${colors[color]}`}>
-      <p className="text-sm text-slate-400 mb-1">{title}</p>
-      <p className={`text-3xl font-bold mb-1 ${colors[color]}`}>{value}</p>
+    <div className={`bg-white rounded-xl p-4 border border-slate-200 shadow-sm border-l-4 ${borderColors[color]}`}>
+      <p className="text-sm text-slate-600 mb-1">{title}</p>
+      <p className={`text-3xl font-bold mb-1 ${textColors[color]}`}>{value}</p>
       <p className="text-xs text-slate-500">{description}</p>
     </div>
   )

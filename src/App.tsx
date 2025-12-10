@@ -1,21 +1,21 @@
 import { useState } from 'react'
 import Header from './components/Header'
-import Dashboard from './components/Dashboard'
 import FinalSimulation from './components/FinalSimulation'
 import Architecture from './components/Architecture'
 import Impact from './components/Impact'
 import AboutCSR from './components/AboutCSR'
+import { SimulationProvider } from './context/SimulationContext'
 
 function App() {
   const [activeTab, setActiveTab] = useState<'dashboard' | 'simulation' | 'architecture' | 'impact' | 'about'>('about')
 
   return (
+    <SimulationProvider>
     <div className="min-h-screen bg-white">
       <Header activeTab={activeTab} setActiveTab={setActiveTab} />
       
       <main className="max-w-7xl mx-auto px-6 py-10">
         {activeTab === 'about' && <AboutCSR />}
-        {activeTab === 'dashboard' && <Dashboard />}
         {activeTab === 'simulation' && <FinalSimulation />}
         {activeTab === 'architecture' && <Architecture />}
         {activeTab === 'impact' && <Impact />}
@@ -36,6 +36,7 @@ function App() {
         </div>
       </footer>
     </div>
+    </SimulationProvider>
   )
 }
 

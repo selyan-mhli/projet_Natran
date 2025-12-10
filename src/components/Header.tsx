@@ -7,48 +7,50 @@ interface HeaderProps {
 
 export default function Header({ activeTab, setActiveTab }: HeaderProps) {
   const tabs = [
-    { id: 'about' as const, label: 'Contexte CSR', icon: BookOpen },
-    { id: 'dashboard' as const, label: 'Monitoring temps réel', icon: BarChart3 },
-    { id: 'simulation' as const, label: 'Détection IA', icon: Cpu },
-    { id: 'architecture' as const, label: 'Architecture système', icon: Flame },
-    { id: 'impact' as const, label: 'Analyse d\'impact', icon: TrendingUp },
+    { id: 'about' as const, label: 'Introduction', icon: BookOpen },
+    { id: 'dashboard' as const, label: 'Monitoring', icon: BarChart3 },
+    { id: 'simulation' as const, label: 'Simulation 3D', icon: Cpu },
+    { id: 'architecture' as const, label: 'Architecture', icon: Flame },
+    { id: 'impact' as const, label: 'Impact', icon: TrendingUp },
   ]
 
   return (
-    <header className="border-b border-slate-200 glass-effect sticky top-0 z-50">
-      <div className="container mx-auto px-4 py-4">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 bg-white rounded-lg flex items-center justify-center shadow-lg border-2 border-slate-900">
-              <Flame className="w-7 h-7 text-slate-900" />
+    <header className="bg-white border-b border-slate-200 sticky top-0 z-50">
+      <div className="max-w-7xl mx-auto px-6">
+        {/* Top bar */}
+        <div className="flex items-center justify-between py-6 border-b border-slate-100">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 bg-slate-900 rounded-xl flex items-center justify-center">
+              <Flame className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-slate-900">NATRAN - Système de Tri Intelligent</h1>
-              <p className="text-sm text-slate-600">Optimisation de la pyro-gazéification des CSR par vision artificielle</p>
+              <h1 className="text-xl font-bold text-slate-900 tracking-tight">NATRAN</h1>
+              <p className="text-sm text-slate-500">Tri intelligent des CSR par IA</p>
             </div>
           </div>
           
-          <div className="hidden md:flex items-center gap-2 px-4 py-2 bg-slate-100 rounded-lg border border-slate-200">
-            <div className="w-2 h-2 bg-slate-700 rounded-full animate-pulse"></div>
-            <span className="text-sm text-slate-700">Système opérationnel</span>
+          <div className="hidden md:block text-right">
+            <p className="text-sm font-medium text-slate-900">Rapport Scientifique</p>
+            <p className="text-xs text-slate-500">Pyro-gazéification industrielle</p>
           </div>
         </div>
         
-        <nav className="flex gap-2">
+        {/* Navigation */}
+        <nav className="flex gap-1 py-3 overflow-x-auto">
           {tabs.map((tab) => {
             const Icon = tab.icon
             return (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${
+                className={`flex items-center gap-2 px-4 py-2.5 rounded-lg transition-all whitespace-nowrap ${
                   activeTab === tab.id
-                    ? 'bg-slate-900 text-white shadow-md'
+                    ? 'bg-slate-900 text-white'
                     : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                 }`}
               >
                 <Icon className="w-4 h-4" />
-                <span className="font-medium">{tab.label}</span>
+                <span className="text-sm font-medium">{tab.label}</span>
               </button>
             )
           })}

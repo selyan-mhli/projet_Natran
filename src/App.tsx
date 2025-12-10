@@ -1,30 +1,38 @@
 import { useState } from 'react'
 import Header from './components/Header'
 import Dashboard from './components/Dashboard'
-import BabylonSimulationV2 from './components/BabylonSimulationV2'
+import FinalSimulation from './components/FinalSimulation'
 import Architecture from './components/Architecture'
 import Impact from './components/Impact'
 import AboutCSR from './components/AboutCSR'
 
 function App() {
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'simulation' | 'architecture' | 'impact' | 'about'>('dashboard')
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'simulation' | 'architecture' | 'impact' | 'about'>('about')
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-white via-slate-50 to-slate-100">
+    <div className="min-h-screen bg-white">
       <Header activeTab={activeTab} setActiveTab={setActiveTab} />
       
-      <main className="container mx-auto px-4 py-8">
+      <main className="max-w-7xl mx-auto px-6 py-10">
         {activeTab === 'about' && <AboutCSR />}
         {activeTab === 'dashboard' && <Dashboard />}
-        {activeTab === 'simulation' && <BabylonSimulationV2 />}
+        {activeTab === 'simulation' && <FinalSimulation />}
         {activeTab === 'architecture' && <Architecture />}
         {activeTab === 'impact' && <Impact />}
       </main>
       
-      <footer className="border-t border-slate-800 mt-16 py-6">
-        <div className="container mx-auto px-4 text-center text-slate-400 text-sm">
-          <p>© 2024 Projet NATRAN - Système de tri intelligent des CSR par vision artificielle</p>
-          <p className="mt-2">Solution d'optimisation pour la pyro-gazéification industrielle</p>
+      <footer className="border-t border-slate-200 mt-20">
+        <div className="max-w-7xl mx-auto px-6 py-8">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+            <div>
+              <p className="font-semibold text-slate-900">Projet NATRAN</p>
+              <p className="text-sm text-slate-500">Système de tri intelligent des CSR par vision artificielle</p>
+            </div>
+            <div className="text-sm text-slate-500">
+              <p>© 2024 - Rapport Scientifique</p>
+              <p>Optimisation de la pyro-gazéification industrielle</p>
+            </div>
+          </div>
         </div>
       </footer>
     </div>

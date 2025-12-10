@@ -3,6 +3,7 @@ import { Play, Pause, RotateCcw, Camera as CameraIcon, Zap } from 'lucide-react'
 import * as BABYLON from '@babylonjs/core'
 import { GridMaterial } from '@babylonjs/materials'
 import '@babylonjs/loaders'
+import { RealisticRoboticArm } from './RealisticRoboticArm'
 
 interface DetectionStats {
   total: number
@@ -31,9 +32,14 @@ export default function BabylonSimulationV2() {
   const cameraRef = useRef<BABYLON.ArcRotateCamera | null>(null)
   const objectsRef = useRef<CSRObject[]>([])
   const animationRef = useRef<number | null>(null)
-  const roboticArmsRef = useRef<any[]>([])
+  const roboticArmsRef = useRef<RealisticRoboticArm[]>([])
   const binCountersRef = useRef({ left: 0, right: 0, end: 0 })
   const binObjectsRef = useRef<{ left: BABYLON.Mesh[], right: BABYLON.Mesh[], end: BABYLON.Mesh[] }>({ left: [], right: [], end: [] })
+  const binPositionsRef = useRef({
+    left: new BABYLON.Vector3(-5, 1.5, 0),
+    right: new BABYLON.Vector3(5, 1.5, 0),
+    end: new BABYLON.Vector3(0, 1.5, 12)
+  })
   
   const [isRunning, setIsRunning] = useState(false)
   const [stats, setStats] = useState<DetectionStats>({
@@ -94,18 +100,71 @@ export default function BabylonSimulationV2() {
     dirLight.position = new BABYLON.Vector3(15, 30, 15)
     dirLight.intensity = 1.5
 
-    // Convoyeur
-    const conveyorMat = new BABYLON.StandardMaterial('conveyorMat', scene)
-    conveyorMat.diffuseColor = new BABYLON.Color3(0.28, 0.33, 0.40)
-    conveyorMat.specularColor = new BABYLON.Color3(0.2, 0.2, 0.2)
+    // CONVOYEUR INDUSTRIEL DÉTAILLÉ
+    const conveyorMat = new BABYLON.PBRMetallicRoughnessMaterial('conveyorMat', scene)
+    conveyorMat.baseColor = new BABYLON.Color3(0.15, 0.18, 0.22)
+    conveyorMat.metallic = 0.8
+    conveyorMat.roughness = 0.4
 
+    // Bande principale
     const conveyor = BABYLON.MeshBuilder.CreateBox('conveyor', {
-      width: 4,
-      height: 0.3,
+      width: 3,
+      height: 0.2,
       depth: 20
     }, scene)
-    conveyor.position.y = 0
+    conveyor.position = new BABYLON.Vector3(0, 0.1, 0)
     conveyor.material = conveyorMat
+    
+    // Rouleaux sous le convoyeur (réalisme)
+    const rollerMat = new BABYLON.StandardMaterial('rollerMat', scene)
+    rollerMat.diffuseColor = new BABYLON.Color3(0.3, 0.3, 0.3)
+    rollerMat.specularColor = new BABYLON.Color3(0.5, 0.5, 0.5)
+    
+    for (let i = -9; i <= 9; i += 1.5) {
+      const roller = BABYLON.MeshBuilder.CreateCylinder(`roller_${i}`, {
+        diameter: 0.15,
+        height: 3.2
+      }, scene)
+      roller.rotation.z = Math.PI / 2
+      roller.position = new BABYLON.Vector3(0, -0.05, i)
+      roller.material = rollerMat
+    }
+    
+    // Bordures latérales métalliques
+    const sideMat = new BABYLON.PBRMetallicRoughnessMaterial('sideMat', scene)
+    sideMat.baseColor = new BABYLON.Color3(0.35, 0.35, 0.38)
+    sideMat.metallic = 0.9
+    sideMat.roughness = 0.3
+    
+    const sideLeft = BABYLON.MeshBuilder.CreateBox('sideLeft', {
+      width: 0.15,
+      height: 0.4,
+      depth: 20
+    }, scene)
+    sideLeft.position = new BABYLON.Vector3(-1.575, 0.3, 0)
+    sideLeft.material = sideMat
+    
+    const sideRight = BABYLON.MeshBuilder.CreateBox('sideRight', {
+      width: 0.15,
+      height: 0.4,
+      depth: 20
+    }, scene)
+    sideRight.position = new BABYLON.Vector3(1.575, 0.3, 0)
+    sideRight.material = sideMat
+    
+    // Lignes de guidage sur le convoyeur
+    for (let i = -9; i <= 9; i += 2) {
+      const guideLine = BABYLON.MeshBuilder.CreateBox(`guide_${i}`, {
+        width: 2.8,
+        height: 0.02,
+        depth: 0.05
+      }, scene)
+      guideLine.position = new BABYLON.Vector3(0, 0.21, i)
+      const guideMat = new BABYLON.StandardMaterial(`guideMat_${i}`, scene)
+      guideMat.diffuseColor = new BABYLON.Color3(0.8, 0.8, 0)
+      guideMat.emissiveColor = new BABYLON.Color3(0.3, 0.3, 0)
+      guideLine.material = guideMat
+    }
 
     // Bordures
     const borderMat = new BABYLON.StandardMaterial('borderMat', scene)
@@ -204,73 +263,172 @@ export default function BabylonSimulationV2() {
     createIndustrialCamera('cam2', new BABYLON.Vector3(0, 5.5, 0))
     createIndustrialCamera('cam3', new BABYLON.Vector3(2, 5, 0))
 
-    // BRAS ROBOTIQUES ARTICULÉS
-    const createRoboticArm = (side: 'left' | 'right', position: BABYLON.Vector3, targetType: 'accept' | 'reject') => {
-      const armMat = new BABYLON.StandardMaterial(`arm${side}Mat`, scene)
-      armMat.diffuseColor = new BABYLON.Color3(0.3, 0.3, 0.35)
-      armMat.specularColor = new BABYLON.Color3(0.6, 0.6, 0.6)
-
-      // Base
-      const base = BABYLON.MeshBuilder.CreateCylinder(`arm${side}Base`, {
-        diameter: 0.5,
+    // STRUCTURE INDUSTRIELLE RÉALISTE (comme vraie usine)
+    const createIndustrialStructure = () => {
+      const structureMat = new BABYLON.PBRMetallicRoughnessMaterial('structureMat', scene)
+      structureMat.baseColor = new BABYLON.Color3(0.25, 0.25, 0.27)
+      structureMat.metallic = 0.95
+      structureMat.roughness = 0.4
+      
+      // COLONNES INDUSTRIELLES (8 colonnes pour solidité)
+      const columnPositions = [
+        [-5, 0, -10], [5, 0, -10],
+        [-5, 0, -3], [5, 0, -3],
+        [-5, 0, 3], [5, 0, 3],
+        [-5, 0, 10], [5, 0, 10]
+      ]
+      
+      columnPositions.forEach((pos, i) => {
+        // Colonne principale
+        const column = BABYLON.MeshBuilder.CreateCylinder(`column${i}`, {
+          diameter: 0.4,
+          height: 10,
+          tessellation: 16
+        }, scene)
+        column.position = new BABYLON.Vector3(pos[0], 5, pos[1])
+        column.material = structureMat
+        
+        // Base de colonne
+        const base = BABYLON.MeshBuilder.CreateBox(`columnBase${i}`, {
+          width: 0.8,
+          height: 0.3,
+          depth: 0.8
+        }, scene)
+        base.position = new BABYLON.Vector3(pos[0], 0.15, pos[1])
+        base.material = structureMat
+      })
+      
+      // POUTRES LONGITUDINALES (le long du convoyeur)
+      for (let side of [-5, 5]) {
+        const beam = BABYLON.MeshBuilder.CreateBox(`longBeam_${side}`, {
+          width: 0.25,
+          height: 0.3,
+          depth: 20
+        }, scene)
+        beam.position = new BABYLON.Vector3(side, 9.5, 0)
+        beam.material = structureMat
+      }
+      
+      // POUTRES TRANSVERSALES (traversent le convoyeur)
+      for (let z of [-10, -3, 3, 10]) {
+        const crossBeam = BABYLON.MeshBuilder.CreateBox(`crossBeam_${z}`, {
+          width: 10,
+          height: 0.25,
+          depth: 0.3
+        }, scene)
+        crossBeam.position = new BABYLON.Vector3(0, 9.5, z)
+        crossBeam.material = structureMat
+      }
+      
+      // TOIT INDUSTRIEL (tôle ondulée)
+      const roofMat = new BABYLON.StandardMaterial('roofMat', scene)
+      roofMat.diffuseColor = new BABYLON.Color3(0.4, 0.42, 0.45)
+      roofMat.specularColor = new BABYLON.Color3(0.6, 0.6, 0.6)
+      roofMat.alpha = 0.85
+      
+      const roof = BABYLON.MeshBuilder.CreateBox('roof', {
+        width: 12,
+        height: 0.1,
+        depth: 22
+      }, scene)
+      roof.position = new BABYLON.Vector3(0, 10, 0)
+      roof.material = roofMat
+      
+      // CÂBLES ÉLECTRIQUES (réalisme)
+      const cableMat = new BABYLON.StandardMaterial('cableMat', scene)
+      cableMat.diffuseColor = new BABYLON.Color3(0.1, 0.1, 0.1)
+      
+      for (let z = -9; z <= 9; z += 3) {
+        const cable = BABYLON.MeshBuilder.CreateCylinder(`cable_${z}`, {
+          diameter: 0.05,
+          height: 10
+        }, scene)
+        cable.position = new BABYLON.Vector3(-4.5, 5, z)
+        cable.material = cableMat
+      }
+      
+      // CONDUITS D'AÉRATION
+      for (let z = -8; z <= 8; z += 4) {
+        const duct = BABYLON.MeshBuilder.CreateBox(`duct_${z}`, {
+          width: 0.4,
+          height: 0.4,
+          depth: 3
+        }, scene)
+        duct.position = new BABYLON.Vector3(0, 9.2, z)
+        const ductMat = new BABYLON.StandardMaterial(`ductMat_${z}`, scene)
+        ductMat.diffuseColor = new BABYLON.Color3(0.5, 0.5, 0.52)
+        duct.material = ductMat
+      }
+    }
+    
+    createIndustrialStructure()
+    
+    // PANNEAUX DE SIGNALISATION
+    const createSignPanel = (text: string, position: BABYLON.Vector3, color: BABYLON.Color3) => {
+      const panel = BABYLON.MeshBuilder.CreatePlane(`panel_${text}`, {
+        width: 2,
+        height: 0.8
+      }, scene)
+      panel.position = position
+      panel.rotation.y = Math.PI
+      
+      const panelMat = new BABYLON.StandardMaterial(`panelMat_${text}`, scene)
+      panelMat.diffuseColor = color
+      panelMat.emissiveColor = color.scale(0.3)
+      panel.material = panelMat
+    }
+    
+    createSignPanel('ZONE DE TRI', new BABYLON.Vector3(0, 6.5, -7.5), new BABYLON.Color3(0.2, 0.5, 0.9))
+    createSignPanel('CONFORME', new BABYLON.Vector3(-4.5, 2, 0), new BABYLON.Color3(0.2, 0.8, 0.3))
+    createSignPanel('NON-CONFORME', new BABYLON.Vector3(4.5, 2, 0), new BABYLON.Color3(0.9, 0.2, 0.2))
+    
+    // ÉCLAIRAGE INDUSTRIEL
+    const createIndustrialLight = (position: BABYLON.Vector3) => {
+      const lightHousing = BABYLON.MeshBuilder.CreateCylinder('lightHousing', {
+        diameter: 0.6,
         height: 0.3
       }, scene)
-      base.position = position
-      base.material = armMat
-
-      // Bras 1 (vertical)
-      const arm1 = BABYLON.MeshBuilder.CreateCylinder(`arm${side}Arm1`, {
-        diameter: 0.12,
-        height: 2
-      }, scene)
-      arm1.position = new BABYLON.Vector3(position.x, position.y + 1.15, position.z)
-      arm1.material = armMat
-
-      // Joint 1
-      const joint1 = BABYLON.MeshBuilder.CreateSphere(`arm${side}Joint1`, {
-        diameter: 0.2
-      }, scene)
-      joint1.position = new BABYLON.Vector3(position.x, position.y + 2.15, position.z)
-      joint1.material = armMat
-
-      // Bras 2 (horizontal)
-      const arm2 = BABYLON.MeshBuilder.CreateCylinder(`arm${side}Arm2`, {
-        diameter: 0.1,
-        height: 2
-      }, scene)
-      arm2.rotation.z = Math.PI / 2
-      arm2.position = new BABYLON.Vector3(
-        position.x + (side === 'left' ? -1 : 1),
-        position.y + 2.15,
-        position.z
+      lightHousing.position = position
+      
+      const housingMat = new BABYLON.StandardMaterial('housingMat', scene)
+      housingMat.diffuseColor = new BABYLON.Color3(0.1, 0.1, 0.1)
+      lightHousing.material = housingMat
+      
+      const spotLight = new BABYLON.SpotLight(
+        `spot_${position.x}_${position.z}`,
+        position,
+        new BABYLON.Vector3(0, -1, 0),
+        Math.PI / 3,
+        2,
+        scene
       )
-      arm2.material = armMat
-
-      // Pince
-      const gripperMat = new BABYLON.StandardMaterial(`gripper${side}Mat`, scene)
-      gripperMat.diffuseColor = targetType === 'reject' ? new BABYLON.Color3(0.6, 0.2, 0.2) : new BABYLON.Color3(0.2, 0.6, 0.3)
-
-      const gripper = BABYLON.MeshBuilder.CreateBox(`arm${side}Gripper`, {
-        width: 0.2,
-        height: 0.15,
-        depth: 0.3
-      }, scene)
-      gripper.position = new BABYLON.Vector3(
-        position.x + (side === 'left' ? -2 : 2),
-        position.y + 2.15,
-        position.z
-      )
-      gripper.material = gripperMat
-
-      return { base, arm1, joint1, arm2, gripper, targetType, side }
+      spotLight.intensity = 0.8
+      spotLight.diffuse = new BABYLON.Color3(1, 0.95, 0.8)
     }
+    
+    createIndustrialLight(new BABYLON.Vector3(-2, 7, -4))
+    createIndustrialLight(new BABYLON.Vector3(2, 7, -4))
+    createIndustrialLight(new BABYLON.Vector3(-2, 7, 0))
+    createIndustrialLight(new BABYLON.Vector3(2, 7, 0))
+    createIndustrialLight(new BABYLON.Vector3(-2, 7, 4))
+    createIndustrialLight(new BABYLON.Vector3(2, 7, 4))
+    
+    // BRAS ROBOTIQUES RÉALISTES (2 seulement - réaliste)
+    const arm1 = new RealisticRoboticArm({
+      scene,
+      position: new BABYLON.Vector3(-3.5, 0.5, 0),
+      side: 'left',
+      targetType: 'accept'
+    })
+    
+    const arm2 = new RealisticRoboticArm({
+      scene,
+      position: new BABYLON.Vector3(3.5, 0.5, 0),
+      side: 'right',
+      targetType: 'reject'
+    })
 
-    const arm1 = createRoboticArm('left', new BABYLON.Vector3(-3, 0.5, 2), 'accept')
-    const arm2 = createRoboticArm('right', new BABYLON.Vector3(3, 0.5, 2), 'reject')
-    const arm3 = createRoboticArm('left', new BABYLON.Vector3(-3, 0.5, -2), 'accept')
-    const arm4 = createRoboticArm('right', new BABYLON.Vector3(3, 0.5, -2), 'reject')
-
-    roboticArmsRef.current = [arm1, arm2, arm3, arm4]
+    roboticArmsRef.current = [arm1, arm2]
 
     // Sol
     const ground = BABYLON.MeshBuilder.CreateGround('ground', {
@@ -363,7 +521,7 @@ export default function BabylonSimulationV2() {
     objMat.specularColor = new BABYLON.Color3(0.4, 0.4, 0.4)
     mesh.material = objMat
 
-    const speed = 0.08 + Math.random() * 0.04
+    const speed = 0.03 + Math.random() * 0.01
     const rotationSpeed = new BABYLON.Vector3(
       (Math.random() - 0.5) * 0.02,
       (Math.random() - 0.5) * 0.02,
@@ -382,17 +540,22 @@ export default function BabylonSimulationV2() {
 
     objectsRef.current.push(csrObject)
 
+    let isPaused = false
+    
     scene.registerBeforeRender(() => {
       if (!mesh.isDisposed()) {
-        mesh.position.z += speed
-        mesh.rotation.addInPlace(rotationSpeed)
+        // Ne bouger que si pas en pause
+        if (!isPaused) {
+          mesh.position.z += speed
+          mesh.rotation.addInPlace(rotationSpeed)
+        }
 
         if (mesh.position.y > 0.5) {
           mesh.position.y -= 0.02
         }
 
-        // Détection
-        if (mesh.position.z > -0.5 && mesh.position.z < 0.5 && !csrObject.detected) {
+        // Détection (zone plus large pour meilleure synchronisation)
+        if (mesh.position.z > -1 && mesh.position.z < 1 && !csrObject.detected) {
           csrObject.detected = true
 
           const detectionMat = mesh.material as BABYLON.StandardMaterial
@@ -402,140 +565,39 @@ export default function BabylonSimulationV2() {
               : new BABYLON.Color3(0.13, 0.77, 0.37)
           }
 
-          // Trouver le bras le plus proche
-          const targetArm = roboticArmsRef.current.find((arm: any) => {
-            const isCorrectType = csrObject.reject ? arm.targetType === 'reject' : arm.targetType === 'accept'
-            const isNearZ = Math.abs(arm.gripper.position.z - mesh.position.z) < 3
-            return isCorrectType && isNearZ
+          // Trouver un bras disponible du bon type ET dans la zone de prise
+          const targetArm = roboticArmsRef.current.find(arm => {
+            const isCorrectType = csrObject.reject ? arm.getTargetType() === 'reject' : arm.getTargetType() === 'accept'
+            const isInZone = arm.isInGraspZone(mesh.position) // ZONE DE PRISE
+            return isCorrectType && isInZone && arm.isAvailable()
           })
 
           if (targetArm) {
-            // Fonction d'easing pour mouvement fluide (ease-in-out)
-            const easeInOutCubic = (t: number) => {
-              return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2
-            }
-
-            // Animation RÉALISTE du bras qui attrape l'objet
-            let animationProgress = 0
-            const objectStartPos = mesh.position.clone()
+            // ARRÊTER l'objet pendant que le bras l'attrape
+            isPaused = true
             
-            // Sauvegarder positions initiales du bras
-            const originalArm2Rotation = targetArm.arm2.rotation.z
-            const originalArm2X = targetArm.arm2.position.x
-            const originalGripperX = targetArm.gripper.position.x
-            const originalGripperY = targetArm.gripper.position.y
+            // Utiliser l'animation réaliste du bras avec COMPENSATION PRÉDICTIVE
+            const binPos = csrObject.reject 
+              ? binPositionsRef.current.right 
+              : binPositionsRef.current.left
             
-            // Positions cibles
-            const binSide = targetArm.side === 'left' ? 'left' : 'right'
-            const binX = targetArm.side === 'left' ? -5 : 5
-            const binY = 0.75 + (binCountersRef.current[binSide] * 0.15)
-            const direction = targetArm.side === 'left' ? 1 : -1
-            
-            const armAnimation = scene.onBeforeRenderObservable.add(() => {
-              animationProgress += 0.018
-
-              if (animationProgress <= 1) {
-                if (animationProgress < 0.25) {
-                  // Phase 1: Bras s'étend vers l'objet (0-25%)
-                  const t1 = animationProgress / 0.25
-                  const ease1 = easeInOutCubic(t1)
-                  
-                  // Rotation du bras horizontal
-                  targetArm.arm2.rotation.z = originalArm2Rotation + direction * 0.6 * ease1
-                  
-                  // Mettre à jour la position du bras2 et joint1
-                  const baseX = targetArm.side === 'left' ? -3 : 3
-                  targetArm.arm2.position.x = baseX + direction * (1 + 1 * ease1)
-                  targetArm.joint1.position.x = baseX
-                  
-                  // Extension de la pince
-                  targetArm.gripper.position.x = originalGripperX + direction * 2 * ease1
-                  targetArm.gripper.position.y = originalGripperY - 1.5 * ease1
-                  
-                } else if (animationProgress < 0.35) {
-                  // Phase 2: Saisie de l'objet (25-35%)
-                  // L'objet suit la pince
-                  mesh.position.x = targetArm.gripper.position.x
-                  mesh.position.y = targetArm.gripper.position.y
-                  
-                } else if (animationProgress < 0.65) {
-                  // Phase 3: Lever l'objet (35-65%)
-                  const t3 = (animationProgress - 0.35) / 0.3
-                  const ease3 = easeInOutCubic(t3)
-                  
-                  const baseX = targetArm.side === 'left' ? -3 : 3
-                  
-                  // Lever la pince
-                  targetArm.gripper.position.y = originalGripperY - 1.5 + 2.5 * ease3
-                  
-                  // Maintenir l'extension du bras
-                  targetArm.arm2.position.x = baseX + direction * 2
-                  
-                  // L'objet suit
-                  mesh.position.x = targetArm.gripper.position.x
-                  mesh.position.y = targetArm.gripper.position.y
-                  mesh.rotation.y += 0.03
-                  
-                } else if (animationProgress < 0.9) {
-                  // Phase 4: Déplacement vers le bac (65-90%)
-                  const t4 = (animationProgress - 0.65) / 0.25
-                  const ease4 = easeInOutCubic(t4)
-                  
-                  const baseX = targetArm.side === 'left' ? -3 : 3
-                  
-                  // Étendre encore plus vers le bac
-                  targetArm.gripper.position.x = originalGripperX + direction * (2 + 3 * ease4)
-                  targetArm.arm2.position.x = baseX + direction * (2 + 1.5 * ease4)
-                  
-                  // L'objet suit
-                  mesh.position.x = targetArm.gripper.position.x
-                  mesh.position.y = targetArm.gripper.position.y
-                  mesh.rotation.y += 0.03
-                  
-                } else {
-                  // Phase 5: Lâcher dans le bac (90-100%)
-                  const t5 = (animationProgress - 0.9) / 0.1
-                  const ease5 = easeInOutCubic(t5)
-                  
-                  // Descendre l'objet dans le bac
-                  mesh.position.x = binX
-                  mesh.position.y = targetArm.gripper.position.y - 1 * ease5
-                  mesh.position.z = objectStartPos.z
-                  
-                  if (animationProgress > 0.95) {
-                    mesh.position.y = binY
-                    
-                    // Rétraction du bras
-                    targetArm.arm2.rotation.z = originalArm2Rotation + direction * 0.6 * (1 - ease5)
-                    targetArm.arm2.position.x = originalArm2X + direction * 3.5 * (1 - ease5)
-                    targetArm.gripper.position.x = originalGripperX + direction * 5 * (1 - ease5)
-                    targetArm.gripper.position.y = originalGripperY + 1 * (1 - ease5)
+            // Passer la vitesse du convoyeur pour la prédiction
+            targetArm.grabObject(mesh, binPos, speed).then(() => {
+              isPaused = false
+              // Après l'animation, ajouter au compteur
+              const binSide = csrObject.reject ? 'right' : 'left'
+              binObjectsRef.current[binSide].push(mesh)
+              binCountersRef.current[binSide]++
+              
+              // Vider le bac si plein
+              if (binCountersRef.current[binSide] > 15) {
+                binObjectsRef.current[binSide].forEach(obj => {
+                  if (!obj.isDisposed()) {
+                    obj.dispose()
                   }
-                  
-                  if (animationProgress > 0.98) {
-                    // Ajouter au bac
-                    binObjectsRef.current[binSide].push(mesh)
-                    binCountersRef.current[binSide]++
-                    
-                    // Vider le bac si plein (>15 objets)
-                    if (binCountersRef.current[binSide] > 15) {
-                      binObjectsRef.current[binSide].forEach(obj => {
-                        if (!obj.isDisposed()) {
-                          obj.dispose()
-                        }
-                      })
-                      binObjectsRef.current[binSide] = []
-                      binCountersRef.current[binSide] = 0
-                    }
-                  }
-                }
-              } else {
-                // Retour complet à la position initiale
-                targetArm.arm2.rotation.z = originalArm2Rotation
-                targetArm.arm2.position.x = originalArm2X
-                targetArm.gripper.position.x = originalGripperX
-                targetArm.gripper.position.y = originalGripperY
-                scene.onBeforeRenderObservable.remove(armAnimation)
+                })
+                binObjectsRef.current[binSide] = []
+                binCountersRef.current[binSide] = 0
               }
             })
           }
@@ -562,9 +624,11 @@ export default function BabylonSimulationV2() {
           })
         }
 
-        // Supprimer si hors de vue
-        if (mesh.position.z > 12) {
-          mesh.dispose()
+        // Supprimer si hors de vue (IMPORTANT pour éviter accumulation)
+        if (mesh.position.z > 12 || mesh.position.z < -15) {
+          if (!mesh.isDisposed()) {
+            mesh.dispose()
+          }
           objectsRef.current = objectsRef.current.filter(obj => obj.mesh !== mesh)
         }
       }
@@ -573,9 +637,12 @@ export default function BabylonSimulationV2() {
 
   const startSimulation = () => {
     setIsRunning(true)
-    animationRef.current = window.setInterval(() => {
-      createCSRObject()
-    }, 800)
+    animationRef.current = setInterval(() => {
+      // Limiter à 5 objets max sur le convoyeur
+      if (objectsRef.current.length < 5) {
+        createCSRObject()
+      }
+    }, 1200)
   }
 
   const stopSimulation = () => {

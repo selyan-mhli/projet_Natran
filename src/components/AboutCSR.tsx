@@ -432,7 +432,7 @@ function ComparisonSection() {
   )
 }
 
-function StatRow({ label, value, good, bad, neutral }: { label: string, value: string, good?: boolean, bad?: boolean, neutral?: boolean }) {
+function StatRow({ label, value, good, bad }: { label: string, value: string, good?: boolean, bad?: boolean, neutral?: boolean }) {
   const colorClass = good ? 'text-green-700' : bad ? 'text-red-700' : 'text-slate-700'
   const bgClass = good ? 'bg-green-100' : bad ? 'bg-red-100' : 'bg-slate-100'
   return (

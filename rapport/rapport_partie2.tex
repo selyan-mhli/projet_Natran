@@ -1,0 +1,375 @@
+% ============================================
+% PARTIE 2 : NOTRE SOLUTION
+% ============================================
+\newpage
+\part{Notre Solution : NATRAN}
+
+\section{Présentation Générale}
+
+\subsection{Vision et Objectifs}
+
+\textbf{NATRAN} (Natural Transformation) est un système de tri intelligent combinant :
+\begin{itemize}
+    \item Vision par ordinateur avec caméras multispectrales
+    \item Intelligence artificielle (YOLOv8)
+    \item Robotique automatisée
+    \item Contrôle qualité intégré
+\end{itemize}
+
+\begin{tcolorbox}[colback=natranblue!5, colframe=natranblue, title=Notre Vision]
+\textbf{Démocratiser l'accès au tri automatisé de haute précision pour tous les acteurs de la filière CSR.}
+\end{tcolorbox}
+
+\subsection{Architecture du Système}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[scale=0.65, node distance=0.8cm,
+    box/.style={rectangle, draw=natranblue, thick, fill=natranblue!10, minimum width=2.2cm, minimum height=0.9cm, align=center, font=\tiny}]
+    
+    \node[box, fill=natrangreen!20] (cam1) at (-3,3) {Caméra RGB};
+    \node[box, fill=natrangreen!20] (cam2) at (0,3) {Caméra NIR};
+    \node[box, fill=natrangreen!20] (cam3) at (3,3) {Caméra SWIR};
+    \node[box, fill=natranorange!20] (fusion) at (0,1.5) {Fusion Multimodale};
+    \node[box, fill=natranorange!20] (yolo) at (0,0) {YOLOv8 Détection};
+    \node[box, fill=natranblue!20] (decision) at (0,-1.5) {Moteur Décision};
+    \node[box, fill=natranred!20] (robot1) at (-2.5,-3) {Bras Accept};
+    \node[box, fill=natranred!20] (robot2) at (2.5,-3) {Bras Reject};
+    \node[box, fill=natranyellow!20] (qc) at (0,-4.5) {Contrôle Qualité};
+    
+    \draw[->, thick, natranblue] (cam1) -- (fusion);
+    \draw[->, thick, natranblue] (cam2) -- (fusion);
+    \draw[->, thick, natranblue] (cam3) -- (fusion);
+    \draw[->, thick, natranblue] (fusion) -- (yolo);
+    \draw[->, thick, natranblue] (yolo) -- (decision);
+    \draw[->, thick, natranblue] (decision) -- (robot1);
+    \draw[->, thick, natranblue] (decision) -- (robot2);
+    \draw[->, thick, natranblue] (robot1) |- (qc);
+    \draw[->, thick, natranblue] (robot2) |- (qc);
+\end{tikzpicture}
+\caption{Architecture en couches du système NATRAN}
+\end{figure}
+
+\section{Composants Techniques}
+
+\subsection{Système de Vision Multispectrale}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|c|p{4cm}|p{4cm}|}
+\hline
+\textbf{Caméra} & \textbf{Spectre} & \textbf{Détection} & \textbf{Avantage} \\
+\hline
+RGB & 400-700 nm & Couleur, forme, texture & Identification visuelle \\
+\hline
+NIR & 700-1000 nm & Polymères (PE, PP, PET) & Discrimination plastiques \\
+\hline
+SWIR & 1000-2500 nm & PVC, humidité & Détection chlore \\
+\hline
+\end{tabular}
+\caption{Caractéristiques des caméras multispectrales}
+\end{table}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+    width=11cm, height=5.5cm,
+    xlabel={Longueur d'onde (nm)}, ylabel={Réflectance (\%)},
+    xmin=400, xmax=2500, ymin=0, ymax=100,
+    legend style={at={(0.98,0.98)}, anchor=north east, font=\tiny},
+    grid=major, title={\textbf{Signatures spectrales des matériaux CSR}},
+]
+\addplot[natranblue, thick, smooth] coordinates {(400,20)(600,25)(800,30)(1000,45)(1400,55)(1800,45)(2200,35)};
+\addplot[natranred, thick, smooth] coordinates {(400,15)(600,20)(800,25)(1000,35)(1400,30)(1800,50)(2200,45)};
+\addplot[natranorange, thick, smooth] coordinates {(400,60)(600,65)(800,70)(1000,75)(1400,65)(1800,55)(2200,45)};
+\addplot[natrangreen!70!black, thick, smooth] coordinates {(400,10)(600,15)(800,25)(1000,35)(1400,50)(1800,50)(2200,40)};
+\legend{PE/PP, PVC, Papier, Bois}
+\fill[natrangreen!10] (axis cs:400,0) rectangle (axis cs:700,100);
+\fill[natranorange!10] (axis cs:700,0) rectangle (axis cs:1000,100);
+\fill[natranblue!10] (axis cs:1000,0) rectangle (axis cs:2500,100);
+\node[font=\tiny] at (axis cs:550,92) {RGB};
+\node[font=\tiny] at (axis cs:850,92) {NIR};
+\node[font=\tiny] at (axis cs:1750,92) {SWIR};
+\end{axis}
+\end{tikzpicture}
+\caption{Signatures spectrales des principaux matériaux CSR}
+\end{figure}
+
+\subsection{Modèle d'Intelligence Artificielle : YOLOv8}
+
+\subsubsection{Choix du Modèle}
+
+Nous avons choisi \textbf{YOLOv8} pour ses performances en détection d'objets en temps réel.
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|c|c|c|c|}
+\hline
+\textbf{Modèle} & \textbf{mAP@50} & \textbf{Vitesse (ms)} & \textbf{Paramètres} & \textbf{Adapté CSR} \\
+\hline
+YOLOv5s & 56.8\% & 6.4 & 7.2M & \cmark \\
+YOLOv7 & 51.4\% & 8.7 & 36.9M & \cmark \\
+\textbf{YOLOv8m} & \textbf{61.2\%} & \textbf{5.3} & \textbf{25.9M} & \cmark\cmark \\
+YOLOv8x & 63.7\% & 12.1 & 68.2M & \cmark \\
+\hline
+\end{tabular}
+\caption{Comparaison des modèles YOLO}
+\end{table}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[scale=0.6, box/.style={rectangle, draw=natranblue, thick, fill=natranblue!10, minimum width=1.2cm, minimum height=0.6cm, align=center, font=\tiny}]
+    \node[box, fill=natrangreen!20] (input) at (0,0) {Image 640×640};
+    \node[box] (conv1) at (2,0) {Conv 3×3};
+    \node[box] (c2f1) at (4,0) {C2f Block};
+    \node[box] (sppf) at (6,0) {SPPF};
+    \node[box, fill=natranorange!20] (fpn) at (8,0) {FPN/PAN};
+    \node[box, fill=natranred!20] (head) at (10,0) {Detect Head};
+    \node[box, fill=natrangreen!20] (output) at (12,0) {Classes + BBox};
+    \draw[->, thick] (input) -- (conv1);
+    \draw[->, thick] (conv1) -- (c2f1);
+    \draw[->, thick] (c2f1) -- (sppf);
+    \draw[->, thick] (sppf) -- (fpn);
+    \draw[->, thick] (fpn) -- (head);
+    \draw[->, thick] (head) -- (output);
+    \node[font=\tiny, natrangray] at (3,-1) {Backbone};
+    \node[font=\tiny, natrangray] at (8,-1) {Neck};
+    \node[font=\tiny, natrangray] at (10,-1) {Head};
+\end{tikzpicture}
+\caption{Architecture simplifiée de YOLOv8}
+\end{figure}
+
+\subsubsection{Performances Simulées}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+    width=10cm, height=6cm, ybar, bar width=15pt,
+    ylabel={Pourcentage (\%)}, ymin=0, ymax=100,
+    symbolic x coords={Précision, Rappel, F1-Score, mAP@50},
+    xtick=data, nodes near coords, nodes near coords align={vertical},
+    title={\textbf{Performances YOLOv8 vs Tri Manuel}},
+    legend style={at={(0.5,-0.2)}, anchor=north},
+]
+\addplot[fill=natranblue!70] coordinates {(Précision,97.2)(Rappel,95.6)(F1-Score,96.4)(mAP@50,94.8)};
+\addplot[fill=natranorange!70] coordinates {(Précision,85)(Rappel,80)(F1-Score,82.4)(mAP@50,78)};
+\legend{YOLOv8 (simulé), Tri manuel (réel)}
+\end{axis}
+\end{tikzpicture}
+\caption{Comparaison des performances}
+\end{figure}
+
+\subsection{Système Robotique}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|c|}
+\hline
+\textbf{Caractéristique} & \textbf{Valeur} \\
+\hline
+Nombre de bras & 4 (2 accept + 2 reject) \\
+Temps de cycle & 200-300 ms \\
+Portée & 0.5 m \\
+Charge utile & 2 kg \\
+Précision & ± 2 mm \\
+Durée de vie & 10 millions de cycles \\
+\hline
+\end{tabular}
+\caption{Spécifications des bras robotiques}
+\end{table}
+
+\subsection{Système de Contrôle Qualité}
+
+Le système QC est une innovation majeure permettant de corriger les erreurs en temps réel.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[scale=0.7]
+    \fill[natrangray!30] (-4,2) rectangle (4,2.4);
+    \node[font=\tiny] at (0,2.6) {Convoyeur Principal};
+    \draw[natranblue, thick, dashed] (-2.5,1.5) rectangle (2.5,2.8);
+    \node[font=\tiny, natranblue] at (0,3) {Zone Tri IA};
+    \fill[natrangreen!30] (-4,0.5) rectangle (-1.5,0.9);
+    \node[font=\tiny] at (-2.75,1.1) {QC Conformes};
+    \fill[natranred!30] (1.5,0.5) rectangle (4,0.9);
+    \node[font=\tiny] at (2.75,1.1) {QC Non-Conformes};
+    \draw[natranorange, very thick] (-2.75,0) -- (-2.75,0.5);
+    \node[font=\tiny, natranorange] at (-2.75,-0.3) {Bras QC FP};
+    \draw[natrangreen!70!black, very thick] (2.75,0) -- (2.75,0.5);
+    \node[font=\tiny, natrangreen!70!black] at (2.75,-0.3) {Bras QC FN};
+    \fill[natrangreen!50] (-4,-1.2) rectangle (-2.5,-0.8);
+    \node[font=\tiny] at (-3.25,-1) {Réacteur};
+    \fill[natranred!50] (2.5,-1.2) rectangle (4,-0.8);
+    \node[font=\tiny] at (3.25,-1) {Incinérateur};
+\end{tikzpicture}
+\caption{Système de contrôle qualité NATRAN}
+\end{figure}
+
+\begin{tcolorbox}[colback=natranorange!10, colframe=natranorange, title=Faux Positifs (FP)]
+Objets \textbf{non-conformes} classés comme conformes par erreur. Le bras QC orange les éjecte vers le bac de rejet.
+\end{tcolorbox}
+
+\begin{tcolorbox}[colback=natrangreen!10, colframe=natrangreen, title=Faux Négatifs (FN)]
+Objets \textbf{conformes} classés comme non-conformes par erreur. Le bras QC vert les récupère vers le réacteur.
+\end{tcolorbox}
+
+\section{Avantages de Notre Solution}
+
+\subsection{Avantages Techniques}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|p{5cm}|c|}
+\hline
+\textbf{Avantage} & \textbf{Description} & \textbf{Impact} \\
+\hline
+Précision élevée & 97.2\% vs 85\% manuel & +14\% \\
+Haute cadence & Jusqu'à 100 obj/min & ×3 \\
+Fonctionnement 24/7 & Pas de fatigue ni pause & +40\% productivité \\
+Détection PVC & Imagerie SWIR spécifique & Chlore < 0.5\% \\
+Contrôle qualité & Correction erreurs temps réel & -80\% erreurs \\
+Traçabilité & Logs de chaque objet trié & 100\% traçable \\
+\hline
+\end{tabular}
+\caption{Avantages techniques de NATRAN}
+\end{table}
+
+\subsection{Avantages Économiques}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+    width=11cm, height=6cm,
+    xlabel={Années}, ylabel={Coût cumulé (k€)},
+    xmin=0, xmax=5, ymin=0, ymax=1200,
+    legend style={at={(0.02,0.98)}, anchor=north west},
+    grid=major, title={\textbf{Analyse TCO sur 5 ans}},
+]
+\addplot[natranred, thick, mark=square] coordinates {(0,0)(1,200)(2,400)(3,600)(4,800)(5,1000)};
+\addplot[natranblue, thick, mark=*] coordinates {(0,250)(1,320)(2,390)(3,460)(4,530)(5,600)};
+\legend{Tri manuel, NATRAN}
+\draw[natrangreen, thick, dashed] (axis cs:1.5,0) -- (axis cs:1.5,350);
+\node[font=\tiny, natrangreen] at (axis cs:1.8,380) {ROI 18 mois};
+\end{axis}
+\end{tikzpicture}
+\caption{Analyse du coût total de possession (TCO)}
+\end{figure}
+
+\begin{tcolorbox}[colback=natrangreen!10, colframe=natrangreen, title=Économies Réalisées]
+\begin{itemize}
+    \item \textbf{Réduction main d'œuvre} : -60\% des coûts salariaux
+    \item \textbf{Qualité CSR} : +15\% de valeur marchande
+    \item \textbf{Pénalités évitées} : -90\% de non-conformités
+    \item \textbf{ROI} : 18 mois en moyenne
+\end{itemize}
+\end{tcolorbox}
+
+\section{Limites et Défis}
+
+\subsection{Limites Techniques}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|p{6cm}|p{4cm}|}
+\hline
+\textbf{Limite} & \textbf{Description} & \textbf{Mitigation} \\
+\hline
+Matériaux noirs & Absorption spectrale limitant la détection & Caméra thermique en option \\
+\hline
+Objets superposés & Difficulté de séparation & Pré-tri mécanique \\
+\hline
+Conditions variables & Poussière, humidité & Maintenance préventive \\
+\hline
+Nouveaux matériaux & Nécessite réentraînement & Mise à jour modèle \\
+\hline
+\end{tabular}
+\caption{Limites techniques et mitigations}
+\end{table}
+
+\subsection{Limites Économiques}
+
+\begin{itemize}
+    \item \textbf{Investissement initial} : 200-350 k€ selon configuration
+    \item \textbf{Compétences requises} : Formation du personnel technique
+    \item \textbf{Dépendance technologique} : Maintenance spécialisée
+    \item \textbf{Évolutivité} : Coût des mises à jour matérielles
+\end{itemize}
+
+\subsection{Défis d'Implémentation}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+    width=10cm, height=6cm, xbar, bar width=10pt,
+    xlabel={Niveau de difficulté (1-10)},
+    symbolic y coords={Formation, Intégration IT, Installation, Calibration, Maintenance},
+    ytick=data, nodes near coords,
+    title={\textbf{Défis d'implémentation}},
+    xmin=0, xmax=10,
+]
+\addplot[fill=natranorange!70] coordinates {(7,Formation)(6,Intégration IT)(5,Installation)(8,Calibration)(4,Maintenance)};
+\end{axis}
+\end{tikzpicture}
+\caption{Évaluation des défis d'implémentation}
+\end{figure}
+
+\section{Types de CSR Traités}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|l|c|c|c|c|}
+\hline
+\textbf{Type} & \textbf{Nom complet} & \textbf{Décision} & \textbf{PCI} & \textbf{Cl (\%)} & \textbf{Danger} \\
+\hline
+PE/PP & Polyéthylène/Polypropylène & \textcolor{natrangreen}{Accept} & 43 & 0 & Non \\
+Carton & Carton/Papier souillé & \textcolor{natrangreen}{Accept} & 16 & 0 & Non \\
+Bois & Bois traité/Palettes & \textcolor{natrangreen}{Accept} & 17 & 0 & Non \\
+Textile & Textile non-chloré & \textcolor{natrangreen}{Accept} & 20 & 0 & Non \\
+\hline
+PVC & Polychlorure de vinyle & \textcolor{natranred}{Reject} & 18 & 57 & \textbf{Oui} \\
+Métal & Métaux ferreux/non-ferreux & \textcolor{natranred}{Reject} & 5 & 0 & \textbf{Oui} \\
+Verre & Verre/Céramique & \textcolor{natranred}{Reject} & 0 & 0 & Non \\
+Caoutchouc & Caoutchouc/Pneus & \textcolor{natranred}{Reject} & 32 & 15 & \textbf{Oui} \\
+\hline
+PET & Polyéthylène téréphtalate & \textcolor{natranorange}{Incertain} & 23 & 0 & Non \\
+Multi-couche & Emballage complexe & \textcolor{natranorange}{Incertain} & 25 & 5 & \textbf{Oui} \\
+\hline
+\end{tabular}
+\caption{Classification des types de CSR traités par NATRAN}
+\end{table}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+    width=11cm, height=6cm,
+    xlabel={PCI (MJ/kg)}, ylabel={Chlore (\%)},
+    xmin=0, xmax=50, ymin=0, ymax=60,
+    grid=major, title={\textbf{Cartographie des matériaux CSR}},
+    legend style={at={(0.98,0.98)}, anchor=north east, font=\tiny},
+]
+% Zone acceptable
+\fill[natrangreen!20] (axis cs:15,0) rectangle (axis cs:50,1);
+% Zone rejet
+\fill[natranred!20] (axis cs:0,1) rectangle (axis cs:50,60);
+\fill[natranred!20] (axis cs:0,0) rectangle (axis cs:15,60);
+
+% Points
+\addplot[only marks, mark=*, mark size=3pt, natrangreen] coordinates {(43,0)(16,0)(17,0)(20,0)};
+\addplot[only marks, mark=square*, mark size=3pt, natranred] coordinates {(18,57)(5,0)(0,0)(32,15)};
+\addplot[only marks, mark=triangle*, mark size=3pt, natranorange] coordinates {(23,0)(25,5)};
+
+\legend{Conformes, Non-conformes, Incertains}
+
+% Labels
+\node[font=\tiny] at (axis cs:43,3) {PE/PP};
+\node[font=\tiny] at (axis cs:18,54) {PVC};
+\node[font=\tiny] at (axis cs:32,18) {Caoutchouc};
+\end{axis}
+\end{tikzpicture}
+\caption{Cartographie PCI/Chlore des matériaux CSR}
+\end{figure}

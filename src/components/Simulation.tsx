@@ -37,7 +37,7 @@ export default function Simulation() {
     pciValue: 18.5
   })
   const [fps, setFps] = useState(0)
-  const [conveyorSpeed, setConveyorSpeed] = useState(100)
+  const [_conveyorSpeed, _setConveyorSpeed] = useState(100)
   const animationRef = useRef<number>()
 
   const materials = [
@@ -166,7 +166,7 @@ export default function Simulation() {
       pciValue: 18.5
     })
     setIsRunning(false)
-    setConveyorSpeed(100)
+    _setConveyorSpeed(100)
   }
 
   return (

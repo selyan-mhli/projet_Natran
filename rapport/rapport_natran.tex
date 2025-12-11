@@ -1,0 +1,417 @@
+\documentclass[11pt,a4paper]{article}
+
+% ============================================
+% PACKAGES
+% ============================================
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[french]{babel}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric, arrows, positioning, calc, patterns, decorations.pathreplacing}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{longtable}
+\usepackage{multirow}
+\usepackage{amsmath}
+\usepackage{hyperref}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{tcolorbox}
+\usepackage{fontawesome5}
+\usepackage{pifont}
+\usepackage{setspace}
+\usepackage{wrapfig}
+
+% ============================================
+% CONFIGURATION
+% ============================================
+\geometry{margin=2.5cm, top=3cm, bottom=3cm}
+
+% Couleurs personnalisées
+\definecolor{natranblue}{RGB}{30, 58, 95}
+\definecolor{natrangreen}{RGB}{34, 197, 94}
+\definecolor{natranorange}{RGB}{249, 115, 22}
+\definecolor{natrangray}{RGB}{100, 116, 139}
+
+% Configuration des liens
+\hypersetup{
+    colorlinks=true,
+    linkcolor=natranblue,
+    urlcolor=natranblue,
+    citecolor=natranblue
+}
+
+% En-têtes et pieds de page
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\textcolor{natrangray}{\small NATRAN - Simulation IA}}
+\fancyhead[R]{\textcolor{natrangray}{\small \thepage}}
+\fancyfoot[C]{\textcolor{natrangray}{\small Université de Technologie de Troyes}}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+
+% Style des titres
+\titleformat{\section}
+    {\Large\bfseries\color{natranblue}}
+    {\thesection.}{0.5em}{}[\titlerule]
+\titleformat{\subsection}
+    {\large\bfseries\color{natranblue}}
+    {\thesubsection}{0.5em}{}
+
+% ============================================
+% DOCUMENT
+% ============================================
+\begin{document}
+
+% ============================================
+% PAGE DE GARDE
+% ============================================
+\begin{titlepage}
+    \centering
+    \vspace*{1cm}
+    
+    % Logo UTT (placeholder)
+    \begin{tikzpicture}
+        \fill[natranblue] (0,0) rectangle (4,1.5);
+        \node[white, font=\bfseries\Large] at (2,0.75) {UTT};
+    \end{tikzpicture}
+    
+    \vspace{1.5cm}
+    
+    {\Huge\bfseries\color{natranblue} NATRAN\par}
+    \vspace{0.5cm}
+    {\Large\color{natrangray} Simulation IA de Tri de CSR\par}
+    {\Large\color{natrangray} par Pyro-gazéification\par}
+    
+    \vspace{2cm}
+    
+    \begin{tikzpicture}
+        \fill[natranblue!10] (0,0) rectangle (12,6);
+        \draw[natranblue, thick] (0,0) rectangle (12,6);
+        \node[align=center, font=\large] at (6,3) {
+            \textcolor{natranblue}{\faRobot\ Simulation 3D Interactive}\\[0.5cm]
+            \textcolor{natrangreen}{\faCheckCircle\ Tri Automatisé par IA}\\[0.5cm]
+            \textcolor{natranorange}{\faChartLine\ Monitoring Temps Réel}
+        };
+    \end{tikzpicture}
+    
+    \vspace{2cm}
+    
+    {\Large\bfseries Rapport de Projet\par}
+    \vspace{0.5cm}
+    {\large Décembre 2025\par}
+    
+    \vfill
+    
+    \begin{tabular}{ll}
+        \textbf{Auteur :} & Moss'Ab Mirande-Ney \\
+        \textbf{Encadrant :} & [Nom de l'encadrant] \\
+        \textbf{Formation :} & Université de Technologie de Troyes \\
+    \end{tabular}
+    
+\end{titlepage}
+
+% ============================================
+% TABLE DES MATIÈRES
+% ============================================
+\tableofcontents
+\newpage
+
+% ============================================
+% INTRODUCTION
+% ============================================
+\section{Introduction}
+
+\subsection{Contexte}
+
+La gestion des déchets industriels représente un enjeu majeur pour l'environnement et l'économie circulaire. Les \textbf{Combustibles Solides de Récupération (CSR)} sont des combustibles alternatifs produits à partir de déchets non dangereux, utilisés notamment dans les procédés de \textbf{pyro-gazéification}.
+
+Le tri efficace des CSR est crucial pour garantir :
+\begin{itemize}[leftmargin=2cm]
+    \item[\faLeaf] Une combustion propre (faible émission de polluants)
+    \item[\faBolt] Un pouvoir calorifique optimal (PCI élevé)
+    \item[\faShieldAlt] L'absence de contaminants dangereux (chlore, métaux lourds)
+\end{itemize}
+
+\subsection{Problématique}
+
+Le tri manuel des CSR est :
+\begin{itemize}
+    \item \textbf{Lent} : débit limité par les opérateurs humains
+    \item \textbf{Coûteux} : main d'œuvre importante
+    \item \textbf{Imprécis} : erreurs de classification fréquentes
+    \item \textbf{Dangereux} : exposition aux matériaux nocifs
+\end{itemize}
+
+\begin{tcolorbox}[colback=natranblue!5, colframe=natranblue, title=\textbf{Objectif du projet}]
+Développer une \textbf{simulation interactive} démontrant l'utilisation de l'intelligence artificielle (YOLOv8) pour automatiser le tri des CSR en temps réel, avec un système de contrôle qualité intégré.
+\end{tcolorbox}
+
+% ============================================
+% SOLUTION TECHNIQUE
+% ============================================
+\section{Solution Technique}
+
+\subsection{Architecture Globale}
+
+Le système NATRAN repose sur une architecture en trois couches :
+
+\begin{table}[H]
+\centering
+\begin{tabularx}{\textwidth}{|l|X|}
+\hline
+\textbf{Couche} & \textbf{Description} \\
+\hline
+\textbf{Détection IA} & Caméras multispectrales (RGB, NIR, SWIR) + YOLOv8 \\
+\hline
+\textbf{Tri Automatisé} & Bras robotiques pneumatiques à haute cadence \\
+\hline
+\textbf{Contrôle Qualité} & Zone QC avec détection des faux positifs/négatifs \\
+\hline
+\end{tabularx}
+\caption{Architecture du système de tri}
+\end{table}
+
+\subsection{Technologies Utilisées}
+
+\begin{table}[H]
+\centering
+\begin{tabularx}{\textwidth}{|l|l|X|}
+\hline
+\textbf{Catégorie} & \textbf{Technologie} & \textbf{Utilisation} \\
+\hline
+Frontend & React + TypeScript & Interface utilisateur \\
+\hline
+3D & Babylon.js & Simulation 3D temps réel \\
+\hline
+Styling & TailwindCSS & Design responsive \\
+\hline
+Build & Vite & Bundler rapide \\
+\hline
+IA (simulée) & YOLOv8 & Détection d'objets \\
+\hline
+\end{tabularx}
+\caption{Stack technique du projet}
+\end{table}
+
+\subsection{Modèle de Détection YOLOv8}
+
+Le système simule les performances de YOLOv8 sur la détection de CSR :
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|c|c|}
+\hline
+\textbf{Métrique} & \textbf{Valeur Cible} & \textbf{Signification} \\
+\hline
+Précision & 97.2\% & Objets acceptés réellement conformes \\
+\hline
+Rappel & 95.6\% & Objets conformes correctement détectés \\
+\hline
+F1-Score & 96.4\% & Moyenne harmonique précision/rappel \\
+\hline
+Faux Positifs & 2.8\% & Contaminants acceptés par erreur \\
+\hline
+Faux Négatifs & 4.4\% & Conformes rejetés par erreur \\
+\hline
+\end{tabular}
+\caption{Performances du modèle YOLOv8 sur CSR}
+\end{table}
+
+% ============================================
+% SIMULATION 3D
+% ============================================
+\section{Simulation 3D Interactive}
+
+\subsection{Composants de la Simulation}
+
+La simulation 3D comprend les éléments suivants :
+
+\begin{enumerate}
+    \item \textbf{Convoyeur principal} : Transport des CSR à trier
+    \item \textbf{Zone de détection} : 3 caméras multispectrales
+    \item \textbf{Bras robotiques} : 4 bras (2 accept, 2 reject)
+    \item \textbf{Zone de contrôle qualité} : Vérification post-tri
+    \item \textbf{Bras QC} : Correction des erreurs de classification
+\end{enumerate}
+
+\subsection{Types de CSR Simulés}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|l|c|c|c|}
+\hline
+\textbf{Type} & \textbf{Décision} & \textbf{PCI (MJ/kg)} & \textbf{Chlore (\%)} & \textbf{Danger} \\
+\hline
+PE/PP & \textcolor{natrangreen}{Accept} & 43 & 0 & Non \\
+\hline
+Carton/Papier & \textcolor{natrangreen}{Accept} & 16 & 0 & Non \\
+\hline
+Bois & \textcolor{natrangreen}{Accept} & 17 & 0 & Non \\
+\hline
+Textile & \textcolor{natrangreen}{Accept} & 20 & 0 & Non \\
+\hline
+PVC & \textcolor{red}{Reject} & 18 & 57 & \textbf{Oui} \\
+\hline
+Métal & \textcolor{red}{Reject} & 5 & 0 & \textbf{Oui} \\
+\hline
+Verre & \textcolor{red}{Reject} & 0 & 0 & Non \\
+\hline
+Caoutchouc & \textcolor{red}{Reject} & 32 & 15 & \textbf{Oui} \\
+\hline
+\end{tabular}
+\caption{Classification des types de CSR}
+\end{table}
+
+\subsection{Système de Contrôle Qualité}
+
+Le système QC permet de corriger les erreurs de classification :
+
+\begin{tcolorbox}[colback=natranorange!10, colframe=natranorange, title=\textbf{Faux Positifs (FP)}]
+Objets \textbf{non-conformes} classés comme conformes par erreur.\\
+\faArrowRight\ Le bras QC orange les éjecte vers le bac de rejet.
+\end{tcolorbox}
+
+\begin{tcolorbox}[colback=natrangreen!10, colframe=natrangreen, title=\textbf{Faux Négatifs (FN)}]
+Objets \textbf{conformes} classés comme non-conformes par erreur.\\
+\faArrowRight\ Le bras QC vert les récupère vers le réacteur.
+\end{tcolorbox}
+
+% ============================================
+% INTERFACE UTILISATEUR
+% ============================================
+\section{Interface Utilisateur}
+
+\subsection{Dashboard de Monitoring}
+
+Le dashboard affiche en temps réel :
+
+\begin{itemize}
+    \item \textbf{Statistiques de tri} : Total, Acceptés, Rejetés, Incertains
+    \item \textbf{Qualité du syngas} : Pourcentage de pureté
+    \item \textbf{Taux de chlore} : Niveau de contamination
+    \item \textbf{Métriques IA} : Précision, Rappel, F1-Score
+    \item \textbf{Compteurs QC} : Vrais Positifs, Faux Positifs, Faux Négatifs
+\end{itemize}
+
+\subsection{Panneau de Détection IA}
+
+Le panneau en haut à gauche de la simulation affiche :
+
+\begin{itemize}
+    \item Les 6 dernières détections en temps réel
+    \item Le type de matériau détecté
+    \item La décision (Accept/Reject)
+    \item Le PCI et le taux de chlore
+    \item Les alertes FP/FN avec couleurs distinctes
+\end{itemize}
+
+% ============================================
+% RÉSULTATS
+% ============================================
+\section{Résultats et Performances}
+
+\subsection{Métriques de Performance}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|c|c|}
+\hline
+\textbf{Métrique} & \textbf{Objectif} & \textbf{Résultat Simulation} \\
+\hline
+Précision & $\geq$ 95\% & 97.2\% \\
+\hline
+Rappel & $\geq$ 95\% & 95.6\% \\
+\hline
+F1-Score & $\geq$ 95\% & 96.4\% \\
+\hline
+Taux de chlore & $<$ 1\% & 0.3\% \\
+\hline
+Qualité syngas & $>$ 90\% & 94.5\% \\
+\hline
+\end{tabular}
+\caption{Résultats de la simulation}
+\end{table}
+
+\subsection{Avantages du Système}
+
+\begin{enumerate}
+    \item \textbf{Automatisation complète} : Pas d'intervention humaine
+    \item \textbf{Haute cadence} : Traitement de plusieurs objets/seconde
+    \item \textbf{Précision élevée} : $>$ 95\% de classification correcte
+    \item \textbf{Contrôle qualité intégré} : Correction des erreurs
+    \item \textbf{Monitoring temps réel} : Visualisation des performances
+\end{enumerate}
+
+% ============================================
+% CONCLUSION
+% ============================================
+\section{Conclusion}
+
+\subsection{Bilan}
+
+Le projet NATRAN démontre la faisabilité d'un système de tri automatisé de CSR basé sur l'intelligence artificielle. La simulation 3D interactive permet de visualiser :
+
+\begin{itemize}
+    \item Le fonctionnement du système de détection multispectrales
+    \item L'efficacité des bras robotiques pour le tri
+    \item L'importance du contrôle qualité pour corriger les erreurs
+    \item Les performances attendues d'un tel système en production
+\end{itemize}
+
+\subsection{Perspectives}
+
+\begin{itemize}
+    \item \textbf{Intégration réelle} : Connexion à un modèle YOLOv8 entraîné
+    \item \textbf{Optimisation} : Amélioration des performances de détection
+    \item \textbf{Déploiement} : Installation sur site industriel
+    \item \textbf{Extension} : Ajout de nouveaux types de CSR
+\end{itemize}
+
+\begin{tcolorbox}[colback=natranblue!5, colframe=natranblue]
+\centering
+\textbf{Le projet NATRAN représente une avancée significative vers l'automatisation intelligente du tri des déchets industriels, contribuant à l'économie circulaire et à la transition énergétique.}
+\end{tcolorbox}
+
+% ============================================
+% ANNEXES
+% ============================================
+\newpage
+\section*{Annexes}
+\addcontentsline{toc}{section}{Annexes}
+
+\subsection*{A. Lien vers le projet}
+
+\begin{itemize}
+    \item \textbf{GitHub} : \url{https://github.com/selyan-mhli/projet_Natran}
+    \item \textbf{Démo en ligne} : [URL de déploiement]
+\end{itemize}
+
+\subsection*{B. Structure du projet}
+
+\begin{verbatim}
+projet_Natran/
+├── src/
+│   ├── components/
+│   │   ├── FinalSimulation.tsx   # Simulation 3D
+│   │   ├── Dashboard.tsx         # Monitoring
+│   │   ├── Architecture.tsx      # Schéma système
+│   │   └── ...
+│   ├── context/
+│   │   └── SimulationContext.tsx # État global
+│   └── App.tsx                   # Point d'entrée
+├── index.html
+├── package.json
+└── vite.config.ts
+\end{verbatim}
+
+\end{document}

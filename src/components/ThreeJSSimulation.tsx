@@ -369,7 +369,7 @@ export default function ThreeJSSimulation() {
     armsRef.current = [armLeft, armRight]
     
     // BACS DE COLLECTE
-    const createBin = (x: number, z: number, color: number, label: string) => {
+    const createBin = (x: number, z: number, color: number, _label: string) => {
       const binGeometry = new THREE.BoxGeometry(1.8, 1.2, 1.8)
       const binMaterial = new THREE.MeshStandardMaterial({
         color: color,
@@ -456,7 +456,7 @@ export default function ThreeJSSimulation() {
         
         // Détection et capture par les bras
         if (obj.position.z > -1 && obj.position.z < 1) {
-          armsRef.current.forEach((arm, armIndex) => {
+          armsRef.current.forEach((_arm, armIndex) => {
             const armX = armIndex === 0 ? -3.5 : 3.5
             const distance = Math.abs(obj.position.x - armX)
             

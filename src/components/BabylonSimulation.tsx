@@ -193,7 +193,7 @@ export default function BabylonSimulation() {
     laser.material = laserMat
 
     // Caméras industrielles ultra-détaillées
-    const createIndustrialCamera = (name: string, position: BABYLON.Vector3, color: BABYLON.Color3, label: string) => {
+    const createIndustrialCamera = (name: string, position: BABYLON.Vector3, color: BABYLON.Color3, _label: string) => {
       // Corps principal métallique
       const bodyMat = new BABYLON.StandardMaterial(`${name}BodyMat`, scene)
       bodyMat.diffuseColor = new BABYLON.Color3(0.15, 0.17, 0.2)

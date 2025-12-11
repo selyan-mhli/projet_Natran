@@ -1,0 +1,347 @@
+\documentclass[11pt,a4paper]{article}
+
+% ============================================
+% PACKAGES
+% ============================================
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[french]{babel}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric, arrows, positioning, calc, patterns, decorations.pathreplacing, backgrounds}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{longtable}
+\usepackage{multirow}
+\usepackage{amsmath}
+\usepackage{hyperref}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{tcolorbox}
+\usepackage{fontawesome5}
+\usepackage{pifont}
+\usepackage{setspace}
+
+% ============================================
+% CONFIGURATION
+% ============================================
+\geometry{margin=2.5cm, top=3cm, bottom=3cm}
+\setstretch{1.15}
+
+\definecolor{natranblue}{RGB}{30, 58, 95}
+\definecolor{natrangreen}{RGB}{34, 197, 94}
+\definecolor{natranorange}{RGB}{249, 115, 22}
+\definecolor{natrangray}{RGB}{100, 116, 139}
+\definecolor{natranred}{RGB}{239, 68, 68}
+\definecolor{natranyellow}{RGB}{234, 179, 8}
+\definecolor{lightgray}{RGB}{243, 244, 246}
+
+\hypersetup{colorlinks=true, linkcolor=natranblue, urlcolor=natranblue}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\textcolor{natrangray}{\small NATRAN - Tri Intelligent de CSR}}
+\fancyhead[R]{\textcolor{natrangray}{\small \thepage}}
+\fancyfoot[C]{\textcolor{natrangray}{\small UTT - 2025}}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+
+\titleformat{\section}{\Large\bfseries\color{natranblue}}{\thesection.}{0.5em}{}[\titlerule]
+\titleformat{\subsection}{\large\bfseries\color{natranblue}}{\thesubsection}{0.5em}{}
+\titleformat{\subsubsection}{\normalsize\bfseries\color{natranblue}}{\thesubsubsection}{0.5em}{}
+
+\newcommand{\cmark}{\textcolor{natrangreen}{\ding{51}}}
+\newcommand{\xmark}{\textcolor{natranred}{\ding{55}}}
+
+\begin{document}
+
+% PAGE DE GARDE
+\begin{titlepage}
+\centering
+\vspace*{1cm}
+\begin{tikzpicture}
+    \fill[natranblue] (0,0) rectangle (4,1.5);
+    \node[white, font=\bfseries\Large] at (2,0.75) {UTT};
+\end{tikzpicture}
+\vspace{1cm}
+
+{\Huge\bfseries\color{natranblue} NATRAN\par}
+\vspace{0.3cm}
+{\LARGE\color{natrangray} Système Intelligent de Tri de CSR\par}
+{\large\color{natrangray} par Intelligence Artificielle\par}
+\vspace{2cm}
+
+\begin{tikzpicture}[scale=0.8]
+    \fill[natranblue!5] (-5,-2.5) rectangle (5,2.5);
+    \draw[natranblue, thick] (-5,-2.5) rectangle (5,2.5);
+    \fill[natrangray!30] (-4,-1.5) rectangle (4,-1);
+    \foreach \x in {-3.5,-3,...,3.5} {\draw[natrangray] (\x,-1.5) -- (\x,-1);}
+    \fill[natrangreen] (-2,-0.8) rectangle (-1.5,-0.3);
+    \fill[natranred] (0,-0.8) rectangle (0.5,-0.3);
+    \fill[natranblue] (2,-0.8) rectangle (2.5,-0.3);
+    \fill[natrangray] (-0.2,1) rectangle (0.2,1.6);
+    \draw[natranyellow, dashed] (-0.2,1) -- (-1.5,-0.3);
+    \draw[natranyellow, dashed] (0.2,1) -- (1.5,-0.3);
+    \node[font=\small, natranblue] at (0,-2) {Simulation 3D Interactive};
+\end{tikzpicture}
+\vspace{2cm}
+
+{\Large\bfseries Rapport de Projet\par}
+\vspace{0.3cm}
+{\large Décembre 2025\par}
+\vfill
+\begin{tabular}{ll}
+\textbf{Auteurs :} & Moss'Ab Mirande-Ney, Selyan Mahli \\
+\textbf{Formation :} & Université de Technologie de Troyes \\
+\end{tabular}
+\end{titlepage}
+
+% RÉSUMÉ
+\newpage
+\section*{Résumé}
+\addcontentsline{toc}{section}{Résumé}
+
+\begin{tcolorbox}[colback=natranblue!5, colframe=natranblue]
+Ce rapport présente \textbf{NATRAN}, un système de tri automatisé des CSR basé sur l'IA. Face aux limites du tri manuel, nous proposons une solution combinant vision par ordinateur (YOLOv8), imagerie multispectrale et robotique. Les résultats démontrent une précision de \textbf{97.2\%} contre 85\% pour le tri manuel.
+\end{tcolorbox}
+
+\textbf{Mots-clés :} CSR, Intelligence Artificielle, YOLOv8, Tri automatisé, Pyro-gazéification
+
+% TABLE DES MATIÈRES
+\newpage
+\tableofcontents
+\newpage
+\listoffigures
+\listoftables
+
+% INTRODUCTION
+\newpage
+\section*{Introduction Générale}
+\addcontentsline{toc}{section}{Introduction Générale}
+
+Les \textbf{Combustibles Solides de Récupération (CSR)} représentent une alternative aux combustibles fossiles. Cependant, leur qualité dépend de l'efficacité du tri.
+
+\begin{tcolorbox}[colback=natranorange!10, colframe=natranorange, title=Problématique]
+\textbf{Comment automatiser le tri des CSR pour garantir une qualité constante tout en réduisant les coûts et l'exposition aux matériaux dangereux ?}
+\end{tcolorbox}
+
+Ce rapport est structuré en quatre parties :
+\begin{enumerate}
+    \item \textbf{Analyse du marché} : État des lieux du secteur des CSR
+    \item \textbf{Notre solution} : Présentation détaillée de NATRAN
+    \item \textbf{Comparatif} : Analyse comparative avec les solutions existantes
+    \item \textbf{Conclusion} : Bilan et perspectives
+\end{enumerate}
+
+% PARTIE 1
+\newpage
+\part{Analyse du Marché des CSR}
+
+\section{Le Marché des Combustibles Solides de Récupération}
+
+\subsection{Définition et Cadre Réglementaire}
+
+Les CSR sont des combustibles préparés à partir de déchets non dangereux, définis par l'arrêté du 23 mai 2016.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[scale=0.7]
+    \fill[natrangreen!30] (-3,0) -- (0,3) -- (3,0) -- cycle;
+    \draw[natrangreen, thick] (-3,0) -- (0,3) -- (3,0) -- cycle;
+    \draw[natrangreen] (-2.5,0.5) -- (2.5,0.5);
+    \draw[natrangreen] (-2,1) -- (2,1);
+    \draw[natrangreen] (-1.5,1.5) -- (1.5,1.5);
+    \draw[natrangreen] (-1,2) -- (1,2);
+    \node[font=\tiny] at (0,0.25) {Élimination};
+    \node[font=\tiny, font=\bfseries] at (0,0.75) {CSR};
+    \node[font=\tiny] at (0,1.25) {Recyclage};
+    \node[font=\tiny] at (0,1.75) {Réemploi};
+    \node[font=\tiny] at (0,2.5) {Prévention};
+    \draw[natranorange, very thick] (-2.7,0.4) rectangle (2.7,0.9);
+\end{tikzpicture}
+\caption{Place des CSR dans la hiérarchie des déchets}
+\end{figure}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|c|c|c|}
+\hline
+\textbf{Paramètre} & \textbf{Classe 1} & \textbf{Classe 2} & \textbf{Classe 3} \\
+\hline
+PCI (MJ/kg) & $\geq$ 25 & $\geq$ 20 & $\geq$ 15 \\
+Chlore (\%) & $\leq$ 0.2 & $\leq$ 0.6 & $\leq$ 1.0 \\
+Mercure (mg/MJ) & $\leq$ 0.02 & $\leq$ 0.03 & $\leq$ 0.08 \\
+\hline
+\end{tabular}
+\caption{Classification des CSR (NF EN ISO 21640)}
+\end{table}
+
+\subsection{Le Marché Européen}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+    width=11cm, height=6cm, ybar, bar width=12pt,
+    xlabel={Année}, ylabel={Production (Mt)},
+    ymin=0, ymax=18,
+    xtick={2018,2019,2020,2021,2022,2023,2024},
+    nodes near coords, nodes near coords align={vertical},
+    title={\textbf{Production de CSR en Europe}},
+]
+\addplot[fill=natranblue!70] coordinates {
+    (2018,8.2) (2019,9.1) (2020,8.5) (2021,10.3) (2022,11.8) (2023,13.2) (2024,14.5)
+};
+\end{axis}
+\end{tikzpicture}
+\caption{Évolution de la production de CSR en Europe}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+    width=9cm, height=6cm, xbar, bar width=10pt,
+    xlabel={Production (Mt)},
+    symbolic y coords={Autres, Espagne, France, Italie, UK, Allemagne},
+    ytick=data, nodes near coords,
+    title={\textbf{Production par pays (2023)}},
+]
+\addplot[fill=natranblue!70] coordinates {
+    (4.2,Allemagne) (2.8,UK) (2.1,Italie) (1.9,France) (1.1,Espagne) (1.1,Autres)
+};
+\end{axis}
+\end{tikzpicture}
+\caption{Répartition par pays}
+\end{figure}
+
+\subsection{Le Marché Français}
+
+\begin{tcolorbox}[colback=lightgray, colframe=natrangray, title=Chiffres Clés France 2023]
+\begin{itemize}
+    \item \textbf{Production} : 1.9 Mt/an
+    \item \textbf{Installations} : 47 sites
+    \item \textbf{Emplois} : 2,500 personnes
+    \item \textbf{CA} : 450 M€
+\end{itemize}
+\end{tcolorbox}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|c|}
+\hline
+\textbf{Entreprise} & \textbf{Part de marché} \\
+\hline
+Veolia & 28\% \\
+Suez & 22\% \\
+Paprec & 15\% \\
+Séché Environnement & 12\% \\
+Autres & 23\% \\
+\hline
+\end{tabular}
+\caption{Principaux acteurs français}
+\end{table}
+
+\section{Technologies de Tri Existantes}
+
+\subsection{Le Tri Manuel}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[scale=0.7]
+    \fill[natrangray!30] (-5,-0.3) rectangle (5,0.2);
+    \foreach \x in {-4.5,-4,...,4.5} {\draw[natrangray] (\x,-0.3) -- (\x,0.2);}
+    \foreach \x/\col in {-3/natrangreen, -1/natranred, 1/natranorange, 3/natranblue} {
+        \fill[\col] (\x,0.3) rectangle (\x+0.3,0.6);
+    }
+    \foreach \x in {-2, 2} {
+        \draw[thick] (\x,1.3) circle (0.2);
+        \draw[thick] (\x,1.1) -- (\x,0.6);
+        \draw[thick] (\x,0.9) -- (\x-0.2,0.5);
+        \draw[thick] (\x,0.9) -- (\x+0.2,0.5);
+    }
+    \fill[natrangreen!30] (-4.5,-1.3) rectangle (-3.5,-0.8);
+    \fill[natranred!30] (3.5,-1.3) rectangle (4.5,-0.8);
+    \node[font=\tiny] at (-4,-1.05) {Accept};
+    \node[font=\tiny] at (4,-1.05) {Reject};
+\end{tikzpicture}
+\caption{Principe du tri manuel}
+\end{figure}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|c|l|}
+\hline
+\textbf{Indicateur} & \textbf{Valeur} & \textbf{Commentaire} \\
+\hline
+Précision & 80-85\% & Variable selon fatigue \\
+Cadence & 20-30 obj/min & Par opérateur \\
+Coût horaire & 25-35 €/h & Charges incluses \\
+Erreur chlore & 8-12\% & Risque contamination \\
+\hline
+\end{tabular}
+\caption{Performances du tri manuel}
+\end{table}
+
+\begin{tcolorbox}[colback=natranred!10, colframe=natranred, title=Limites du Tri Manuel]
+\begin{enumerate}
+    \item Fatigue et variabilité des performances
+    \item Exposition aux matériaux dangereux
+    \item Coût élevé (40-60\% des coûts opérationnels)
+    \item Difficulté de recrutement
+    \item Incapacité à détecter certains contaminants (PVC vs PET)
+\end{enumerate}
+\end{tcolorbox}
+
+\subsection{Technologies Automatisées Existantes}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|c|c|c|}
+\hline
+\textbf{Technologie} & \textbf{Investissement} & \textbf{Précision} & \textbf{Détection PVC} \\
+\hline
+NIR & 300-500 k€ & 90\% & Limitée \\
+Rayons X & 500-800 k€ & 92\% & \cmark \\
+IA (existant) & 200-400 k€ & 88\% & Variable \\
+\hline
+\end{tabular}
+\caption{Comparaison des technologies existantes}
+\end{table}
+
+\section{Synthèse et Opportunités}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[scale=0.8]
+    \draw[thick] (0,0) -- (8,0) -- (8,6) -- (0,6) -- cycle;
+    \draw[thick] (4,0) -- (4,6);
+    \draw[thick] (0,3) -- (8,3);
+    \fill[natrangreen!20] (0,3) rectangle (4,6);
+    \fill[natranblue!20] (4,3) rectangle (8,6);
+    \fill[natranorange!20] (0,0) rectangle (4,3);
+    \fill[natranred!20] (4,0) rectangle (8,3);
+    \node[font=\bfseries\small] at (2,5.5) {FORCES};
+    \node[font=\bfseries\small] at (6,5.5) {FAIBLESSES};
+    \node[font=\bfseries\small] at (2,2.5) {OPPORTUNITÉS};
+    \node[font=\bfseries\small] at (6,2.5) {MENACES};
+    \node[font=\tiny, align=left] at (2,4.5) {Marché croissant\\Demande forte\\Réglementation};
+    \node[font=\tiny, align=left] at (6,4.5) {Coûts élevés\\Complexité\\ROI incertain};
+    \node[font=\tiny, align=left] at (2,1.5) {IA et deep learning\\Pénurie main d'œuvre\\Économie circulaire};
+    \node[font=\tiny, align=left] at (6,1.5) {Concurrence\\Évolution réglementaire\\Résistance changement};
+\end{tikzpicture}
+\caption{Analyse SWOT du marché}
+\end{figure}
+
+% Suite dans les parties suivantes...
+\input{rapport_partie2}
+\input{rapport_partie3}
+\input{rapport_partie4}

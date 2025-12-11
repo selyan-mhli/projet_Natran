@@ -1,7 +1,7 @@
 import { Canvas } from '@react-three/fiber'
-import { OrbitControls, Box, Cylinder, Sphere } from '@react-three/drei'
-import { Physics, useBox, useCylinder, useSphere, usePlane } from '@react-three/cannon'
-import { useEffect, useState, useRef } from 'react'
+import { OrbitControls, Box, Cylinder } from '@react-three/drei'
+import { Physics, useBox, useCylinder, usePlane } from '@react-three/cannon'
+import { useEffect, useState } from 'react'
 import { Play, Pause, RotateCcw } from 'lucide-react'
 
 // Convoyeur

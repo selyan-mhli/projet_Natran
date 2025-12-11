@@ -30,7 +30,6 @@ export class RealisticRoboticArm {
   
   // État
   private isGrabbing = false
-  private targetObject: BABYLON.Mesh | null = null
   
   constructor(config: RoboticArmConfig) {
     this.scene = config.scene
@@ -262,7 +261,6 @@ export class RealisticRoboticArm {
   public async grabObject(object: BABYLON.Mesh, targetBin: BABYLON.Vector3, conveyorSpeed: number = 0.06) {
     if (this.isGrabbing) return
     this.isGrabbing = true
-    this.targetObject = object
     
     // 1. PRÉDICTION DE POSITION (compensation du mouvement)
     const visionLatency = 0.05 // 50ms latence caméra
@@ -340,7 +338,6 @@ export class RealisticRoboticArm {
     await this.animateGripper(false, 0.2)
     
     this.isGrabbing = false
-    this.targetObject = null
   }
   
   // Animation fluide avec easing
@@ -495,49 +492,5 @@ export class RealisticRoboticArm {
     
     // Zone de prise : rayon de 4 unités autour du bras
     return distance < 4 && Math.abs(objectPosition.y - 0.5) < 2
-  }
-  
-  // 7. LISSAGE DE TRAJECTOIRE (trajectory smoothing)
-  private smoothTrajectory(points: BABYLON.Vector3[]): BABYLON.Vector3[] {
-    // Interpolation cubique pour trajectoire fluide
-    const smoothed: BABYLON.Vector3[] = []
-    
-    for (let i = 0; i < points.length - 1; i++) {
-      const p0 = points[Math.max(0, i - 1)]
-      const p1 = points[i]
-      const p2 = points[i + 1]
-      const p3 = points[Math.min(points.length - 1, i + 2)]
-      
-      // Interpolation Catmull-Rom
-      for (let t = 0; t <= 1; t += 0.1) {
-        const t2 = t * t
-        const t3 = t2 * t
-        
-        const x = 0.5 * (
-          (2 * p1.x) +
-          (-p0.x + p2.x) * t +
-          (2 * p0.x - 5 * p1.x + 4 * p2.x - p3.x) * t2 +
-          (-p0.x + 3 * p1.x - 3 * p2.x + p3.x) * t3
-        )
-        
-        const y = 0.5 * (
-          (2 * p1.y) +
-          (-p0.y + p2.y) * t +
-          (2 * p0.y - 5 * p1.y + 4 * p2.y - p3.y) * t2 +
-          (-p0.y + 3 * p1.y - 3 * p2.y + p3.y) * t3
-        )
-        
-        const z = 0.5 * (
-          (2 * p1.z) +
-          (-p0.z + p2.z) * t +
-          (2 * p0.z - 5 * p1.z + 4 * p2.z - p3.z) * t2 +
-          (-p0.z + 3 * p1.z - 3 * p2.z + p3.z) * t3
-        )
-        
-        smoothed.push(new BABYLON.Vector3(x, y, z))
-      }
-    }
-    
-    return smoothed
   }
 }

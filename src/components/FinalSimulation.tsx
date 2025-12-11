@@ -33,6 +33,7 @@ export default function FinalSimulation() {
     pci: number
     chlore: number
     danger: boolean
+    qcStatus?: 'falsePositive' | 'falseNegative' | null
   }>>([])
   
   // Utiliser le contexte global pour les stats
@@ -432,7 +433,7 @@ export default function FinalSimulation() {
     createBin(5, 5, new BABYLON.Color3(0.9, 0.2, 0.2), 'Non-conformes')
     createBin(0, 12, new BABYLON.Color3(0.5, 0.5, 0.5), 'Incertains')
 
-    // ZONE DE TRI
+    // ZONE DE TRI (rouge)
     const sortZone = BABYLON.MeshBuilder.CreatePlane('sortZone', { width: 3, height: 0.1 }, scene)
     sortZone.position = new BABYLON.Vector3(0, 0.21, 2)
     sortZone.rotation.x = Math.PI / 2
@@ -441,6 +442,267 @@ export default function FinalSimulation() {
     sortMat.emissiveColor = new BABYLON.Color3(0.5, 0, 0)
     sortMat.alpha = 0.7
     sortZone.material = sortMat
+
+    // ========== ZONE DE CONTRÔLE QUALITÉ ==========
+    // Convoyeur secondaire pour les conformes (vers le réacteur)
+    const qcConveyor = BABYLON.MeshBuilder.CreateBox('qcConveyor', { width: 2, height: 0.15, depth: 6 }, scene)
+    qcConveyor.position = new BABYLON.Vector3(-5, 0.08, 9)
+    const qcConveyorMat = new BABYLON.StandardMaterial('qcConveyorMat', scene)
+    qcConveyorMat.diffuseColor = new BABYLON.Color3(0.15, 0.15, 0.18)
+    qcConveyorMat.specularColor = new BABYLON.Color3(0.2, 0.2, 0.2)
+    qcConveyor.material = qcConveyorMat
+
+    // Bordures du convoyeur QC
+    const qcSideLeft = BABYLON.MeshBuilder.CreateBox('qcSideL', { width: 0.1, height: 0.3, depth: 6 }, scene)
+    qcSideLeft.position = new BABYLON.Vector3(-6.05, 0.2, 9)
+    qcSideLeft.material = sideMat
+    const qcSideRight = BABYLON.MeshBuilder.CreateBox('qcSideR', { width: 0.1, height: 0.3, depth: 6 }, scene)
+    qcSideRight.position = new BABYLON.Vector3(-3.95, 0.2, 9)
+    qcSideRight.material = sideMat
+
+    // Zone de scan QC (verte)
+    const qcZone = BABYLON.MeshBuilder.CreatePlane('qcZone', { width: 2, height: 1.5 }, scene)
+    qcZone.position = new BABYLON.Vector3(-5, 0.17, 10)
+    qcZone.rotation.x = Math.PI / 2
+    const qcZoneMat = new BABYLON.StandardMaterial('qcZoneMat', scene)
+    qcZoneMat.diffuseColor = new BABYLON.Color3(0, 1, 0.5)
+    qcZoneMat.emissiveColor = new BABYLON.Color3(0, 0.5, 0.25)
+    qcZoneMat.alpha = 0.6
+    qcZone.material = qcZoneMat
+
+    // Caméra de contrôle qualité
+    const createQCCamera = () => {
+      const qcCamGroup = new BABYLON.TransformNode('qcCamera', scene)
+      
+      // Support
+      const qcSupport = BABYLON.MeshBuilder.CreateCylinder('qcSupport', { diameter: 0.12, height: 1.5 }, scene)
+      qcSupport.position = new BABYLON.Vector3(-5, 5.5, 10)
+      qcSupport.parent = qcCamGroup
+      const qcSupportMat = new BABYLON.StandardMaterial('qcSupportMat', scene)
+      qcSupportMat.diffuseColor = new BABYLON.Color3(0.1, 0.1, 0.1)
+      qcSupport.material = qcSupportMat
+
+      // Corps caméra QC (vert)
+      const qcBody = BABYLON.MeshBuilder.CreateBox('qcBody', { width: 0.6, height: 0.5, depth: 0.9 }, scene)
+      qcBody.position = new BABYLON.Vector3(-5, 4.8, 10)
+      qcBody.rotation.x = -Math.PI / 5
+      qcBody.parent = qcCamGroup
+      const qcBodyMat = new BABYLON.StandardMaterial('qcBodyMat', scene)
+      qcBodyMat.diffuseColor = new BABYLON.Color3(0.05, 0.15, 0.05)
+      qcBodyMat.specularColor = new BABYLON.Color3(0.3, 0.3, 0.3)
+      qcBody.material = qcBodyMat
+
+      // Lentille verte
+      const qcLens = BABYLON.MeshBuilder.CreateCylinder('qcLens', { diameter: 0.3, height: 0.25 }, scene)
+      qcLens.position = new BABYLON.Vector3(-5, 4.6, 10.5)
+      qcLens.rotation.x = Math.PI / 2
+      qcLens.parent = qcCamGroup
+      const qcLensMat = new BABYLON.StandardMaterial('qcLensMat', scene)
+      qcLensMat.diffuseColor = new BABYLON.Color3(0, 0, 0)
+      qcLensMat.emissiveColor = new BABYLON.Color3(0, 0.8, 0.4)
+      qcLensMat.specularColor = new BABYLON.Color3(1, 1, 1)
+      qcLens.material = qcLensMat
+
+      // LED verte clignotante
+      const qcLed = BABYLON.MeshBuilder.CreateSphere('qcLed', { diameter: 0.08 }, scene)
+      qcLed.position = new BABYLON.Vector3(-5.25, 5, 10)
+      qcLed.parent = qcCamGroup
+      const qcLedMat = new BABYLON.StandardMaterial('qcLedMat', scene)
+      qcLedMat.emissiveColor = new BABYLON.Color3(0, 1, 0.3)
+      qcLed.material = qcLedMat
+
+      // Label "QC"
+      const qcLabel = BABYLON.MeshBuilder.CreatePlane('qcLabel', { width: 0.8, height: 0.25 }, scene)
+      qcLabel.position = new BABYLON.Vector3(-5, 4, 10)
+      qcLabel.parent = qcCamGroup
+      const qcLabelMat = new BABYLON.StandardMaterial('qcLabelMat', scene)
+      qcLabelMat.diffuseColor = new BABYLON.Color3(0, 0.8, 0.4)
+      qcLabelMat.emissiveColor = new BABYLON.Color3(0, 0.4, 0.2)
+      qcLabelMat.alpha = 0.9
+      qcLabel.material = qcLabelMat
+
+      return qcCamGroup
+    }
+    createQCCamera()
+
+    // BRAS QC (orange) pour éjecter les faux positifs détectés au contrôle qualité
+    const qcArm = createSimpleArm(-7, 10, new BABYLON.Color3(1, 0.5, 0), 'qc')
+    qcArm.pivot.rotation.y = Math.PI / 2 // Pointe vers le convoyeur QC
+    armsRef.current.push(qcArm)
+
+    // BAC DE REJET QC (orange) - pour les faux positifs détectés au contrôle qualité
+    const createQCRejectBin = () => {
+      const binX = -8
+      const binZ = 10
+      const binColor = new BABYLON.Color3(1, 0.5, 0) // Orange
+      
+      const wallThickness = 0.08
+      const binWidth = 1.5
+      const binHeight = 1.2
+      const binDepth = 1.5
+      
+      const binMat = new BABYLON.StandardMaterial('qcBinMat', scene)
+      binMat.diffuseColor = binColor
+      binMat.alpha = 0.5
+      
+      // Fond
+      const bottom = BABYLON.MeshBuilder.CreateBox('qcBinBottom', { width: binWidth, height: wallThickness, depth: binDepth }, scene)
+      bottom.position = new BABYLON.Vector3(binX, 0.04, binZ)
+      bottom.material = binMat
+      
+      // Murs
+      const leftWall = BABYLON.MeshBuilder.CreateBox('qcBinLeft', { width: wallThickness, height: binHeight, depth: binDepth }, scene)
+      leftWall.position = new BABYLON.Vector3(binX - binWidth/2, binHeight/2, binZ)
+      leftWall.material = binMat
+      
+      const rightWall = BABYLON.MeshBuilder.CreateBox('qcBinRight', { width: wallThickness, height: binHeight, depth: binDepth }, scene)
+      rightWall.position = new BABYLON.Vector3(binX + binWidth/2, binHeight/2, binZ)
+      rightWall.material = binMat
+      
+      const backWall = BABYLON.MeshBuilder.CreateBox('qcBinBack', { width: binWidth, height: binHeight, depth: wallThickness }, scene)
+      backWall.position = new BABYLON.Vector3(binX, binHeight/2, binZ - binDepth/2)
+      backWall.material = binMat
+      
+      const frontWall = BABYLON.MeshBuilder.CreateBox('qcBinFront', { width: binWidth, height: binHeight, depth: wallThickness }, scene)
+      frontWall.position = new BABYLON.Vector3(binX, binHeight/2, binZ + binDepth/2)
+      frontWall.material = binMat
+      
+      // Bordures lumineuses
+      const edgeMat = new BABYLON.StandardMaterial('qcEdgeMat', scene)
+      edgeMat.emissiveColor = binColor
+      edgeMat.wireframe = true
+      const edges = BABYLON.MeshBuilder.CreateBox('qcEdges', { width: binWidth + 0.15, height: binHeight + 0.15, depth: binDepth + 0.15 }, scene)
+      edges.position = new BABYLON.Vector3(binX, binHeight/2, binZ)
+      edges.material = edgeMat
+    }
+    createQCRejectBin()
+
+    // ========== ZONE QC POUR NON-CONFORMES ==========
+    // Convoyeur QC pour les non-conformes (vérification avant destruction)
+    const ncConveyor = BABYLON.MeshBuilder.CreateBox('ncConveyor', { width: 2, height: 0.15, depth: 5 }, scene)
+    ncConveyor.position = new BABYLON.Vector3(5, 0.08, 9)
+    ncConveyor.material = qcConveyorMat
+
+    // Bordures
+    const ncSideLeft = BABYLON.MeshBuilder.CreateBox('ncSideL', { width: 0.1, height: 0.3, depth: 5 }, scene)
+    ncSideLeft.position = new BABYLON.Vector3(3.95, 0.2, 9)
+    ncSideLeft.material = sideMat
+    const ncSideRight = BABYLON.MeshBuilder.CreateBox('ncSideR', { width: 0.1, height: 0.3, depth: 5 }, scene)
+    ncSideRight.position = new BABYLON.Vector3(6.05, 0.2, 9)
+    ncSideRight.material = sideMat
+
+    // Zone de scan QC non-conformes (rouge)
+    const ncQcZone = BABYLON.MeshBuilder.CreatePlane('ncQcZone', { width: 2, height: 1.2 }, scene)
+    ncQcZone.position = new BABYLON.Vector3(5, 0.17, 10)
+    ncQcZone.rotation.x = Math.PI / 2
+    const ncQcZoneMat = new BABYLON.StandardMaterial('ncQcZoneMat', scene)
+    ncQcZoneMat.diffuseColor = new BABYLON.Color3(1, 0.3, 0.3)
+    ncQcZoneMat.emissiveColor = new BABYLON.Color3(0.5, 0.15, 0.15)
+    ncQcZoneMat.alpha = 0.6
+    ncQcZone.material = ncQcZoneMat
+
+    // Caméra QC non-conformes (rouge)
+    const ncQcCamBody = BABYLON.MeshBuilder.CreateBox('ncQcBody', { width: 0.5, height: 0.4, depth: 0.7 }, scene)
+    ncQcCamBody.position = new BABYLON.Vector3(5, 4.5, 10)
+    ncQcCamBody.rotation.x = -Math.PI / 5
+    const ncQcBodyMat = new BABYLON.StandardMaterial('ncQcBodyMat', scene)
+    ncQcBodyMat.diffuseColor = new BABYLON.Color3(0.15, 0.05, 0.05)
+    ncQcCamBody.material = ncQcBodyMat
+
+    const ncQcLens = BABYLON.MeshBuilder.CreateCylinder('ncQcLens', { diameter: 0.25, height: 0.2 }, scene)
+    ncQcLens.position = new BABYLON.Vector3(5, 4.35, 10.4)
+    ncQcLens.rotation.x = Math.PI / 2
+    const ncQcLensMat = new BABYLON.StandardMaterial('ncQcLensMat', scene)
+    ncQcLensMat.emissiveColor = new BABYLON.Color3(1, 0.2, 0.2)
+    ncQcLens.material = ncQcLensMat
+
+    // BRAS QC VERT pour récupérer les faux négatifs (objets conformes mal classés comme non-conformes)
+    const ncQcArm = createSimpleArm(7, 10, new BABYLON.Color3(0.2, 0.9, 0.3), 'ncqc')
+    ncQcArm.pivot.rotation.y = -Math.PI / 2 // Pointe vers le convoyeur NC
+    armsRef.current.push(ncQcArm)
+
+    // Incinérateur pour les non-conformes confirmés
+    const incinerator = BABYLON.MeshBuilder.CreateCylinder('incinerator', { diameter: 2, height: 2.5 }, scene)
+    incinerator.position = new BABYLON.Vector3(5, 1.25, 13)
+    const incMat = new BABYLON.StandardMaterial('incMat', scene)
+    incMat.diffuseColor = new BABYLON.Color3(0.25, 0.25, 0.28)
+    incinerator.material = incMat
+
+    // Flammes de l'incinérateur
+    const incFlame = BABYLON.MeshBuilder.CreateSphere('incFlame', { diameter: 0.6 }, scene)
+    incFlame.position = new BABYLON.Vector3(5, 0.3, 11.5)
+    const incFlameMat = new BABYLON.StandardMaterial('incFlameMat', scene)
+    incFlameMat.emissiveColor = new BABYLON.Color3(1, 0.3, 0)
+    incFlameMat.alpha = 0.8
+    incFlame.material = incFlameMat
+
+    // Réacteur de pyro-gazéification (destination finale)
+    const createReactor = () => {
+      const reactorGroup = new BABYLON.TransformNode('reactor', scene)
+      
+      // Corps principal du réacteur (cylindre)
+      const reactorBody = BABYLON.MeshBuilder.CreateCylinder('reactorBody', { 
+        diameter: 2.5, 
+        height: 3,
+        tessellation: 24
+      }, scene)
+      reactorBody.position = new BABYLON.Vector3(-5, 1.5, 14)
+      reactorBody.parent = reactorGroup
+      const reactorMat = new BABYLON.StandardMaterial('reactorMat', scene)
+      reactorMat.diffuseColor = new BABYLON.Color3(0.3, 0.3, 0.35)
+      reactorMat.specularColor = new BABYLON.Color3(0.5, 0.5, 0.5)
+      reactorBody.material = reactorMat
+
+      // Dôme supérieur
+      const dome = BABYLON.MeshBuilder.CreateSphere('dome', { 
+        diameter: 2.5, 
+        slice: 0.5 
+      }, scene)
+      dome.position = new BABYLON.Vector3(-5, 3, 14)
+      dome.parent = reactorGroup
+      dome.material = reactorMat
+
+      // Cheminée
+      const chimney = BABYLON.MeshBuilder.CreateCylinder('chimney', { 
+        diameter: 0.6, 
+        height: 2 
+      }, scene)
+      chimney.position = new BABYLON.Vector3(-5, 4.5, 14)
+      chimney.parent = reactorGroup
+      const chimneyMat = new BABYLON.StandardMaterial('chimneyMat', scene)
+      chimneyMat.diffuseColor = new BABYLON.Color3(0.2, 0.2, 0.22)
+      chimney.material = chimneyMat
+
+      // Flamme/Glow à l'entrée
+      const glow = BABYLON.MeshBuilder.CreateSphere('glow', { diameter: 0.8 }, scene)
+      glow.position = new BABYLON.Vector3(-5, 0.3, 12.5)
+      glow.parent = reactorGroup
+      const glowMat = new BABYLON.StandardMaterial('glowMat', scene)
+      glowMat.emissiveColor = new BABYLON.Color3(1, 0.5, 0)
+      glowMat.alpha = 0.7
+      glow.material = glowMat
+
+      // Label "RÉACTEUR"
+      const reactorLabel = BABYLON.MeshBuilder.CreatePlane('reactorLabel', { width: 2, height: 0.4 }, scene)
+      reactorLabel.position = new BABYLON.Vector3(-5, 3.8, 14)
+      reactorLabel.billboardMode = BABYLON.Mesh.BILLBOARDMODE_ALL
+      reactorLabel.parent = reactorGroup
+      const reactorLabelMat = new BABYLON.StandardMaterial('reactorLabelMat', scene)
+      reactorLabelMat.diffuseColor = new BABYLON.Color3(1, 0.6, 0)
+      reactorLabelMat.emissiveColor = new BABYLON.Color3(0.5, 0.3, 0)
+      reactorLabel.material = reactorLabelMat
+
+      return reactorGroup
+    }
+    createReactor()
+
+    // Flèche directionnelle vers le réacteur
+    const arrow = BABYLON.MeshBuilder.CreateBox('arrow', { width: 0.3, height: 0.05, depth: 2 }, scene)
+    arrow.position = new BABYLON.Vector3(-5, 0.1, 7)
+    const arrowMat = new BABYLON.StandardMaterial('arrowMat', scene)
+    arrowMat.diffuseColor = new BABYLON.Color3(0, 0.8, 0.4)
+    arrowMat.emissiveColor = new BABYLON.Color3(0, 0.4, 0.2)
+    arrow.material = arrowMat
 
     // RENDER LOOP avec FPS
     let lastTime = performance.now()
@@ -563,9 +825,11 @@ export default function FinalSimulation() {
                 danger: obj.danger
               }].slice(-6)) // Garder max 6 détections
               
-              const binPos = targetSide === 'left' 
-                ? new BABYLON.Vector3(-5, 0.5, 5) 
-                : new BABYLON.Vector3(5, 0.5, 5)
+              // Pour les conformes: déposer sur le convoyeur QC conformes (vers le réacteur)
+              // Pour les non-conformes: déposer sur le convoyeur QC non-conformes (vers l'incinérateur)
+              const dropPos = targetSide === 'left' 
+                ? new BABYLON.Vector3(-5, 0.4, 6.5)  // Début du convoyeur QC conformes
+                : new BABYLON.Vector3(5, 0.4, 6.5)   // Début du convoyeur QC non-conformes
               
               // Animation dynamique du bras
               const animateArmAndCube = async () => {
@@ -573,7 +837,7 @@ export default function FinalSimulation() {
                 const restAngle = targetSide === 'left' ? 0 : Math.PI
                 
                 try {
-                  // 1. VISER LE CUBE - Calculer l'angle vers la position actuelle du cube
+                  // 1. VISER LE CUBE
                   const dx = obj.mesh.position.x - armPos.x
                   const dz = obj.mesh.position.z - armPos.z
                   const targetAngle = Math.atan2(dx, dz)
@@ -581,33 +845,32 @@ export default function FinalSimulation() {
                   // 2. TOURNER VERS LE CUBE
                   await animatePivot(availableArm.pivot, 'y', targetAngle, 0.25)
                   
-                  // 3. DESCENDRE - Incliner le bras vers le bas pour attraper
+                  // 3. DESCENDRE
                   await animatePivot(availableArm.pivot, 'x', -0.25, 0.15)
                   
-                  // 4. ATTRAPER - Attacher le cube au gripper
+                  // 4. ATTRAPER
                   obj.mesh.parent = availableArm.gripper
                   obj.mesh.position = new BABYLON.Vector3(0, -0.35, 0)
                   
                   // 5. REMONTER
                   await animatePivot(availableArm.pivot, 'x', 0, 0.15)
                   
-                  // 6. CALCULER L'ANGLE VERS LE BAC
-                  const binDx = binPos.x - armPos.x
-                  const binDz = binPos.z - armPos.z
-                  const binAngle = Math.atan2(binDx, binDz)
+                  // 6. CALCULER L'ANGLE VERS LA DESTINATION
+                  const dropDx = dropPos.x - armPos.x
+                  const dropDz = dropPos.z - armPos.z
+                  const dropAngle = Math.atan2(dropDx, dropDz)
                   
-                  // 7. TOURNER VERS LE BAC
-                  await animatePivot(availableArm.pivot, 'y', binAngle, 0.4)
+                  // 7. TOURNER VERS LA DESTINATION
+                  await animatePivot(availableArm.pivot, 'y', dropAngle, 0.4)
                   
                   // 8. DESCENDRE POUR LÂCHER
                   await animatePivot(availableArm.pivot, 'x', -0.2, 0.15)
                   
-                  // 9. LÂCHER DANS LE BAC
+                  // 9. LÂCHER
                   obj.mesh.parent = null
-                  obj.mesh.position = binPos.clone()
-                  obj.mesh.position.y = 0.5 + Math.random() * 0.3
-                  obj.mesh.position.x += (Math.random() - 0.5) * 0.5
-                  obj.mesh.position.z += (Math.random() - 0.5) * 0.5
+                  obj.mesh.position = dropPos.clone()
+                  obj.mesh.position.y = 0.4
+                  obj.mesh.position.x += (Math.random() - 0.5) * 0.3
                   
                   // 10. REMONTER
                   await animatePivot(availableArm.pivot, 'x', 0, 0.1)
@@ -615,21 +878,20 @@ export default function FinalSimulation() {
                   // 11. RETOUR POSITION INITIALE
                   await animatePivot(availableArm.pivot, 'y', restAngle, 0.3)
                   
-                  // 12. SUPPRIMER LE CUBE APRÈS UN DÉLAI
-                  setTimeout(() => {
-                    if (obj.mesh) {
-                      obj.mesh.dispose()
-                      const idx = objectsRef.current.indexOf(obj)
-                      if (idx > -1) objectsRef.current.splice(idx, 1)
-                    }
-                  }, 2000)
+                  // Marquer pour le convoyeur QC approprié
+                  obj.isBeingGrabbed = false
+                  if (targetSide === 'left') {
+                    // Conformes → convoyeur QC conformes → réacteur
+                    (obj as any).onQCConveyor = 'conform'
+                  } else {
+                    // Non-conformes → convoyeur QC non-conformes → incinérateur
+                    (obj as any).onQCConveyor = 'nonconform'
+                  }
                   
                 } catch (error) {
-                  // En cas d'erreur, remettre le bras en position
                   availableArm.pivot.rotation.x = 0
                   availableArm.pivot.rotation.y = restAngle
                 } finally {
-                  // TOUJOURS libérer le bras
                   availableArm.isBusy = false
                   availableArm.heldObject = null
                 }
@@ -640,8 +902,170 @@ export default function FinalSimulation() {
           }
         }
 
-        // Supprimer si hors de vue (incertains qui continuent)
-        if (obj.mesh.position.z > 15 && !obj.isBeingGrabbed) {
+        // MOUVEMENT SUR LES CONVOYEURS QC
+        const qcStatus = (obj as any).onQCConveyor
+        if (qcStatus && !obj.isBeingGrabbed) {
+          // Avancer sur le convoyeur QC
+          obj.mesh.position.z += 0.03
+          
+          if (qcStatus === 'conform') {
+            // CONFORMES → vers le réacteur
+            // 2.8% de faux positif (précision 97.2% - basé sur études YOLOv8)
+            if (obj.mesh.position.z > 9.5 && obj.mesh.position.z < 10.2 && !(obj as any).qcChecked) {
+              (obj as any).qcChecked = true
+              // Enregistrer comme True Positive par défaut
+              updateStats({ truePositives: stats.truePositives + 1 })
+              if (Math.random() < 0.028) {
+                // Faux positif détecté! Le bras QC orange va l'éjecter
+                const qcArm = armsRef.current.find(a => a.side === 'qc' && !a.isBusy)
+                if (qcArm) {
+                  obj.isBeingGrabbed = true
+                  qcArm.isBusy = true
+                  const mat = obj.mesh.material as BABYLON.StandardMaterial
+                  if (mat) mat.emissiveColor = new BABYLON.Color3(1, 0.3, 0)
+                  
+                  // Animation du bras QC
+                  const animateQCArm = async () => {
+                    try {
+                      // Tourner vers l'objet
+                      await animatePivot(qcArm.pivot, 'y', Math.PI / 2, 0.2)
+                      await animatePivot(qcArm.pivot, 'x', -0.2, 0.1)
+                      // Attraper
+                      obj.mesh.parent = qcArm.gripper
+                      obj.mesh.position = new BABYLON.Vector3(0, -0.3, 0)
+                      await animatePivot(qcArm.pivot, 'x', 0, 0.1)
+                      // Tourner vers le bac
+                      await animatePivot(qcArm.pivot, 'y', Math.PI, 0.3)
+                      await animatePivot(qcArm.pivot, 'x', -0.15, 0.1)
+                      // Lâcher
+                      obj.mesh.parent = null
+                      obj.mesh.position = new BABYLON.Vector3(-8, 0.5, 10)
+                      await animatePivot(qcArm.pivot, 'x', 0, 0.1)
+                      await animatePivot(qcArm.pivot, 'y', Math.PI / 2, 0.2)
+                      // Supprimer après délai et enregistrer comme faux positif
+                      updateStats({ 
+                        falsePositives: stats.falsePositives + 1,
+                        truePositives: stats.truePositives - 1 // Corriger le TP enregistré avant
+                      })
+                      // Ajouter notification dans le popup
+                      setActiveDetections(prev => [{
+                        id: Date.now(),
+                        type: '⚠️ FAUX POSITIF',
+                        fullName: 'Erreur de classification corrigée par QC',
+                        decision: 'qc_reject',
+                        pci: 0,
+                        chlore: 0,
+                        danger: false,
+                        qcStatus: 'falsePositive' as const
+                      }, ...prev].slice(0, 6))
+                      window.setTimeout(() => {
+                        if (obj.mesh) {
+                          obj.mesh.dispose()
+                          const idx = objectsRef.current.indexOf(obj)
+                          if (idx > -1) objectsRef.current.splice(idx, 1)
+                        }
+                      }, 1500)
+                    } finally {
+                      qcArm.isBusy = false
+                      obj.isBeingGrabbed = false
+                    }
+                  }
+                  animateQCArm()
+                  ;(obj as any).onQCConveyor = false
+                }
+              }
+            }
+            
+            // Quand l'objet atteint le réacteur (z > 13)
+            if (obj.mesh.position.z > 13 && (obj as any).onQCConveyor === 'conform') {
+              const mat = obj.mesh.material as BABYLON.StandardMaterial
+              if (mat) mat.emissiveColor = new BABYLON.Color3(0, 1, 0.5)
+              window.setTimeout(() => {
+                if (obj.mesh) {
+                  obj.mesh.dispose()
+                  const idx = objectsRef.current.indexOf(obj)
+                  if (idx > -1) objectsRef.current.splice(idx, 1)
+                }
+              }, 500)
+              ;(obj as any).onQCConveyor = false
+            }
+          } else if (qcStatus === 'nonconform') {
+            // NON-CONFORMES → vers l'incinérateur
+            // 4.4% de faux négatif (rappel 95.6% - basé sur études YOLOv8)
+            if (obj.mesh.position.z > 9.5 && obj.mesh.position.z < 10.2 && !(obj as any).qcChecked) {
+              (obj as any).qcChecked = true
+              // Enregistrer comme True Negative par défaut
+              updateStats({ trueNegatives: stats.trueNegatives + 1 })
+              if (Math.random() < 0.044) {
+                // Faux négatif! Le bras QC vert va le récupérer
+                const ncqcArm = armsRef.current.find(a => a.side === 'ncqc' && !a.isBusy)
+                if (ncqcArm) {
+                  obj.isBeingGrabbed = true
+                  ncqcArm.isBusy = true
+                  const mat = obj.mesh.material as BABYLON.StandardMaterial
+                  if (mat) mat.emissiveColor = new BABYLON.Color3(0, 1, 0.5)
+                  
+                  // Animation du bras QC vert
+                  const animateNCQCArm = async () => {
+                    try {
+                      await animatePivot(ncqcArm.pivot, 'y', -Math.PI / 2, 0.2)
+                      await animatePivot(ncqcArm.pivot, 'x', -0.2, 0.1)
+                      obj.mesh.parent = ncqcArm.gripper
+                      obj.mesh.position = new BABYLON.Vector3(0, -0.3, 0)
+                      await animatePivot(ncqcArm.pivot, 'x', 0, 0.1)
+                      // Tourner vers le convoyeur conformes
+                      await animatePivot(ncqcArm.pivot, 'y', -Math.PI, 0.3)
+                      await animatePivot(ncqcArm.pivot, 'x', -0.15, 0.1)
+                      // Lâcher sur le convoyeur conformes et enregistrer comme faux négatif
+                      obj.mesh.parent = null
+                      obj.mesh.position = new BABYLON.Vector3(-5, 0.4, 10)
+                      updateStats({ 
+                        falseNegatives: stats.falseNegatives + 1,
+                        trueNegatives: stats.trueNegatives - 1 // Corriger le TN enregistré avant
+                      })
+                      // Ajouter notification dans le popup
+                      setActiveDetections(prev => [{
+                        id: Date.now(),
+                        type: '🔄 FAUX NÉGATIF',
+                        fullName: 'Objet conforme récupéré par QC',
+                        decision: 'qc_recover',
+                        pci: 0,
+                        chlore: 0,
+                        danger: false,
+                        qcStatus: 'falseNegative' as const
+                      }, ...prev].slice(0, 6))
+                      ;(obj as any).onQCConveyor = 'conform'
+                      ;(obj as any).qcChecked = true
+                      await animatePivot(ncqcArm.pivot, 'x', 0, 0.1)
+                      await animatePivot(ncqcArm.pivot, 'y', -Math.PI / 2, 0.2)
+                    } finally {
+                      ncqcArm.isBusy = false
+                      obj.isBeingGrabbed = false
+                    }
+                  }
+                  animateNCQCArm()
+                }
+              }
+            }
+            
+            // Quand l'objet atteint l'incinérateur (z > 12)
+            if (obj.mesh.position.z > 12 && (obj as any).onQCConveyor === 'nonconform') {
+              const mat = obj.mesh.material as BABYLON.StandardMaterial
+              if (mat) mat.emissiveColor = new BABYLON.Color3(1, 0.3, 0)
+              window.setTimeout(() => {
+                if (obj.mesh) {
+                  obj.mesh.dispose()
+                  const idx = objectsRef.current.indexOf(obj)
+                  if (idx > -1) objectsRef.current.splice(idx, 1)
+                }
+              }, 500)
+              ;(obj as any).onQCConveyor = false
+            }
+          }
+        }
+
+        // Supprimer si hors de vue (incertains qui continuent sur le convoyeur principal)
+        if (obj.mesh.position.z > 15 && !obj.isBeingGrabbed && !(obj as any).onQCConveyor) {
           obj.mesh.dispose()
           objectsRef.current.splice(index, 1)
         }
@@ -727,35 +1151,57 @@ export default function FinalSimulation() {
           
           {activeDetections.length > 0 ? (
             <div className="space-y-2">
-              {activeDetections.slice(-3).reverse().map((detection, index) => (
+              {activeDetections.slice(-4).reverse().map((detection, index) => (
                 <div key={detection.id} className={`p-3 rounded-lg transition-all ${
                   index === 0 ? 'scale-100 opacity-100' : 'scale-95 opacity-70'
                 } ${
+                  detection.qcStatus === 'falsePositive' ? 'bg-orange-900/60 border-2 border-orange-500 animate-pulse' :
+                  detection.qcStatus === 'falseNegative' ? 'bg-teal-900/60 border-2 border-teal-500 animate-pulse' :
                   detection.decision === 'accept' ? 'bg-green-900/50 border border-green-700' :
                   detection.decision === 'reject' ? 'bg-red-900/50 border border-red-700' :
                   'bg-slate-800/50 border border-slate-600'
                 }`}>
                   <div className="flex items-center justify-between mb-1">
-                    <span className="text-sm font-bold text-white">{detection.type}</span>
+                    <span className={`text-sm font-bold ${
+                      detection.qcStatus === 'falsePositive' ? 'text-orange-300' :
+                      detection.qcStatus === 'falseNegative' ? 'text-teal-300' :
+                      'text-white'
+                    }`}>{detection.type}</span>
                     <div className="flex items-center gap-2">
                       {detection.danger && <span className="text-red-400 text-xs">⚠️</span>}
                       <span className={`text-xs px-2 py-0.5 rounded ${
+                        detection.qcStatus === 'falsePositive' ? 'bg-orange-600' :
+                        detection.qcStatus === 'falseNegative' ? 'bg-teal-600' :
                         detection.decision === 'accept' ? 'bg-green-600' :
                         detection.decision === 'reject' ? 'bg-red-600' :
                         'bg-slate-600'
                       } text-white`}>
-                        {detection.decision === 'accept' ? '✓' : detection.decision === 'reject' ? '✗' : '?'}
+                        {detection.qcStatus === 'falsePositive' ? 'FP' : 
+                         detection.qcStatus === 'falseNegative' ? 'FN' :
+                         detection.decision === 'accept' ? '✓' : 
+                         detection.decision === 'reject' ? '✗' : '?'}
                       </span>
                     </div>
                   </div>
                   <div className="flex items-center justify-between text-xs">
-                    <span className="text-slate-400">{detection.fullName}</span>
-                    <div className="flex gap-2">
-                      <span className="text-slate-300">{detection.pci} MJ/kg</span>
-                      {detection.chlore > 0 && (
-                        <span className="text-red-400">{detection.chlore}% Cl</span>
-                      )}
-                    </div>
+                    <span className={`${
+                      detection.qcStatus ? 'text-slate-300' : 'text-slate-400'
+                    }`}>{detection.fullName}</span>
+                    {!detection.qcStatus && (
+                      <div className="flex gap-2">
+                        <span className="text-slate-300">{detection.pci} MJ/kg</span>
+                        {detection.chlore > 0 && (
+                          <span className="text-red-400">{detection.chlore}% Cl</span>
+                        )}
+                      </div>
+                    )}
+                    {detection.qcStatus && (
+                      <span className={`font-medium ${
+                        detection.qcStatus === 'falsePositive' ? 'text-orange-400' : 'text-teal-400'
+                      }`}>
+                        {detection.qcStatus === 'falsePositive' ? 'Bras QC Orange' : 'Bras QC Vert'}
+                      </span>
+                    )}
                   </div>
                 </div>
               ))}

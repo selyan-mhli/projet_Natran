@@ -11,32 +11,76 @@ export default function Impact() {
       </div>
 
       {stats.total > 0 && (
-        <div className="bg-slate-900 rounded-xl p-6 text-white">
-          <h2 className="text-xl font-bold mb-4">Résultats Simulation</h2>
-          <div className="grid grid-cols-3 md:grid-cols-6 gap-4">
-            <div className="bg-white/10 rounded-lg p-3">
-              <p className="text-xs text-slate-400">Total</p>
-              <p className="text-xl font-bold">{stats.total}</p>
+        <div className="space-y-4">
+          <div className="bg-slate-900 rounded-xl p-6 text-white">
+            <h2 className="text-xl font-bold mb-4">Résultats Simulation - Tri</h2>
+            <div className="grid grid-cols-3 md:grid-cols-6 gap-4">
+              <div className="bg-white/10 rounded-lg p-3">
+                <p className="text-xs text-slate-400">Total</p>
+                <p className="text-xl font-bold">{stats.total}</p>
+              </div>
+              <div className="bg-white/10 rounded-lg p-3">
+                <p className="text-xs text-slate-400">Conformes</p>
+                <p className="text-xl font-bold text-green-400">{stats.accepted}</p>
+              </div>
+              <div className="bg-white/10 rounded-lg p-3">
+                <p className="text-xs text-slate-400">Rejetés</p>
+                <p className="text-xl font-bold text-red-400">{stats.rejected}</p>
+              </div>
+              <div className="bg-white/10 rounded-lg p-3">
+                <p className="text-xs text-slate-400">Chlore</p>
+                <p className="text-xl font-bold text-amber-400">{stats.chlore.toFixed(2)}%</p>
+              </div>
+              <div className="bg-white/10 rounded-lg p-3">
+                <p className="text-xs text-slate-400">PCI</p>
+                <p className="text-xl font-bold text-blue-400">{stats.pci.toFixed(1)} MJ/kg</p>
+              </div>
+              <div className="bg-white/10 rounded-lg p-3">
+                <p className="text-xs text-slate-400">Syngas</p>
+                <p className="text-xl font-bold text-green-400">{stats.syngasQuality.toFixed(0)}%</p>
+              </div>
             </div>
-            <div className="bg-white/10 rounded-lg p-3">
-              <p className="text-xs text-slate-400">Conformes</p>
-              <p className="text-xl font-bold text-green-400">{stats.accepted}</p>
-            </div>
-            <div className="bg-white/10 rounded-lg p-3">
-              <p className="text-xs text-slate-400">Rejetés</p>
-              <p className="text-xl font-bold text-red-400">{stats.rejected}</p>
-            </div>
-            <div className="bg-white/10 rounded-lg p-3">
-              <p className="text-xs text-slate-400">Chlore</p>
-              <p className="text-xl font-bold text-amber-400">{stats.chlore.toFixed(2)}%</p>
-            </div>
-            <div className="bg-white/10 rounded-lg p-3">
-              <p className="text-xs text-slate-400">PCI</p>
-              <p className="text-xl font-bold text-blue-400">{stats.pci.toFixed(1)}</p>
-            </div>
-            <div className="bg-white/10 rounded-lg p-3">
-              <p className="text-xs text-slate-400">Syngas</p>
-              <p className="text-xl font-bold text-green-400">{stats.syngasQuality.toFixed(0)}%</p>
+          </div>
+
+          <div className="bg-gradient-to-r from-orange-900 to-teal-900 rounded-xl p-6 text-white">
+            <h2 className="text-xl font-bold mb-4">Contrôle Qualité - Performance Modèle</h2>
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-3">
+              <div className="bg-white/10 rounded-lg p-3">
+                <p className="text-xs text-slate-300">Précision</p>
+                <p className="text-lg font-bold text-green-400">{stats.precision.toFixed(1)}%</p>
+              </div>
+              <div className="bg-white/10 rounded-lg p-3">
+                <p className="text-xs text-slate-300">Rappel</p>
+                <p className="text-lg font-bold text-green-400">{stats.recall.toFixed(1)}%</p>
+              </div>
+              <div className="bg-white/10 rounded-lg p-3">
+                <p className="text-xs text-slate-300">F1-Score</p>
+                <p className="text-lg font-bold text-green-400">{stats.f1Score.toFixed(1)}%</p>
+              </div>
+              <div className="bg-white/10 rounded-lg p-3">
+                <p className="text-xs text-slate-300">Vrais Positifs</p>
+                <p className="text-lg font-bold text-green-400">{stats.truePositives}</p>
+              </div>
+              <div className="bg-white/10 rounded-lg p-3">
+                <p className="text-xs text-slate-300">Vrais Négatifs</p>
+                <p className="text-lg font-bold text-green-400">{stats.trueNegatives}</p>
+              </div>
+              <div className="bg-orange-500/30 rounded-lg p-3">
+                <p className="text-xs text-orange-200">Faux Positifs</p>
+                <p className="text-lg font-bold text-orange-400">{stats.falsePositives}</p>
+                <p className="text-xs text-orange-300">~2.8%</p>
+              </div>
+              <div className="bg-teal-500/30 rounded-lg p-3">
+                <p className="text-xs text-teal-200">Faux Négatifs</p>
+                <p className="text-lg font-bold text-teal-400">{stats.falseNegatives}</p>
+                <p className="text-xs text-teal-300">~4.4%</p>
+              </div>
+              <div className="bg-white/10 rounded-lg p-3">
+                <p className="text-xs text-slate-300">Taux Erreur</p>
+                <p className="text-lg font-bold text-amber-400">
+                  {((stats.falsePositives + stats.falseNegatives) / Math.max(1, stats.total) * 100).toFixed(1)}%
+                </p>
+              </div>
             </div>
           </div>
         </div>

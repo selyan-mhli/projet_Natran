@@ -295,11 +295,20 @@ export default function Dashboard() {
 }
 
 function MetricCard({ title, value, icon: Icon, status, trend }: any) {
+  // Déterminer la couleur du trend selon son contenu
+  const getTrendColor = () => {
+    if (trend.startsWith('+')) return 'text-green-600'
+    if (trend.startsWith('-')) return 'text-red-600'
+    if (trend === 'YOLOv8' || trend === 'Modèle') return 'text-slate-400 text-xs'
+    if (trend.endsWith('%')) return 'text-slate-500'
+    return 'text-slate-400'
+  }
+  
   return (
     <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm">
       <div className="flex items-center justify-between mb-2">
         <Icon className={`w-8 h-8 ${status === 'good' ? 'text-slate-700' : 'text-amber-600'}`} />
-        <span className={`text-sm font-medium ${trend.startsWith('+') ? 'text-green-600' : 'text-red-600'}`}>
+        <span className={`text-sm font-medium ${getTrendColor()}`}>
           {trend}
         </span>
       </div>

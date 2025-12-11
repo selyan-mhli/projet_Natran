@@ -86,18 +86,27 @@ export function SimulationProvider({ children }: { children: ReactNode }) {
         updated.syngasQuality = Math.min(95, 60 + (tauxRejet * 25) + (tauxAccept * 10))
         
         // Calcul des métriques de performance du modèle
+        // Seulement si on a assez de données (>10 objets) pour avoir des stats significatives
         const tp = updated.truePositives
         const fp = updated.falsePositives
         const fn = updated.falseNegatives
         
-        if (tp + fp > 0) {
-          updated.precision = (tp / (tp + fp)) * 100
-        }
-        if (tp + fn > 0) {
-          updated.recall = (tp / (tp + fn)) * 100
-        }
-        if (updated.precision + updated.recall > 0) {
-          updated.f1Score = 2 * (updated.precision * updated.recall) / (updated.precision + updated.recall)
+        if (updated.total >= 10) {
+          // Calcul basé sur les données réelles
+          if (tp + fp > 0) {
+            updated.precision = (tp / (tp + fp)) * 100
+          }
+          if (tp + fn > 0) {
+            updated.recall = (tp / (tp + fn)) * 100
+          }
+          if (updated.precision > 0 && updated.recall > 0) {
+            updated.f1Score = 2 * (updated.precision * updated.recall) / (updated.precision + updated.recall)
+          }
+        } else {
+          // Garder les valeurs cibles du modèle YOLOv8 tant qu'on n'a pas assez de données
+          updated.precision = 97.2
+          updated.recall = 95.6
+          updated.f1Score = 96.4
         }
       }
       

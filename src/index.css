@@ -1,0 +1,50 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-white text-slate-900 antialiased;
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-semibold tracking-tight;
+  }
+}
+
+@layer utilities {
+  .glass-effect {
+    @apply bg-white/95 backdrop-blur-sm border border-slate-200 shadow-sm;
+  }
+  
+  .card {
+    @apply bg-white border border-slate-200 rounded-xl shadow-sm hover:shadow-md transition-shadow;
+  }
+  
+  .card-dark {
+    @apply bg-slate-900 border border-slate-800 rounded-xl text-white;
+  }
+  
+  .btn-primary {
+    @apply bg-slate-900 text-white px-6 py-3 rounded-lg font-medium hover:bg-slate-800 transition-colors;
+  }
+  
+  .btn-secondary {
+    @apply bg-white text-slate-900 px-6 py-3 rounded-lg font-medium border border-slate-300 hover:bg-slate-50 transition-colors;
+  }
+  
+  .section-title {
+    @apply text-2xl font-bold text-slate-900 mb-6;
+  }
+  
+  .stat-value {
+    @apply text-4xl font-bold tracking-tight;
+  }
+  
+  .stat-label {
+    @apply text-sm text-slate-500 uppercase tracking-wide;
+  }
+}

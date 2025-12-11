@@ -1,16 +1,37 @@
 {
-  "name": "natran-dashboard",
+  "name": "natran-csr-ai-demo",
   "version": "1.0.0",
-  "description": "Dashboard CSR - Unité Pilote",
-  "main": "serveur.js",
+  "description": "Démonstration IA pour tri intelligent des CSR en pyro-gazéification",
+  "type": "module",
   "scripts": {
-    "start": "node serveur.js",
-    "test-data": "node insert-test-data.js"
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
   },
   "dependencies": {
-    "express": "^4.18.2",
-    "cors": "^2.8.5",
-    "sqlite3": "^5.1.6"
+    "@babylonjs/core": "^8.40.1",
+    "@babylonjs/loaders": "^8.40.1",
+    "@babylonjs/materials": "^8.40.1",
+    "@react-three/cannon": "^6.6.0",
+    "@react-three/drei": "^9.88.0",
+    "@react-three/fiber": "^8.15.0",
+    "@types/three": "^0.181.0",
+    "clsx": "^2.0.0",
+    "lucide-react": "^0.294.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "recharts": "^2.10.3",
+    "tailwind-merge": "^2.1.0",
+    "three": "^0.181.2"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.43",
+    "@types/react-dom": "^18.2.17",
+    "@vitejs/plugin-react": "^4.2.1",
+    "autoprefixer": "^10.4.16",
+    "postcss": "^8.4.32",
+    "tailwindcss": "^3.3.6",
+    "typescript": "^5.3.3",
+    "vite": "^5.0.8"
   }
 }
-

@@ -3,74 +3,23 @@ import { Activity, AlertTriangle, CheckCircle, TrendingUp, Target, XCircle } fro
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 import { useSimulation } from '../context/SimulationContext'
 
-// Types de détection pour les notifications
-type DetectionType = 'normal' | 'falsePositive' | 'falseNegative'
-
-interface Detection {
-  id: number
-  type: string
-  confidence: number
-  time: string
-  detectionType: DetectionType
-}
-
 export default function Dashboard() {
   const { stats } = useSimulation()
-  const [detections, setDetections] = useState<Detection[]>([])
   const [qualityHistory, setQualityHistory] = useState<Array<{ time: string; chlore: number; syngas: number }>>([])
 
-  // Ajouter des détections basées sur la simulation
+  // Historique qualité syngas et chlore
   useEffect(() => {
     if (stats.total === 0) {
-      setDetections([])
       setQualityHistory([])
       return
     }
     
-    const materials = ['PE/PP', 'Papier/Carton', 'Bois', 'PVC (Chloré)', 'Métaux ferreux', 'Textile']
-    const newDetection: Detection = {
-      id: Date.now(),
-      type: materials[Math.floor(Math.random() * materials.length)],
-      confidence: 88 + Math.random() * 11,
-      time: new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
-      detectionType: 'normal'
-    }
-    setDetections(prev => [newDetection, ...prev].slice(0, 12))
-    
-    // Historique qualité syngas et chlore
     setQualityHistory(prev => [...prev, {
       time: new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
       chlore: stats.chlore,
       syngas: stats.syngasQuality
     }].slice(-15))
   }, [stats.total, stats.chlore, stats.syngasQuality])
-
-  // Ajouter notification quand faux positif/négatif détecté
-  useEffect(() => {
-    if (stats.falsePositives > 0) {
-      const fpDetection: Detection = {
-        id: Date.now() + 1,
-        type: '⚠️ FAUX POSITIF détecté',
-        confidence: 0,
-        time: new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
-        detectionType: 'falsePositive'
-      }
-      setDetections(prev => [fpDetection, ...prev].slice(0, 12))
-    }
-  }, [stats.falsePositives])
-
-  useEffect(() => {
-    if (stats.falseNegatives > 0) {
-      const fnDetection: Detection = {
-        id: Date.now() + 2,
-        type: '🔄 FAUX NÉGATIF récupéré',
-        confidence: 0,
-        time: new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
-        detectionType: 'falseNegative'
-      }
-      setDetections(prev => [fnDetection, ...prev].slice(0, 12))
-    }
-  }, [stats.falseNegatives])
 
   // Données vides si simulation pas lancée
   const isSimulationActive = stats.total > 0
@@ -155,58 +104,25 @@ export default function Dashboard() {
           value={`${stats.falsePositives}`}
           icon={XCircle}
           status={stats.falsePositives === 0 ? 'good' : 'warning'}
-          trend={`${((stats.falsePositives / Math.max(1, stats.truePositives + stats.falsePositives)) * 100).toFixed(1)}%`}
+          trend={`${((stats.falsePositives / Math.max(1, stats.total)) * 100).toFixed(1)}% du total`}
         />
         <MetricCard
           title="Faux Négatifs"
           value={`${stats.falseNegatives}`}
           icon={XCircle}
           status={stats.falseNegatives === 0 ? 'good' : 'warning'}
-          trend={`${((stats.falseNegatives / Math.max(1, stats.trueNegatives + stats.falseNegatives)) * 100).toFixed(1)}%`}
+          trend={`${((stats.falseNegatives / Math.max(1, stats.total)) * 100).toFixed(1)}% du total`}
         />
         <MetricCard
           title="Vrais Positifs"
           value={`${stats.truePositives}`}
           icon={CheckCircle}
           status="good"
-          trend={`${((stats.truePositives / Math.max(1, stats.total)) * 100).toFixed(0)}%`}
+          trend={`${((stats.truePositives / Math.max(1, stats.total)) * 100).toFixed(0)}% du total`}
         />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm">
-          <h3 className="text-xl font-bold mb-4 text-slate-900">Flux de détection en temps réel</h3>
-          {detections.length > 0 ? (
-            <div className="space-y-2 max-h-96 overflow-y-auto">
-              {detections.map((detection) => (
-                <div key={detection.id} className={`flex items-center justify-between p-3 rounded-lg border ${getDetectionStyle(detection.detectionType)}`}>
-                  <div className="flex items-center gap-3">
-                    <div className={`w-3 h-3 rounded-full ${detection.detectionType === 'normal' ? getMaterialColor(detection.type) : detection.detectionType === 'falsePositive' ? 'bg-orange-500' : 'bg-teal-500'}`}></div>
-                    <div>
-                      <p className={`font-medium ${detection.detectionType === 'falsePositive' ? 'text-orange-700' : detection.detectionType === 'falseNegative' ? 'text-teal-700' : 'text-slate-900'}`}>{detection.type}</p>
-                      <p className="text-xs text-slate-500">{detection.time}</p>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    {detection.detectionType === 'normal' ? (
-                      <>
-                        <p className="text-sm font-medium text-slate-700">{detection.confidence.toFixed(1)}%</p>
-                        <p className="text-xs text-slate-500">Confiance</p>
-                      </>
-                    ) : (
-                      <p className={`text-xs font-medium ${detection.detectionType === 'falsePositive' ? 'text-orange-600' : 'text-teal-600'}`}>
-                        {detection.detectionType === 'falsePositive' ? 'QC Orange' : 'QC Vert'}
-                      </p>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <p className="text-slate-500 text-center py-8">En attente de détections...</p>
-          )}
-        </div>
-
+      <div className="grid grid-cols-1 lg:grid-cols-1 gap-6">
         <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm">
           <h3 className="text-xl font-bold mb-4 text-slate-900">Répartition du tri</h3>
           {compositionData.length > 0 ? (
@@ -318,25 +234,3 @@ function MetricCard({ title, value, icon: Icon, status, trend }: any) {
   )
 }
 
-function getMaterialColor(type: string) {
-  const colors: Record<string, string> = {
-    'PVC (Chloré)': 'bg-red-500',
-    'PE/PP': 'bg-blue-500',
-    'Papier/Carton': 'bg-amber-500',
-    'Métaux ferreux': 'bg-gray-500',
-    'Bois': 'bg-amber-700',
-    'Textile': 'bg-purple-500'
-  }
-  return colors[type] || 'bg-slate-500'
-}
-
-function getDetectionStyle(detectionType: string) {
-  switch (detectionType) {
-    case 'falsePositive':
-      return 'bg-orange-50 border-orange-200'
-    case 'falseNegative':
-      return 'bg-teal-50 border-teal-200'
-    default:
-      return 'bg-slate-50 border-slate-100'
-  }
-}

@@ -825,6 +825,13 @@ export default function FinalSimulation() {
                 danger: obj.danger
               }].slice(-6)) // Garder max 6 détections
               
+              // Enregistrer TP/TN dès la détection (sera corrigé si FP/FN plus tard)
+              if (targetSide === 'left') {
+                updateStats({ truePositives: stats.truePositives + 1 })
+              } else {
+                updateStats({ trueNegatives: stats.trueNegatives + 1 })
+              }
+              
               // Pour les conformes: déposer sur le convoyeur QC conformes (vers le réacteur)
               // Pour les non-conformes: déposer sur le convoyeur QC non-conformes (vers l'incinérateur)
               const dropPos = targetSide === 'left' 
@@ -878,7 +885,7 @@ export default function FinalSimulation() {
                   // 11. RETOUR POSITION INITIALE
                   await animatePivot(availableArm.pivot, 'y', restAngle, 0.3)
                   
-                  // Marquer pour le convoyeur QC approprié
+                  // Marquer pour le convoyeur QC approprié (stats déjà enregistrées à la détection)
                   obj.isBeingGrabbed = false
                   if (targetSide === 'left') {
                     // Conformes → convoyeur QC conformes → réacteur
@@ -910,19 +917,39 @@ export default function FinalSimulation() {
           
           if (qcStatus === 'conform') {
             // CONFORMES → vers le réacteur
-            // 2.8% de faux positif (précision 97.2% - basé sur études YOLOv8)
+            // 50% de faux positif pour démo visible
             if (obj.mesh.position.z > 9.5 && obj.mesh.position.z < 10.2 && !(obj as any).qcChecked) {
               (obj as any).qcChecked = true
-              // Enregistrer comme True Positive par défaut
-              updateStats({ truePositives: stats.truePositives + 1 })
-              if (Math.random() < 0.028) {
+              // TP déjà enregistré au moment du tri initial
+              const randomFP = Math.random()
+              console.log('QC Check conform:', obj.type, 'random:', randomFP, 'will be FP:', randomFP < 0.5)
+              if (randomFP < 0.5) {
                 // Faux positif détecté! Le bras QC orange va l'éjecter
                 const qcArm = armsRef.current.find(a => a.side === 'qc' && !a.isBusy)
+                console.log('QC Arm found:', qcArm ? 'yes' : 'no', 'busy:', qcArm?.isBusy)
                 if (qcArm) {
                   obj.isBeingGrabbed = true
                   qcArm.isBusy = true
+                  ;(obj as any).onQCConveyor = false // Arrêter l'objet immédiatement
                   const mat = obj.mesh.material as BABYLON.StandardMaterial
                   if (mat) mat.emissiveColor = new BABYLON.Color3(1, 0.3, 0)
+                  
+                  // Enregistrer comme faux positif (corriger le TP enregistré au tri)
+                  updateStats({ 
+                    falsePositives: stats.falsePositives + 1,
+                    truePositives: Math.max(0, stats.truePositives - 1)
+                  })
+                  // Ajouter notification dans le popup IMMÉDIATEMENT
+                  setActiveDetections(prev => [{
+                    id: Date.now(),
+                    type: '⚠️ FAUX POSITIF',
+                    fullName: 'Erreur de classification corrigée par QC',
+                    decision: 'qc_reject',
+                    pci: 0,
+                    chlore: 0,
+                    danger: false,
+                    qcStatus: 'falsePositive' as const
+                  }, ...prev].slice(0, 6))
                   
                   // Animation du bras QC
                   const animateQCArm = async () => {
@@ -942,22 +969,7 @@ export default function FinalSimulation() {
                       obj.mesh.position = new BABYLON.Vector3(-8, 0.5, 10)
                       await animatePivot(qcArm.pivot, 'x', 0, 0.1)
                       await animatePivot(qcArm.pivot, 'y', Math.PI / 2, 0.2)
-                      // Supprimer après délai et enregistrer comme faux positif
-                      updateStats({ 
-                        falsePositives: stats.falsePositives + 1,
-                        truePositives: stats.truePositives - 1 // Corriger le TP enregistré avant
-                      })
-                      // Ajouter notification dans le popup
-                      setActiveDetections(prev => [{
-                        id: Date.now(),
-                        type: '⚠️ FAUX POSITIF',
-                        fullName: 'Erreur de classification corrigée par QC',
-                        decision: 'qc_reject',
-                        pci: 0,
-                        chlore: 0,
-                        danger: false,
-                        qcStatus: 'falsePositive' as const
-                      }, ...prev].slice(0, 6))
+                      // Supprimer après délai
                       window.setTimeout(() => {
                         if (obj.mesh) {
                           obj.mesh.dispose()
@@ -971,7 +983,6 @@ export default function FinalSimulation() {
                     }
                   }
                   animateQCArm()
-                  ;(obj as any).onQCConveyor = false
                 }
               }
             }
@@ -991,19 +1002,39 @@ export default function FinalSimulation() {
             }
           } else if (qcStatus === 'nonconform') {
             // NON-CONFORMES → vers l'incinérateur
-            // 4.4% de faux négatif (rappel 95.6% - basé sur études YOLOv8)
+            // 50% de faux négatif pour démo visible
             if (obj.mesh.position.z > 9.5 && obj.mesh.position.z < 10.2 && !(obj as any).qcChecked) {
               (obj as any).qcChecked = true
-              // Enregistrer comme True Negative par défaut
-              updateStats({ trueNegatives: stats.trueNegatives + 1 })
-              if (Math.random() < 0.044) {
+              // TN déjà enregistré au moment du tri initial
+              const randomFN = Math.random()
+              console.log('QC Check nonconform:', obj.type, 'random:', randomFN, 'will be FN:', randomFN < 0.5)
+              if (randomFN < 0.5) {
                 // Faux négatif! Le bras QC vert va le récupérer
                 const ncqcArm = armsRef.current.find(a => a.side === 'ncqc' && !a.isBusy)
+                console.log('NCQC Arm found:', ncqcArm ? 'yes' : 'no', 'busy:', ncqcArm?.isBusy)
                 if (ncqcArm) {
                   obj.isBeingGrabbed = true
                   ncqcArm.isBusy = true
+                  ;(obj as any).onQCConveyor = false // Arrêter l'objet immédiatement
                   const mat = obj.mesh.material as BABYLON.StandardMaterial
                   if (mat) mat.emissiveColor = new BABYLON.Color3(0, 1, 0.5)
+                  
+                  // Enregistrer comme faux négatif (corriger le TN enregistré au tri)
+                  updateStats({ 
+                    falseNegatives: stats.falseNegatives + 1,
+                    trueNegatives: Math.max(0, stats.trueNegatives - 1)
+                  })
+                  // Ajouter notification dans le popup IMMÉDIATEMENT
+                  setActiveDetections(prev => [{
+                    id: Date.now(),
+                    type: '🔄 FAUX NÉGATIF',
+                    fullName: 'Objet conforme récupéré par QC',
+                    decision: 'qc_recover',
+                    pci: 0,
+                    chlore: 0,
+                    danger: false,
+                    qcStatus: 'falseNegative' as const
+                  }, ...prev].slice(0, 6))
                   
                   // Animation du bras QC vert
                   const animateNCQCArm = async () => {
@@ -1016,24 +1047,9 @@ export default function FinalSimulation() {
                       // Tourner vers le convoyeur conformes
                       await animatePivot(ncqcArm.pivot, 'y', -Math.PI, 0.3)
                       await animatePivot(ncqcArm.pivot, 'x', -0.15, 0.1)
-                      // Lâcher sur le convoyeur conformes et enregistrer comme faux négatif
+                      // Lâcher sur le convoyeur conformes
                       obj.mesh.parent = null
                       obj.mesh.position = new BABYLON.Vector3(-5, 0.4, 10)
-                      updateStats({ 
-                        falseNegatives: stats.falseNegatives + 1,
-                        trueNegatives: stats.trueNegatives - 1 // Corriger le TN enregistré avant
-                      })
-                      // Ajouter notification dans le popup
-                      setActiveDetections(prev => [{
-                        id: Date.now(),
-                        type: '🔄 FAUX NÉGATIF',
-                        fullName: 'Objet conforme récupéré par QC',
-                        decision: 'qc_recover',
-                        pci: 0,
-                        chlore: 0,
-                        danger: false,
-                        qcStatus: 'falseNegative' as const
-                      }, ...prev].slice(0, 6))
                       ;(obj as any).onQCConveyor = 'conform'
                       ;(obj as any).qcChecked = true
                       await animatePivot(ncqcArm.pivot, 'x', 0, 0.1)

@@ -23,7 +23,7 @@ export default function Header({ activeTab, setActiveTab }: HeaderProps) {
               <Flame className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h1 className="text-xl font-bold text-slate-900 tracking-tight">NATRAN</h1>
+              <h1 className="text-xl font-bold text-slate-900 tracking-tight">C.U.R.I.E</h1>
               <p className="text-sm text-slate-500">Tri intelligent des CSR par IA</p>
             </div>
           </div>

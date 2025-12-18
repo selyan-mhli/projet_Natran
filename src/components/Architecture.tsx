@@ -10,7 +10,7 @@ export default function Architecture() {
             <Workflow className="w-6 h-6" />
           </div>
           <div>
-            <h1 className="text-3xl font-bold">Architecture NATRAN</h1>
+            <h1 className="text-3xl font-bold">Architecture C.U.R.I.E</h1>
             <p className="text-slate-300">Système de Tri Prédictif par Intelligence Artificielle</p>
           </div>
         </div>
@@ -170,7 +170,7 @@ export default function Architecture() {
           </div>
           <div>
             <h3 className="text-xl font-bold text-slate-900">Infrastructure Matérielle</h3>
-            <p className="text-sm text-slate-500">Composants du système NATRAN</p>
+            <p className="text-sm text-slate-500">Composants du système C.U.R.I.E</p>
           </div>
         </div>
 
@@ -287,7 +287,7 @@ export default function Architecture() {
 
       {/* Section Avantages */}
       <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-2xl p-8 text-white">
-        <h3 className="text-2xl font-bold mb-6">Avantages de l'Architecture NATRAN</h3>
+        <h3 className="text-2xl font-bold mb-6">Avantages de l'Architecture C.U.R.I.E</h3>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <AdvantageCard
@@ -332,14 +332,14 @@ export default function Architecture() {
       {/* Section Schéma Technique - Version Moderne */}
       <div className="bg-gradient-to-br from-slate-50 to-slate-100 rounded-2xl p-8 border border-slate-200 shadow-sm">
         <h3 className="text-2xl font-bold text-slate-900 mb-2">Schéma de Communication</h3>
-        <p className="text-slate-600 mb-8">Architecture temps réel du système NATRAN</p>
+        <p className="text-slate-600 mb-8">Architecture temps réel du système C.U.R.I.E</p>
         
         <div className="relative bg-white rounded-2xl p-8 border border-slate-200 shadow-inner overflow-hidden">
           {/* Titre du système */}
           <div className="absolute top-0 left-0 right-0 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 text-white py-3 px-6 rounded-t-2xl">
             <div className="flex items-center justify-center gap-3">
               <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
-              <span className="font-bold tracking-wide">SYSTÈME NATRAN</span>
+              <span className="font-bold tracking-wide">SYSTÈME C.U.R.I.E</span>
               <span className="text-slate-400 text-sm">• Actif</span>
             </div>
           </div>
